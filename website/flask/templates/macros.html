@@ -53,36 +53,27 @@
 										</div>
 									</div>
 								</div>
-								<i class="fa fa-info-circle canned-analysis-info-icon" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" data-content="
-									<div class='canned-analysis-info-popover'>
-										<div class='row'>
-											<div class='col-12'>
-												Datasets
-											</div>
-										</div>
+								<i class="fa fa-info-circle canned-analysis-info-icon" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" title="Datasets" data-template='<div class="popover canned-analysis-info-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="
 										{% for dataset in canned_analysis.datasets %}
-										<div class='row'>
+										<div class='row canned-analysis-info-popover-dataset'>
 											<div class='col-12'>
 												<a href='#'>{{dataset.dataset_accession}}</a>
 											</div>
 										</div>
 										{% endfor %}
-										<div class='row'>
-											<div class='col-12'>
-												Metadata
-											</div>
+										<div class='popover-title canned-analysis-info-popover-metadata-title'>
+											Metadata
 										</div>
 										{% for key, value in canned_analysis.metadata.iteritems() %}
-										<div class='row'>
-											<div class='col-6'>
+										<div class='row canned-analysis-info-popover-metadata'>
+											<div class='col-6 canned-analysis-info-popover-metadata-tag'>
 												{{key}}
 											</div>
-											<div class='col-6 text-right'>
+											<div class='col-6 canned-analysis-info-popover-metadata-value'>
 												{{value}}
 											</div>
 										</div>
 										{% endfor %}
-									</div>
 								"></i>
 							</div> <!-- .canned-analysis-info-col -->
 						</div>

@@ -37,7 +37,7 @@
 /*************************/
 
 .canned-analysis-row {
-	margin-top: 20px;
+	margin-top: 10px;
 }
 
 	.canned-analysis-col {
@@ -45,7 +45,7 @@
 	}
 
 		.canned-analysis-card {
-			padding: 15px 15px;
+			padding: 13px;
 			background-color: white;
 			border: 1px solid #c2c2c2;
 			border-radius: 5px;
@@ -64,11 +64,11 @@
 			}
 
 				.canned-analysis-title-col {
-					height: 70px;
+					height: 60px;
 				}
 
 					.canned-analysis-title {
-						font-size: 9pt;
+						font-size: 8pt;
 						color: darkblue;
 						line-height: 1.5;
 						font-weight: 600;
@@ -80,10 +80,9 @@
 				}
 
 					.canned-analysis-tool a {
-						font-size: 9pt;
+						font-size: 8pt;
 						color: darkblue;
 						font-weight: 400;
-						padding-top: 5px;
 					}
 
 						.canned-analysis-tool a:hover, .canned-analysis-tool a:focus {
@@ -102,7 +101,7 @@
 						}
 
 							.canned-analysis-tool-popover ul a {
-								font-size: 10pt;
+								font-size: 8pt;
 								color: darkblue;
 								font-weight: 400;
 							}
@@ -113,10 +112,62 @@
 					right: 9px;
 					color: darkgrey;
 					cursor: pointer;
+					font-size: 10pt;
 				}
 
 					.canned-analysis-info-icon:focus {
 						outline: none;
 					}
+
+					.canned-analysis-info-popover {
+						width: 200px;
+						font-size: 9pt;
+					}
+
+
+						.canned-analysis-info-popover .popover-title {
+							padding: 5px 10px;
+							margin-bottom: 0px;
+							font-weight: 600;
+							text-align: left;
+							font-size: 9pt;
+						}
+
+						.canned-analysis-info-popover .popover-content {
+							padding: 0px;
+						}
+
+							.canned-analysis-info-popover-dataset {
+								border-bottom: 1px solid #f2f2f2;
+								font-size: 9pt;
+								padding: 3px 10px;
+							}
+
+							.canned-analysis-info-popover-metadata-title {
+								padding: 7px 7px;
+							}
+
+								.canned-analysis-info-popover-metadata-title .col-12 {
+									padding: 0px;
+								}
+
+							.canned-analysis-info-popover-metadata {
+								border-bottom: 1px solid #f2f2f2;
+								padding: 3px 10px;
+							}
+
+								.canned-analysis-info-popover-metadata-tag {
+									padding: 2px 15px;
+									font-weight: 600;
+									font-style: italic;
+								}
+
+								.canned-analysis-info-popover-metadata-value {
+									padding: 2px 15px;
+									text-align: right;
+									font-weight: 200;
+								}
+
+
 
 
