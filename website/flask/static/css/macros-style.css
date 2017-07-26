@@ -121,7 +121,7 @@
 
 					.canned-analysis-info-popover {
 						width: 200px;
-						font-size: 9pt;
+						font-size: 8pt;
 					}
 
 
@@ -139,8 +139,7 @@
 
 							.canned-analysis-info-popover-dataset {
 								border-bottom: 1px solid #f2f2f2;
-								font-size: 9pt;
-								padding: 3px 10px;
+								padding: 5px 10px;
 							}
 
 							.canned-analysis-info-popover-metadata-title {
@@ -156,17 +155,19 @@
 								padding: 3px 10px;
 							}
 
-								.canned-analysis-info-popover-metadata-tag {
+								.canned-analysis-info-popover-metadata .col-6 {
 									padding: 2px 15px;
-									font-weight: 600;
-									font-style: italic;
 								}
 
-								.canned-analysis-info-popover-metadata-value {
-									padding: 2px 15px;
-									text-align: right;
-									font-weight: 200;
-								}
+									.canned-analysis-info-popover-metadata-tag {
+										font-weight: 600;
+										font-style: italic;
+									}
+
+									.canned-analysis-info-popover-metadata-value {
+										text-align: right;
+										font-weight: 200;
+									}
 
 
 
