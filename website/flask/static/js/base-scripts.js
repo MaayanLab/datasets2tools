@@ -11,6 +11,13 @@ function main() {
 		$('#signup-modal').modal('show');
 	}
 
+	$(document).ready(function(){
+	    $('[data-toggle="tooltip"]').tooltip(); 
+	});
+
+	$(function () {
+		  $('[data-toggle="popover"]').popover()
+	});
 }
 
 main();

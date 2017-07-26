@@ -2,14 +2,19 @@
 /** WEBPAGE 
 /*************************/
 
-body {
-	margin-bottom: 125px;
+html {
+	background-color: #f2f2f2;
 }
 
-	.container {
-		max-width: 900px;
-		min-width: 300px;
+	body {
+		margin-bottom: 125px;
+		background-color: #f2f2f2;
 	}
+
+		.container {
+			max-width: 900px;
+			min-width: 300px;
+		}
 
 /*************************/
 /** NAVBAR 
@@ -17,11 +22,11 @@ body {
 
 #navbar {
 	/*font-family: 'Helvetica';*/
-	font-size: 11pt;
+	font-size: 9pt;
 }
 
 	#d2t-logo {
-		height: 30px;
+		height: 27px;
 	}
 
 	#search-form {
@@ -30,8 +35,8 @@ body {
 	}
 
 		#search-form input {
-			width: 80%;
-			height: 29px;
+			width: 85%;
+			height: 27px;
 			font-size: 10pt;
 			background-color: #e1e1e1;
 			border-radius: 5px 0px 0px 5px;
@@ -39,8 +44,8 @@ body {
 		}
 
 		#search-form button {
-			height: 29px;
-			width: 29px;
+			height: 27px;
+			width: 27px;
 			background-color: #e1e1e1;
 			border-radius: 0px 5px 5px 0px;
 			border: none;
@@ -51,7 +56,7 @@ body {
 		}
 
 	.nav-link {
-		margin-right: 10px;
+		margin-right: 15px;
 		font-weight: 500;
 	}
 
@@ -90,6 +95,7 @@ body {
 			border-radius: 5px;
 			cursor: pointer;
 			margin-left: 5px;
+			font-size: 9pt;
 		}
 
 			#user-dropdown span {
@@ -108,7 +114,7 @@ body {
 				}
 
 				#user-dropdown-content .fa-user {
-					font-size: 13pt;
+					font-size: 9pt;
 				}
 
 /*************************/

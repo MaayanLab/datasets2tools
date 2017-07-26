@@ -1,0 +1,122 @@
+/*************************/
+/** OVERVIEW 
+/*************************/
+
+	#overview {
+
+	}
+
+		.overview-row {
+			padding: 25px 0px;
+		}
+
+			.overview-row .col-2 {
+				padding-left: 0;
+			}
+
+				.overview-label {
+					background-color: #255FA7;
+					color: white;
+					border-radius: 7px;
+					padding: 10px 20px;
+					text-align: center;
+					font-size: 13pt;
+					font-weight: 600;
+					width: 100%;
+					height: 100%;
+				}
+
+				.overview-value {
+					padding: 10px 5px;
+					font-size: 12pt;
+					font-weight: 300;
+				}
+
+/*************************/
+/** CANNED ANALYSIS 
+/*************************/
+
+.canned-analysis-row {
+	margin-top: 20px;
+}
+
+	.canned-analysis-col {
+		padding: 10px 15px;
+	}
+
+		.canned-analysis-card {
+			padding: 15px 15px;
+			background-color: white;
+			border: 1px solid #c2c2c2;
+			border-radius: 5px;
+		}
+
+			.canned-analysis-preview-col {
+				margin: auto;
+			}
+
+				.canned-analysis-preview-icon {
+					max-width: 100%;
+				}
+
+			.canned-analysis-info-col {
+				padding-left: 0px;
+			}
+
+				.canned-analysis-title-col {
+					height: 70px;
+				}
+
+					.canned-analysis-title {
+						font-size: 9pt;
+						color: darkblue;
+						line-height: 1.5;
+						font-weight: 600;
+						display: block;
+					}
+
+				.canned-analysis-tool {
+
+				}
+
+					.canned-analysis-tool a {
+						font-size: 9pt;
+						color: darkblue;
+						font-weight: 400;
+						padding-top: 5px;
+					}
+
+						.canned-analysis-tool a:hover, .canned-analysis-tool a:focus {
+							outline: none;
+							text-decoration: none;
+						}
+
+					.canned-analysis-tool-popover {
+						padding: 0px;
+					}
+						
+						.canned-analysis-tool-popover ul {
+							list-style: none;
+							padding: 0px;
+							margin: 0px;
+						}
+
+							.canned-analysis-tool-popover ul a {
+								font-size: 10pt;
+								color: darkblue;
+								font-weight: 400;
+							}
+
+				.canned-analysis-info-icon {
+					position: absolute;
+					bottom: -7px;
+					right: 9px;
+					color: darkgrey;
+					cursor: pointer;
+				}
+
+					.canned-analysis-info-icon:focus {
+						outline: none;
+					}
+
+

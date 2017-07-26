@@ -1,0 +1,94 @@
+<!-- Object Overview -->
+{% macro display_object_overview(object_data) %}
+	{% for key, value in object_data.iteritems() %}
+		<div class="row overview-row">
+			<div class="col-2">
+				<div class="overview-label">
+					<span class="align-middle">{{key.replace('_', ' ').title()}}</span>
+				</div>
+			</div>
+			<div class="col-10">
+				<div class="overview-value">
+					{{value}}
+				</div>
+			</div>
+		</div>
+	{% endfor %}
+{% endmacro %}
+
+<!-- Canned Analysis -->
+{% macro display_canned_analyses(canned_analysis_list) %}
+	<div class="row canned-analysis-row">
+		{% for canned_analysis in canned_analysis_list %}
+			{% for i in range(50) %}
+				<div class="col-4 canned-analysis-col">
+					<div class="canned-analysis-card">
+						<div class="row">
+							<div class="col-5 canned-analysis-preview-col">
+								<a href="#">
+									<img class="canned-analysis-preview-icon" src="{{canned_analysis.canned_analysis_preview_url}}">
+								</a>
+							</div>
+							<div class="col-7 canned-analysis-info-col">
+								<div class="row">
+									<div class="col-12 canned-analysis-title-col">
+										<a href="#" class="canned-analysis-title">
+											{{canned_analysis.canned_analysis_title}}
+										</a>
+										<div class="canned-analysis-tool">
+										{% if canned_analysis.tools|length == 1%}
+											<a href="#">{{canned_analysis.tools[0].tool_name}}</a>
+										{% else %}
+											<a href="#" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" data-content="
+												<div class='canned-analysis-tool-popover'>
+													<ul>
+													{% for tool in canned_analysis.tools %}
+														<li><a href='#'>{{tool.tool_name}}</a></li>
+													{% endfor %}
+													</ul>
+												</div>
+											">
+											{{canned_analysis.tools|length}} tools</a>
+										{% endif %}
+										</div>
+									</div>
+								</div>
+								<i class="fa fa-info-circle canned-analysis-info-icon" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" data-content="
+									<div class='canned-analysis-info-popover'>
+										<div class='row'>
+											<div class='col-12'>
+												Datasets
+											</div>
+										</div>
+										{% for dataset in canned_analysis.datasets %}
+										<div class='row'>
+											<div class='col-12'>
+												<a href='#'>{{dataset.dataset_accession}}</a>
+											</div>
+										</div>
+										{% endfor %}
+										<div class='row'>
+											<div class='col-12'>
+												Metadata
+											</div>
+										</div>
+										{% for key, value in canned_analysis.metadata.iteritems() %}
+										<div class='row'>
+											<div class='col-6'>
+												{{key}}
+											</div>
+											<div class='col-6 text-right'>
+												{{value}}
+											</div>
+										</div>
+										{% endfor %}
+									</div>
+								"></i>
+							</div> <!-- .canned-analysis-info-col -->
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		{% endfor %}
+	</div>
+{% endmacro %}

@@ -1,3 +1,4 @@
+# Modules
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -6,6 +7,7 @@ import pandas as pd
 import os, json
 from sqlalchemy.exc import IntegrityError
 
+# Configure
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:MyNewPass@localhost/datasets2tools'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -14,6 +16,7 @@ db = SQLAlchemy(app)
 engine = db.engine
 entry_point = '/datasets2tools'
 
+# Login
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -27,10 +30,6 @@ class User(UserMixin, db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-
-@app.route(entry_point)
-def index():
-	return render_template('index.html', entry_point=entry_point)
 
 @app.route(entry_point+'/login', methods=['POST'])
 def login():
@@ -68,6 +67,50 @@ def signup():
 def logout():
 	logout_user()
 	return redirect(url_for('index'))
+
+# Routes
+@app.route(entry_point)
+def index():
+	return render_template('index.html')
+
+@app.route(entry_point+'/dataset')
+def dataset_landing():
+	dataset = {'dataset_accession': 'GSE68203', 'dataset_type': 'RNA-seq', 'date': 'May 27th, 2017'}
+	canned_analysis_list = [
+		{
+			'canned_analysis_preview_url': 'https://github.com/denis-torre/images/blob/master/genemania/1.png?raw=true',
+			'canned_analysis_title': 'Enrichment analysis of genes upregulated in cancer',
+			'tools': [
+				{
+					'tool_name': 'GeneMANIA'
+				},
+				{
+					'tool_name': 'Enrichr'
+				},
+				{
+					'tool_name': 'L1000CDS2'
+				}],
+			'datasets': [
+				{
+					'dataset_accession': 'GSE68203'
+				},
+				{
+					'dataset_accession': 'GSE68205'
+				},
+				{
+					'dataset_accession': 'GSE68209'
+				}
+			],
+			'metadata': {
+				'alpha': 'beta',
+				'gamma': 'delta',
+				'epsilon': 'zeta'
+			}
+		}
+	]
+
+	return render_template('dataset_landing.html', dataset=dataset, canned_analysis_list=canned_analysis_list)
+
 
 if __name__ == "__main__":
 	app.run(debug=True, host='0.0.0.0')
