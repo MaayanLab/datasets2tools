@@ -1,0 +1,192 @@
+/*************************/
+/** WEBPAGE 
+/*************************/
+
+body {
+	margin-bottom: 125px;
+}
+
+	.container {
+		max-width: 900px;
+		min-width: 300px;
+	}
+
+/*************************/
+/** NAVBAR 
+/*************************/
+
+#navbar {
+	/*font-family: 'Helvetica';*/
+	font-size: 11pt;
+}
+
+	#d2t-logo {
+		height: 30px;
+	}
+
+	#search-form {
+		min-width: 300px;
+		margin-left: 15px;
+	}
+
+		#search-form input {
+			width: 80%;
+			height: 29px;
+			font-size: 10pt;
+			background-color: #e1e1e1;
+			border-radius: 5px 0px 0px 5px;
+			border: none;
+		}
+
+		#search-form button {
+			height: 29px;
+			width: 29px;
+			background-color: #e1e1e1;
+			border-radius: 0px 5px 5px 0px;
+			border: none;
+			border-left: 1px solid rgba(0,0,0,.1);
+			font-size: 11pt;
+			padding: 0;
+			color: grey;
+		}
+
+	.nav-link {
+		margin-right: 10px;
+		font-weight: 500;
+	}
+
+	#sign-in {
+		background-color: #255FA7;
+		border-radius: 5px;
+		padding-left: 1rem;
+		padding-right: 1rem;
+		margin-right: 0px;
+		margin-left: 10px;
+		color: white;
+		cursor: pointer;
+	}
+
+	@media (max-width: 992px) {
+		.nav-link,
+		#search-form {
+			padding: 15px 0px;
+		}
+
+		#search-form {
+			padding-top: 30px;
+		}
+
+	}
+
+	#navbar li:last-child {
+		margin-top: auto;
+		margin-bottom: auto;
+	}
+
+		#user-dropdown {
+			color: white;
+			background-color: #255FA7;
+			padding: 5px 10px;
+			border-radius: 5px;
+			cursor: pointer;
+			margin-left: 5px;
+		}
+
+			#user-dropdown span {
+				font-family: "FontAwesome";
+				margin-right: 9px;
+			}
+
+			#user-dropdown-content {
+				display: table;
+			}
+
+				#user-dropdown-content i,
+				#user-dropdown-content span {
+					display: table-cell;
+					vertical-align: middle;
+				}
+
+				#user-dropdown-content .fa-user {
+					font-size: 13pt;
+				}
+
+/*************************/
+/** FOOTER 
+/*************************/
+
+#footer {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	height: 125px;
+	padding: 15px;
+	color: white;
+	font-size: 8pt;
+	display: none;
+}
+
+	#footer ul {
+	  list-style-type: none;
+	  padding: 0;
+	}
+
+	#footer a {
+	  color: white;
+	}
+
+	#footer img {
+		margin-bottom: 10px;
+	}
+
+/*************************/
+/** LOGIN MODAL 
+/*************************/
+
+.user-modal .modal-content {
+	background-color: #fcfcfc;
+}
+
+	.user-modal .modal-header {
+		padding: 10px 15px 15px 0;
+	}
+
+		.user-modal-label {
+			margin: auto;
+			text-align: center;
+			font-size: 23px;
+			font-weight: 300;
+		}
+
+	.user-modal-body {
+		margin: 0px 35px;
+	}
+
+		.account-button {
+			width: 100%;
+			cursor: pointer;
+		}
+
+		.user-modal-body input {
+			font-family: "FontAwesome", Helvetica;
+		}
+
+	.user-modal .modal-footer {}
+
+
+		#login-modal .modal-footer .row {
+			width: 100%;
+			padding: 0px;
+			margin: 0px 0.9rem;
+			font-size: 10pt;
+		}
+
+		.error-message {
+			text-align: center;
+			color: red;
+		    font-size: 11pt;
+		    font-weight: 600;
+		    padding-top: 10px;
+		}
+
+

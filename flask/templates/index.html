@@ -1,0 +1,79 @@
+<!DOCTYPE html> <html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Datasets2Tools</title>
+		<link rel="stylesheet" type="text/css" href="https://v4-alpha.getbootstrap.com/dist/css/bootstrap.min.css">
+		<link href="https://fonts.googleapis.com/css?family=Quicksand" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-awesome.css') }}">
+		<link rel="icon" type="image/ico" href="{{ url_for('static', filename='img/favicon.ico') }}">
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='slick/slick.css') }}"/>
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='slick/slick-theme.css') }}"/>
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+		<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+			ga('create', 'UA-6277639-30', 'auto');
+			ga('send', 'pageview');
+		</script>
+	</head>
+
+	<body>
+		<div id="main-container" class="container-fluid">
+
+		</div> <!-- #main_container -->
+
+		<div id="footer" class="hidden">
+		    <div class="container">
+		        <div class="row">
+		            <div class="col-sm-6">
+		                <h4>Affiliations</h4>
+		                <ul>
+		                    <li><a href="http://icahn.mssm.edu/research/labs/maayan-laboratory" target="_blank">The Ma'ayan
+		                        Lab</a></li>
+		                    <li><a href="http://www.lincs-dcic.org/" target="_blank">BD2K-LINCS Data Coordination and
+		                        Integration Center (DCIC)</a></li>
+		                    <li><a href="http://www.lincsproject.org/">NIH LINCS program</a></li>
+		                    <li><a href="http://bd2k.nih.gov/" target="_blank">NIH Big Data to Knowledge (BD2K)</a></li>
+		                    <!-- <li><a href="https://commonfund.nih.gov/idg/index" target="_blank">NIH Illuminating the Druggable Genome (IDG) Program</a></li> -->
+		                    <li><a href="http://icahn.mssm.edu/" target="_blank">Icahn School of Medicine at Mount Sinai</a>
+		                    </li>
+		                </ul>
+		            </div>
+		            <div class="col-sm-6">
+		                <h4>License</h4>
+		                <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png"></a><br><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">All contents on this site are covered </span> by the <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+		            </div>
+		        </div>
+		    </div>
+		</div>
+
+		<div id="js">
+			<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+			<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+			<script src="{{ url_for('static', filename='slick/slick.min.js') }}"></script>
+			<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+			<script> $(function() {$('[data-toggle="tooltip"]').tooltip()}) </script>
+			<script type="text/javascript">
+				$(document).ready(function(){
+				  $('#main-slider-col').slick({
+					dots:true,
+					autoplay: false,
+					autoplaySpeed: 10000,
+				  });
+				  $('#news-slider-col').slick({
+					dots:true,
+					autoplay: false,
+					autoplaySpeed: 10000,
+					slidesToShow: 5,
+					slidesToScroll: 1,
+					infinite: false
+				  });
+				});
+			</script>
+		</div> <!-- #js -->
+
+	</body>
+</html>

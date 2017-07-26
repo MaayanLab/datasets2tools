@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Datasets2Tools</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/base-style.css') }}">
+    <link rel="icon" type="image/ico" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+    <nav id="navbar" class="navbar navbar-toggleable-md navbar-inverse bg-inverse">
+      <div class="container">
+
+          <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar-links" aria-controls="navbar-links" aria-expanded="false" aria-label="Toggle navigation.">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <a class="navbar-brand" href="#">
+            <img id="d2t-logo" src="{{ url_for('static', filename='icons/datasets2tools.png') }}">
+          </a>
+
+          <div class="collapse navbar-collapse" id="navbar-links">
+              <form id="search-form" class="form-inline">
+                  <input class="form-control" type="text" placeholder="Search Datasets2Tools">
+                  <button class="btn" type="button">
+                    <i class="fa fa-search"></i>
+                  </button>
+              </form>
+              <ul class="navbar-nav">
+                  <li class="nav-item">
+                      <a class="nav-link" href="#">Explore</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link" href="#">Analyze</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link" href="#">Contribute</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link" href="#">Extension</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link" href="#">Help</a>
+                  </li>
+                  <li class="nav-item">
+
+                    {% if not current_user.is_authenticated %}
+
+                      <button id="sign-in" type="button" class="btn" data-toggle="modal" data-target="#login-modal">
+                          Sign In
+                      </button>
+
+                    {% else %}
+
+                    <div class="dropdown">
+                      <button class="btn dropdown-toggle" type="button" id="user-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span>&#xf007;</span>{{current_user.username}}
+                      </button>
+                      <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">Your Profile</a>
+                        <a id="logout" class="dropdown-item" href="{{url_for('logout')}}">Log Out</a>
+                      </div>
+                    </div>
+
+                    {% endif %}
+
+                  </li>
+              </ul>
+          </div>
+
+        </div>
+    </nav> <!-- #navbar -->
+
+    <div id="login-modal" class="modal user-modal" tabindex="-1" role="dialog" aria-labelledby="login-modal-label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title user-modal-label">Sign In</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body user-modal-body">
+                  <form id="login-form" action="{{url_for('login')}}" method="post">
+                      <div class="form-group">
+                          <input type="email" class="form-control" name="email" placeholder="&#xf0e0;&nbsp;&nbsp;&nbsp;Email">
+                      </div>
+                      <div class="form-group">
+                          <input type="password" class="form-control" name="password" placeholder="&#xf084;&nbsp;&nbsp;&nbsp;Password">
+                      </div>
+                      <input id="signin-button" type="submit" value="Sign In" class="btn btn-primary account-button">
+                    </form>
+                    <div class="error-message">
+                      {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                          {% for category, message in messages %}
+                            {{ message if category == 'login-error' }}
+                          {% endfor %}
+                        {% endif %}
+                      {% endwith %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="row">
+                        <div id="signup-question" class="col-6">New? <a href="#" data-toggle="modal" data-target="#signup-modal">Sign up</a></div>
+                        <div id="forgot-password-question" class="col-6 text-right"><a href="#">Forgot password?</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- #login-modal -->
+
+    <div id="signup-modal" class="modal user-modal" tabindex="-1" role="dialog" aria-labelledby="signup-modal-label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title user-modal-label">Sign Up</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body user-modal-body">
+                  <form id="signup-form" action="{{url_for('signup')}}" method="post">
+                      <div class="form-group">
+                          <input type="text" class="form-control" name="username" placeholder="&#xf2c0;&nbsp;&nbsp;&nbsp;Username" required>
+                      </div>
+                      <div class="form-group">
+                          <input type="email" class="form-control" name="email" placeholder="&#xf0e0;&nbsp;&nbsp;&nbsp;Email" required>
+                      </div>
+                      <div class="form-group">
+                          <input type="password" class="form-control" name="password" placeholder="&#xf084;&nbsp;&nbsp;&nbsp;Password" required>
+                      </div>
+                      <input id="signup-button" type="submit" value="Create Account" class="btn btn-primary account-button">
+                  </form>
+                  <div class="error-message">
+                  {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                      {% for category, message in messages %}
+                        {{ message if category == 'signup-error' }}
+                      {% endfor %}
+                    {% endif %}
+                  {% endwith %}
+                  </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- #signup-modal -->
+
+    <div id="content" class="container-fluid">
+        {% block content %}{% endblock %}
+    </div> <!-- #content -->
+
+    <div id="footer" class="bg-inverse">
+
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h6>Affiliations</h6>
+                    <ul>
+                        <li><a href="http://icahn.mssm.edu/research/labs/maayan-laboratory" target="_blank">The Ma'ayan
+                            Lab</a></li>
+                        <li><a href="http://www.lincs-dcic.org/" target="_blank">BD2K-LINCS Data Coordination and
+                            Integration Center (DCIC)</a></li>
+                        <li><a href="http://www.lincsproject.org/">NIH LINCS program</a></li>
+                        <li><a href="http://bd2k.nih.gov/" target="_blank">NIH Big Data to Knowledge (BD2K)</a></li>
+                        <li><a href="http://icahn.mssm.edu/" target="_blank">Icahn School of Medicine at Mount Sinai</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-sm-6">
+                    <h6>License</h6>
+                    <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png"></a><br><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">All contents on this site are covered </span> by the <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+                </div>
+            </div>
+        </div> <!-- .container -->
+
+        <div id="js">
+            <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+            <script src="{{ url_for('static', filename='js/base-scripts.js') }}"></script>
+        </div> <!-- #js -->
+        {% block footer %}{% endblock %}
+    </div> <!-- #footer -->
+
+</body>
+</html>
