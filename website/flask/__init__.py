@@ -109,7 +109,16 @@ def dataset_landing():
 		}
 	]
 
-	return render_template('dataset_landing.html', dataset=dataset, canned_analysis_list=canned_analysis_list)
+	tool_list = [
+		{
+			'tool_name': 'Enrichr',
+			'tool_icon_url': 'http://amp.pharm.mssm.edu/Enrichr/images/enrichr-icon.png',
+			'tool_description': 'Bla bla bla.',
+			'has_scripts': True
+		}
+	]
+
+	return render_template('dataset_landing.html', dataset=dataset, canned_analysis_list=canned_analysis_list, tool_list=tool_list)
 
 
 if __name__ == "__main__":

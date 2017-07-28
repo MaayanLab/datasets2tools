@@ -72,14 +72,17 @@
 
 			<div class="tab-pane active" id="overview" role="tabpanel">
 				<!-- {{ macros.display_object_overview(dataset) }} -->
-				{{ macros.display_canned_analyses(canned_analysis_list) }}
+				{{ macros.display_tools(tool_list) }}
 			</div> <!-- #overview -->
 
 			<div class="tab-pane" id="analyses" role="tabpanel">
 				{{ macros.display_canned_analyses(canned_analysis_list) }}
 			</div> <!-- #analyses -->
 
-			<div class="tab-pane" id="tools" role="tabpanel">tools</div> <!-- #tools -->
+			<div class="tab-pane" id="tools" role="tabpanel">
+				{{ macros.display_tools(tool_list) }}
+				
+			</div> <!-- #tools -->
 			<div class="tab-pane" id="fair-metrics" role="tabpanel">fair-metrics</div> <!-- #fair-metrics -->
 			<div class="tab-pane" id="scripts" role="tabpanel">scripts</div> <!-- #scripts -->
 		</div> <!-- #dataset-content -->

@@ -63,12 +63,12 @@ html {
 	#sign-in {
 		background-color: #255FA7;
 		border-radius: 5px;
-		padding-left: 1rem;
-		padding-right: 1rem;
+		padding: 0.5rem 0.7rem;
 		margin-right: 0px;
 		margin-left: 10px;
 		color: white;
 		cursor: pointer;
+		font-size: 9pt;
 	}
 
 	@media (max-width: 992px) {

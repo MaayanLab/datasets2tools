@@ -83,3 +83,27 @@
 		{% endfor %}
 	</div>
 {% endmacro %}
+
+<!-- Tools -->
+{% macro display_tools(tool_list) %}
+	<div class="row tool-row">
+		{% for i in range(50) %}
+			{% for tool in tool_list %}
+				<div class="col-3 tool-col">
+					<div class="tool-card">
+						<div class="row">
+							<div class="col-6 tool-icon-col">
+								<a href="#"><img class="tool-icon" src="{{tool.tool_icon_url}}"></a>
+							</div>
+							<div class="col-6 tool-info-col">
+								<a class="tool-name" href="#">{{tool.tool_name}}</a>
+								<button class="btn analyze-button">Analyze</button>
+								<i class="fa fa-info-circle tool-info-icon" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" data-template='<div class="popover tool-info-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="{{tool.tool_description}}"></i>
+							</div>
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		{% endfor %}
+	</div>
+{% endmacro %}
