@@ -219,7 +219,7 @@
 			}
 
 				.tool-icon {
-					max-width: 70%;
+					max-width: 60%;
 				}
 
 			.tool-info-col {
@@ -246,7 +246,7 @@
 					margin: 0px;
 					display: block;
 					margin-top: 2px;
-					margin-bottom: 5px;
+					margin-bottom: 2px;
 				}
 
 					.tool-developer:hover {
@@ -271,7 +271,7 @@
 
 				.tool-info-icon {
 					position: absolute;
-					bottom: 0px;
+					bottom: -3px;
 					right: 9px;
 					color: darkgrey;
 					font-size: 10pt;
@@ -285,6 +285,25 @@
 						.tool-info-icon:focus {
 							outline: none;
 						}
+
+
+/*************************/
+/** DATASETS 
+/*************************/
+
+
+
+/*************************/
+/** FAIRNESS TABLE 
+/*************************/
+
+#dynatable-processing-fairness-table {
+
+}
+
+	#dynatable-processing-fairness-table th {
+		background-color: blue;
+	}
 
 
 

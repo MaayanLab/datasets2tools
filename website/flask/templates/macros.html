@@ -90,7 +90,7 @@
 {% endmacro %}
 
 <!-- Tools -->
-{% macro display_tools(tool_list) %}
+{% macro display_tools(tool_list, dataset_accession) %}
 	<div class="row tool-row">
 		{% for i in range(50) %}
 			{% for tool in tool_list %}
@@ -103,7 +103,11 @@
 							<div class="col-6 tool-info-col">
 								<a class="tool-name" href="#">{{tool.tool_name}}</a>
 								<a class="tool-developer" href="#">maayanlab</a>
-								<button class="btn analyze-button">Analyze</button>
+								<form action="{{url_for('index')}}">
+									<input type="hidden" name="dataset_accession" value="{{dataset_accession}}">
+									<input type="hidden" name="tool_name" value="{{tool.tool_name}}">
+									<button class="btn analyze-button">Analyze</button>
+								</form>
 								<i class="fa fa-info-circle tool-info-icon" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" data-template='<div class="popover tool-info-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="{{tool.tool_description}}"></i>
 							</div>
 						</div>
@@ -112,4 +116,26 @@
 			{% endfor %}
 		{% endfor %}
 	</div>
+{% endmacro %}
+
+<!-- Tools -->
+{% macro display_fairness(fairness_dataframe) %}
+	<table id="fairness-table">
+		<thead>
+			<tr>
+				{% for title in fairness_dataframe.columns %}
+					<th>{{title}}</th>
+				{% endfor %}
+			</tr>
+		</thead>
+		<tbody>
+			{% for index, rowData in fairness_dataframe.iterrows() %}
+				<tr>
+					{% for value in rowData.values %}
+						<th>{{value}}</th>
+					{% endfor %}
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 {% endmacro %}

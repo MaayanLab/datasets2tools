@@ -103,19 +103,14 @@ html {
 				margin-right: 9px;
 			}
 
-			#user-dropdown-content {
-				display: table;
+		#user-dropdown-menu {
+			font-size: 9pt;
+		}
+
+			#user-dropdown-menu .dropdown-item {
+				padding: 5px 15px;
 			}
 
-				#user-dropdown-content i,
-				#user-dropdown-content span {
-					display: table-cell;
-					vertical-align: middle;
-				}
-
-				#user-dropdown-content .fa-user {
-					font-size: 9pt;
-				}
 
 /*************************/
 /** FOOTER 

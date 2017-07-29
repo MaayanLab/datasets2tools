@@ -3,11 +3,11 @@
 <head>
     <title>Datasets2Tools</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link rel="icon" type="image/ico" href="{{ url_for('static', filename='icons/favicon.ico') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/base-style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/macros-style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="icon" type="image/ico" href="{{ url_for('static', filename='icons/favicon.ico') }}">
     {% block head %}{% endblock %}
 </head>
 <body>
@@ -60,7 +60,7 @@
                       <button class="btn dropdown-toggle" type="button" id="user-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span>&#xf007;</span>{{current_user.username}}
                       </button>
-                      <div class="dropdown-menu">
+                      <div id="user-dropdown-menu" class="dropdown-menu">
                         <a class="dropdown-item" href="#">Your Profile</a>
                         <a id="logout" class="dropdown-item" href="{{url_for('logout')}}">Log Out</a>
                       </div>
@@ -179,13 +179,13 @@
         </div> <!-- .container -->
 
         <div id="js">
-            <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+            <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
             <script src="{{ url_for('static', filename='js/base-scripts.js') }}"></script>
             <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+            {% block footer %}{% endblock %}
         </div> <!-- #js -->
-        {% block footer %}{% endblock %}
     </div> <!-- #footer -->
 
 </body>

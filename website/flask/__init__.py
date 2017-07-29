@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import pandas as pd
-import os, json
+import os, json, random
 from sqlalchemy.exc import IntegrityError
 
 # Configure
@@ -75,7 +75,16 @@ def index():
 
 @app.route(entry_point+'/dataset')
 def dataset_landing():
-	dataset = {'dataset_accession': 'GSE68203', 'dataset_type': 'RNA-seq', 'date': 'May 27th, 2017'}
+	dataset = {
+		'dataset_accession': 'GSE68203',
+		'dataset_type': 'RNA-seq',
+		'dataset_title': 'Genome-wide RNA Pol II-CTD occupancy in wild type and mutant worms',
+		'dataset_description': 'We used RNA Pol II-CTD occupancy assay to identify mRNA isoform switch in mutant animals compared to wild type animals.',
+		'repository_name': 'Gene Expression Omnibus',
+		'repository_icon_url': 'https://www.ncbi.nlm.nih.gov/geo/img/geo_main.gif',
+		'repository_homepage_url': 'https://www.ncbi.nlm.nih.gov/geo/',
+		'date': 'May 27th, 2017'
+	}
 	canned_analysis_list = [
 		{
 			'canned_analysis_preview_url': 'https://github.com/denis-torre/images/blob/master/genemania/1.png?raw=true',
@@ -123,8 +132,8 @@ def dataset_landing():
 			'has_scripts': True
 		}
 	]
-
-	return render_template('dataset_landing.html', dataset=dataset, canned_analysis_list=canned_analysis_list, tool_list=tool_list)
+	fairness_dataframe = pd.DataFrame([[1, 'The tool is hosted in one or more well-used repositories, if relevant repositories exist.', "{:0.1f}%".format(random.uniform(0,1)*100)],[2, 'Source code is shared on a public repository.', "{:0.1f}%".format(random.uniform(0,1)*100)],[3, 'Code is written in an open-source, free programming language.', "{:0.1f}%".format(random.uniform(0,1)*100)],[4, 'The tool inputs standard data format(s) consistent with community practice.', "{:0.1f}%".format(random.uniform(0,1)*100)],[5, 'All previous versions of the tool are made available.', "{:0.1f}%".format(random.uniform(0,1)*100)],[6, 'Web-based version is available (in addition to desktop version).', "{:0.1f}%".format(random.uniform(0,1)*100)],[7, 'Source code is documented.', "{:0.1f}%".format(random.uniform(0,1)*100)],[8, 'Pipelines that use the tool have been standardized and provide detailed usage guidelines.', "{:0.1f}%".format(random.uniform(0,1)*100)],[9, 'A tutorial page is provided for the tool.', "{:0.1f}%".format(random.uniform(0,1)*100)],[10, 'Example datasets are provided.', "{:0.1f}%".format(random.uniform(0,1)*100)],[11, 'Licensing information is provided on the tool\'s landing page.', "{:0.1f}%".format(random.uniform(0,1)*100)],[12, 'Information is provided describing how to cite the tool.', "{:0.1f}%".format(random.uniform(0,1)*100)],[13, 'Version information is provided for the tool.', "{:0.1f}%".format(random.uniform(0,1)*100)],[14, 'A paper about the tool has been published.', "{:0.1f}%".format(random.uniform(0,1)*100)],[15, 'Video tutorials for the tool are available.', "{:0.1f}%".format(random.uniform(0,1)*100)],[16, 'Contact information is provided for the originator(s) of the tool.', "{:0.1f}%".format(random.uniform(0,1)*100)]],columns=['#', 'FAIRness Question', 'Score'])
+	return render_template('dataset_landing.html', dataset=dataset, canned_analysis_list=canned_analysis_list, tool_list=tool_list, fairness_dataframe=fairness_dataframe)
 
 
 if __name__ == "__main__":
