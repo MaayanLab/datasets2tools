@@ -82,23 +82,29 @@ def dataset_landing():
 			'canned_analysis_title': 'Enrichment analysis of genes upregulated in cancer',
 			'tools': [
 				{
-					'tool_name': 'GeneMANIA'
+					'tool_name': 'GeneMANIA',
+					'tool_icon_url': 'https://pbs.twimg.com/profile_images/720745173970460672/psYcEwIT_400x400.jpg'
 				},
 				{
-					'tool_name': 'Enrichr'
+					'tool_name': 'Enrichr',
+					'tool_icon_url': 'http://amp.pharm.mssm.edu/Enrichr/images/enrichr-icon.png'
 				},
 				{
-					'tool_name': 'L1000CDS2'
+					'tool_name': 'L1000CDS2',
+					'tool_icon_url': 'http://amp.pharm.mssm.edu/L1000CDS2/CSS/images/sigine.png'
 				}],
 			'datasets': [
 				{
-					'dataset_accession': 'GSE68203'
+					'dataset_accession': 'GSE68203',
+					'repository_icon_url': 'https://www.ncbi.nlm.nih.gov/geo/img/geo_main.gif'
 				},
 				{
-					'dataset_accession': 'GSE68205'
+					'dataset_accession': 'GSE68205',
+					'repository_icon_url': 'https://www.ncbi.nlm.nih.gov/geo/img/geo_main.gif'
 				},
 				{
-					'dataset_accession': 'GSE68209'
+					'dataset_accession': 'GSE68209',
+					'repository_icon_url': 'https://www.ncbi.nlm.nih.gov/geo/img/geo_main.gif'
 				}
 			],
 			'metadata': {
@@ -113,7 +119,7 @@ def dataset_landing():
 		{
 			'tool_name': 'Enrichr',
 			'tool_icon_url': 'http://amp.pharm.mssm.edu/Enrichr/images/enrichr-icon.png',
-			'tool_description': 'Bla bla bla.',
+			'tool_description': 'An enrichment analysis tool with over 90 libraries.',
 			'has_scripts': True
 		}
 	]

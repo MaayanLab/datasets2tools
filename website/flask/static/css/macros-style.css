@@ -124,7 +124,6 @@
 						font-size: 8pt;
 					}
 
-
 						.canned-analysis-info-popover .popover-title {
 							padding: 5px 10px;
 							margin-bottom: 0px;
@@ -137,36 +136,61 @@
 							padding: 0px;
 						}
 
-							.canned-analysis-info-popover-dataset {
+							.canned-analysis-info-popover-row {
 								border-bottom: 1px solid #f2f2f2;
-								padding: 5px 10px;
+								padding: 5px 0px;
+								margin-left: auto;
+								margin-right: auto;
 							}
 
-							.canned-analysis-info-popover-metadata-title {
-								padding: 7px 7px;
-							}
-
-								.canned-analysis-info-popover-metadata-title .col-12 {
-									padding: 0px;
+								.canned-analysis-info-popover-row .col-12 {
+									padding-left: 10px;
 								}
 
-							.canned-analysis-info-popover-metadata {
-								border-bottom: 1px solid #f2f2f2;
-								padding: 3px 10px;
-							}
+									.canned-analysis-info-popover-link {
+										color: darkblue;
+										text-decoration: none;
+										display: table;										
+									}
 
-								.canned-analysis-info-popover-metadata .col-6 {
-									padding: 2px 15px;
-								}
+										.canned-analysis-info-popover-link:hover {
+											color: darkblue;
+											text-decoration: none;
+										}
+
+										.canned-analysis-info-popover-icon {
+											height: 15px;
+											margin-right: 9px;
+											display: table-cell;
+											vertical-align: middle;
+										}
+
+										.canned-analysis-info-popover-name {
+											display: table-cell;
+											vertical-align: middle;
+										}
+
+									.canned-analysis-info-popover-dataset-link {
+										color: darkblue;
+										text-decoration: none;
+										display: table;
+									}
+
+										.canned-analysis-info-popover-dataset-link:hover {
+											color: darkblue;
+											text-decoration: none;
+										}
 
 									.canned-analysis-info-popover-metadata-tag {
 										font-weight: 600;
 										font-style: italic;
+										padding-left: 10px;
 									}
 
 									.canned-analysis-info-popover-metadata-value {
 										text-align: right;
 										font-weight: 200;
+										padding-right: 10px;
 									}
 
 /*************************/
@@ -182,50 +206,85 @@
 	}
 
 		.tool-card {
-			padding: 10px 13px;
+			padding: 7px 13px;
 			background-color: white;
 			border: 1px solid #c2c2c2;
 			border-radius: 5px;
 		}
 
 			.tool-icon-col {
+				padding: 5px 0px;
+				text-align: center;
 				margin: auto;
 			}
 
 				.tool-icon {
-					max-width: 100%;
+					max-width: 70%;
 				}
 
 			.tool-info-col {
-				padding-left: 0px;
+				padding-left: 3px;
+				margin-top:-3px;
+				padding-top: 0px;
 			}
 
 				.tool-name {
-					font-size: 9pt;
+					font-size: 8pt;
 					color: darkblue;
-					margin-top: -5px;
+					font-weight: 600;
+				}
+
+					.tool-name:hover {
+						color: darkblue;
+						text-decoration: none;
+					}
+
+				.tool-developer {
+					font-size: 7pt;
+					font-weight: 300;
+					color: darkblue;
+					margin: 0px;
+					display: block;
+					margin-top: 2px;
+					margin-bottom: 5px;
+				}
+
+					.tool-developer:hover {
+						color: darkblue;
+						text-decoration: none;
+					}
+
+				.tool-description {
+					font-size: 7pt;
+					margin-bottom: 3px;
 				}
 
 				.analyze-button {
 					font-size: 7pt;
 					background-color: #255FA7;
 					color: white;
-					padding: 5px 7px;
-					margin-top: 3px;
+					margin-top: 0px;
+					padding: 3px 5px;
+					font-weight: 500;
+					cursor: pointer;
 				}
 
 				.tool-info-icon {
 					position: absolute;
-					bottom: -5px;
+					bottom: 0px;
 					right: 9px;
 					color: darkgrey;
-					position: absolute;
 					font-size: 10pt;
+					cursor: pointer;
 				}
 
 					.tool-info-popover {
 						font-size: 8pt;
 					}
+					
+						.tool-info-icon:focus {
+							outline: none;
+						}
 
 
 

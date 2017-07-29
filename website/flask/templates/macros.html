@@ -39,33 +39,38 @@
 										{% if canned_analysis.tools|length == 1%}
 											<a href="#">{{canned_analysis.tools[0].tool_name}}</a>
 										{% else %}
-											<a href="#" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" data-content="
-												<div class='canned-analysis-tool-popover'>
-													<ul>
-													{% for tool in canned_analysis.tools %}
-														<li><a href='#'>{{tool.tool_name}}</a></li>
-													{% endfor %}
-													</ul>
-												</div>
+											<a href="#" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" title="Tools"  data-template='<div class="popover canned-analysis-info-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="
+												{% for tool in canned_analysis.tools %}
+													<div class='row canned-analysis-info-popover-row'>
+														<div class='col-12'>
+															<a class='canned-analysis-info-popover-link' href='#'>
+																<img class='canned-analysis-info-popover-icon'src='{{tool.tool_icon_url}}'>
+																<span class='canned-analysis-info-popover-name'>{{tool.tool_name}}</span>
+															</a>
+														</div>
+													</div>
+												{% endfor %}
 											">
 											{{canned_analysis.tools|length}} tools</a>
 										{% endif %}
 										</div>
 									</div>
 								</div>
-								<i class="fa fa-info-circle canned-analysis-info-icon" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" title="Datasets" data-template='<div class="popover canned-analysis-info-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="
+								<i class="fa fa-info-circle canned-analysis-info-icon" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" title="Datasets" data-template='<div class="popover canned-analysis-info-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content container-fluid"></div></div>' data-content="
 										{% for dataset in canned_analysis.datasets %}
-											<div class='row canned-analysis-info-popover-dataset'>
+											<div class='row canned-analysis-info-popover-row'>
 												<div class='col-12'>
-													<a href='#'>{{dataset.dataset_accession}}</a>
+													<a class='canned-analysis-info-popover-link' href='#'>
+														<span class='canned-analysis-info-popover-name'>{{dataset.dataset_accession}}</span>
+													</a>
 												</div>
 											</div>
 										{% endfor %}
-										<div class='popover-title canned-analysis-info-popover-metadata-title'>
+										<div class='popover-title'>
 											Metadata
 										</div>
 										{% for key, value in canned_analysis.metadata.iteritems() %}
-											<div class='row canned-analysis-info-popover-metadata'>
+											<div class='row canned-analysis-info-popover-row'>
 												<div class='col-6 canned-analysis-info-popover-metadata-tag'>
 													{{key}}
 												</div>
@@ -97,6 +102,7 @@
 							</div>
 							<div class="col-6 tool-info-col">
 								<a class="tool-name" href="#">{{tool.tool_name}}</a>
+								<a class="tool-developer" href="#">maayanlab</a>
 								<button class="btn analyze-button">Analyze</button>
 								<i class="fa fa-info-circle tool-info-icon" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" data-template='<div class="popover tool-info-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="{{tool.tool_description}}"></i>
 							</div>
