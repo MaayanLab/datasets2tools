@@ -1,43 +1,201 @@
 /*************************/
-/** OVERVIEW 
+/** GENERAL LANDING 
 /*************************/
 
-	#overview {
+#landing-container {
+	width: 750px;
+}
 
+	#object-overview {
+		background-color: white;
+		border: 1px solid #c2c2c2;
+		margin-top: 35px;
+		border-radius: 7px 7px 0px 0px;
+		font-family: Helvetica;
 	}
 
-		.overview-row {
-			padding: 25px 0px;
+		#object-icon-col {
+			border-right: 1px solid #c2c2c2;
+			display: flex;
+			align-items: center;
+			flex-wrap: wrap;
 		}
 
-			.overview-row .col-2 {
-				padding-left: 0;
+			#object-icon {
+				width: 100%;
+				margin: auto;
+				padding: 20px;
 			}
 
-				.overview-label {
-					background-color: #255FA7;
-					color: white;
-					border-radius: 7px;
-					padding: 10px 20px;
-					text-align: center;
-					font-size: 10pt;
-					font-weight: 600;
-					width: 100%;
-					height: 100%;
+				#object-icon.tool {
+					padding: 5px;
 				}
 
-				.overview-value {
-					padding: 10px 5px;
-					font-size: 9pt;
-					font-weight: 300;
+		#object-info-col {
+			margin: auto;
+		}
+
+			#object-info-col .row {
+				margin: 15px -5px;
+			}
+
+				#object-main-title {
+					font-size: 12pt;
+					font-weight: 600;
 				}
+
+					#object-main-title.tool {
+						font-size: 13pt;
+					}
+
+				#object-subtype {
+					font-size: 11pt;
+					font-style: italic;
+				}
+
+				#object-date {
+					font-size: 11pt;
+				}
+
+		#object-actions-col {
+			display:flex;
+			align-items:center;
+		}
+
+			#object-actions-col button {
+				margin: 10px 0px;
+				width: 100%;
+				background-color: #255FA7;
+				color: white;
+				font-weight: 600;
+				cursor: pointer;
+				font-size: 10pt;
+			}
+
+		#object-fairness-col {
+			display: flex;
+			align-items: center;
+			flex-wrap: wrap;
+			border-left: 1px solid #c2c2c2
+		}
+			
+			#object-fairness-col::after {
+				content: "FAIR Metrics";
+				z-index: 10;
+				font-size: 9pt;
+				color: black;
+				top: 25px;
+				left: 25px;
+				position: absolute;
+				text-align: center;
+				font-weight: 600;
+			}
+
+			#object-fairness-icon {
+				width: 100%;
+				padding: 0px;
+				padding-top: 25px;
+				margin: auto;
+			}
+
+	#object-tabs {
+		background-color: white;
+		border: 1px solid #c2c2c2;
+		border-top: none;
+		border-radius: 0 0 7px 7px;
+	}
+
+		#object-tabs .nav {
+			border: none;
+			padding-left: 10px;
+		}
+
+			#object-tabs .nav-link {
+				border: none;
+				color: black;
+				background-color: transparent;
+				padding: 10px 13px;
+				font-size: 10pt;
+				font-weight: 400;
+			}
+
+				#object-tabs .nav-link.active {
+					color: #255FA7;
+					border: none;
+					-webkit-box-shadow: inset 0px -3px 0px 0px rgba(37,95,167,1);
+					-moz-box-shadow: inset 0px -3px 0px 0px rgba(37,95,167,1);
+					box-shadow: inset 0px -3px 0px 0px rgba(37,95,167,1);
+				}
+
+	#object-content {
+		margin-top: 25px;
+	}
+
+		#overview {
+
+		}
+
+			.info-card {
+				border: 1px solid #c2c2c2;
+				border-radius: 7px;
+				background-color: #f9f9f9;
+				padding: 1px;
+				margin-bottom: 30px;
+			}
+
+				.info-card-title {
+					padding: 5px 10px;
+					font-size: 10pt;
+					font-weight: 600;
+					border-bottom: 1px solid #c2c2c2;
+				}
+
+				.info-card-table {
+					background-color: white;
+				}
+
+					.info-card-table tr:nth-child(even) { background-color: #f9f9f9; }
+					.info-card-table tr:nth-child(odd) { background-color: white; }
+
+						.info-card-table tr td {
+							padding: 10px 10px;
+						}
+
+							.info-card-table tr td:first-child {
+								font-size: 10pt;
+								font-weight: 600;
+								text-align: right;
+								font-style: italic;
+								min-width: 130px;
+							}
+
+							.info-card-table tr td:nth-child(2) {
+								font-size: 9pt;
+								font-weight: 300;
+								padding-left: 10px;
+								width: 100%;
+							}
+
+					.keyword {
+						background-color: #255FA7;
+						color: white;
+						padding: 3px 7px;
+						border-radius: 3px;
+						margin-right: 5px;
+						font-size: 8pt;
+						font-weight: 500;
+					}
+
+						.keyword:hover, .keyword:focus {
+							color: white;
+						}
+
 
 /*************************/
 /** CANNED ANALYSIS 
 /*************************/
 
 .canned-analysis-row {
-	margin-top: 10px;
 }
 
 	.canned-analysis-col {
@@ -87,7 +245,6 @@
 
 						.canned-analysis-tool a:hover, .canned-analysis-tool a:focus {
 							outline: none;
-							text-decoration: none;
 						}
 
 					.canned-analysis-tool-popover {
@@ -155,7 +312,6 @@
 
 										.canned-analysis-info-popover-link:hover {
 											color: darkblue;
-											text-decoration: none;
 										}
 
 										.canned-analysis-info-popover-icon {
@@ -178,7 +334,6 @@
 
 										.canned-analysis-info-popover-dataset-link:hover {
 											color: darkblue;
-											text-decoration: none;
 										}
 
 									.canned-analysis-info-popover-metadata-tag {
@@ -198,7 +353,6 @@
 /*************************/
 
 .tool-row {
-	margin-top: 10px;
 }
 
 	.tool-col {
@@ -236,7 +390,6 @@
 
 					.tool-name:hover {
 						color: darkblue;
-						text-decoration: none;
 					}
 
 				.tool-developer {
@@ -251,7 +404,6 @@
 
 					.tool-developer:hover {
 						color: darkblue;
-						text-decoration: none;
 					}
 
 				.tool-description {
@@ -292,7 +444,6 @@
 /*************************/
 
 .dataset-row {
-	margin-top: 10px;
 }
 
 	.dataset-col {
@@ -331,7 +482,6 @@
 
 					.dataset-accession:hover {
 						color: darkblue;
-						text-decoration: none;
 					}
 
 				.dataset-title {
@@ -346,7 +496,6 @@
 
 					.dataset-title:hover {
 						color: darkblue;
-						text-decoration: none;
 					}
 
 				.dataset-description {

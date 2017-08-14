@@ -3,34 +3,6 @@
 
 {% block content %}
 
-	<div id="landing-container" class="container">
+	{{ macros.landing_page_template(object_data, object_type='dataset') }}
 
-		{{ macros.landing_page_template(object_data, object_type='dataset') }}
-
-		<div id="dataset-content" class="tab-content">
-
-			<div class="tab-pane active" id="overview" role="tabpanel">
-				{{ macros.display_object_overview(object_data.dataset) }}
-			</div> <!-- #overview -->
-
-			<div class="tab-pane" id="analyses" role="tabpanel">
-				{{ macros.display_canned_analyses(object_data.canned_analyses) }}
-			</div> <!-- #analyses -->
-
-			<div class="tab-pane" id="tools" role="tabpanel">
-				{{ macros.display_tools(object_data.tools) }}
-			</div> <!-- #tools -->
-		</div> <!-- #dataset-content -->
-
-	</div>
-
-{% endblock %}
-
-{% block footer %}
-    <script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript">
-    	$('#fairness-table').DataTable({
-		    paging: false
-    	});
-    </script>
 {% endblock %}
