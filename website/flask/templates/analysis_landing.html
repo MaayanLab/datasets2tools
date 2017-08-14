@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block content %}
+
+	<div id="analysis-container" class="container">
+
+		<div id="analysis-overview" class="row">
+			<div id="analysis-preview-col" class="col-3">
+				<img id="analysis-preview" src="{{canned_analysis.canned_analysis_preview_url}}">
+			</div>
+			<div id="analysis-info-col" class="col-9">
+				<div class="row">
+					<div class="col-6">
+						<div class="row">
+							<div id="analysis-title" class="col-12">
+								{{canned_analysis.canned_analysis_title}}
+							</div>
+						</div>						
+						<div class="row">
+							<div id="analysis-type" class="col-12">
+								Computational Analysis
+							</div>
+						</div>
+						<div class="row">
+							<div id="analysis-date" class="col-12">
+								Uploaded {{canned_analysis.date}}
+							</div>
+						</div>
+					</div>
+					<div id="analysis-actions-col" class="col-3">
+						<div class="row">
+							<div class="col-12">
+								<form action="{{canned_analysis.canned_analysis_url}}">
+									<button class="btn" type="submit">View</button>
+								</form>
+							</div>
+							<div class="col-12">
+								<button class="btn" type="button">Evaluate</button>
+							</div>
+						</div>
+					</div>
+					<div id="analysis-fairness-col" class="col-3">
+						<div id="analysis-fairness-wrapper">
+							<div id="analysis-fairness-label">FAIR Metrics</div>
+							<img id="analysis-fairness-icon" src="{{url_for('static', filename='icons/fairness.png')}}">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div> <!-- #dataset-overview -->
+
+		<div id="analysis-tabs" class="row">
+			<ul class="nav nav-tabs" role="tablist">
+				<li class="nav-item">
+					<a class="nav-link active" data-toggle="tab" href="#overview" role="tab">Overview</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" data-toggle="tab" href="#datasets" role="tab">Datasets ({{ canned_analysis.datasets|length }})</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" data-toggle="tab" href="#tools" role="tab">Tools ({{ canned_analysis.tools|length }})</a>
+				</li>
+			</ul>
+		</div> <!-- #dataset-tabs -->
+
+		<div id="analysis-content" class="tab-content">
+
+			<div class="tab-pane active" id="overview" role="tabpanel">
+			</div> <!-- #overview -->
+
+			<div class="tab-pane" id="datasets" role="tabpanel">
+				{{ macros.display_datasets(canned_analysis.datasets) }}
+			</div> <!-- #analyses -->
+
+			<div class="tab-pane" id="tools" role="tabpanel">
+				{{ macros.display_tools(canned_analysis.tools) }}
+			</div> <!-- #tools -->
+		</div> <!-- #dataset-content -->
+
+	</div>
+
+{% endblock %}

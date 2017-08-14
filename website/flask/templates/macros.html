@@ -1,4 +1,101 @@
 <!-- Object Overview -->
+{% macro landing_page_template(object_data, object_type) %}
+	<div id="object-overview" class="row">
+		<div id="object-icon-col" class="col-3">
+			<img id="object-icon" src="{{url_for('static', filename='icons/gene.png')}}">
+		</div>
+		<div id="object-info-col" class="col-5">
+			<div class="row">
+				<div id="object-main-title" class="col-12">
+					{% if object_type == 'dataset' %}
+						{{ object_data.dataset.dataset_accession }}
+					{% elif object_type == 'tool' %}
+						{{ object_data.tool.tool_name }}
+					{% elif object_type == 'analysis' %}
+						{{ object_data.analysis.canned_analysis_title }}
+					{% endif %}
+				</div>
+			</div>
+			<div class="row">
+				<div id="object-subtype" class="col-12">
+					{% if object_type == 'dataset' %}
+						{{ object_data.dataset.dataset_type }}
+					{% elif object_type == 'tool' %}
+						Computational Tool
+					{% elif object_type == 'analysis' %}
+						Canned Analysis
+					{% endif %}
+				</div>
+			</div>
+			<div class="row">
+				<div id="object-date" class="col-12">
+					{% if object_type == 'dataset' %}
+						{{ object_data.dataset.date }}
+					{% elif object_type == 'tool' %}
+						{{ object_data.tool.date }}
+					{% elif object_type == 'analysis' %}
+						{{ object_data.analysis.date }}
+					{% endif %}
+				</div>
+			</div>
+		</div>
+		<div id="object-actions-col" class="col-2">
+			<div class="row">
+				{% if object_type == 'dataset' %}
+					<div class="col-12">
+						<button class="btn" type="button">Analyze</button>
+					</div>
+					<div class="col-12">
+						<button class="btn" type="button">Evaluate</button>
+					</div>
+				{% elif object_type == 'tool' %}
+					<div class="col-12">
+						<button class="btn" type="button">Analyze</button>
+					</div>
+					<div class="col-12">
+						<button class="btn" type="button">Evaluate</button>
+					</div>
+				{% elif object_type == 'analysis' %}
+					<div class="col-12">
+						<button class="btn" type="button">View</button>
+					</div>
+					<div class="col-12">
+						<button class="btn" type="button">Evaluate</button>
+					</div>
+				{% endif %}
+			</div>
+		</div>
+		<div id="object-fairness-col" class="col-2">
+			<img id="object-fairness-icon" src="{{url_for('static', filename='icons/fairness.png')}}">
+		</div>
+	</div> <!-- #object-overview -->
+
+	<div id="object-tabs" class="row">
+		<ul class="nav nav-tabs" role="tablist">
+			<li class="nav-item">
+				<a class="nav-link active" data-toggle="tab" href="#overview" role="tab">Overview</a>
+			</li>
+			{% if object_type != 'dataset' %}
+			<li class="nav-item">
+				<a class="nav-link" data-toggle="tab" href="#analyses" role="tab">Datasets ({{object_data.datasets|length}})</a>
+			</li>
+			{% endif %}
+			{% if object_type != 'tool' %}
+			<li class="nav-item">
+				<a class="nav-link" data-toggle="tab" href="#analyses" role="tab">Tools ({{object_data.tools|length}})</a>
+			</li>
+			{% endif %}
+			{% if object_type != 'analysis' %}
+			<li class="nav-item">
+				<a class="nav-link" data-toggle="tab" href="#analyses" role="tab">Analyses ({{object_data.canned_analyses|length}})</a>
+			</li>
+			{% endif %}
+		</ul>
+	</div> <!-- #object-tabs -->
+
+{% endmacro %}
+
+<!-- Object Overview -->
 {% macro display_object_overview(object_data) %}
 	{% for key, value in object_data.iteritems() %}
 		<div class="row overview-row">
@@ -20,107 +117,130 @@
 {% macro display_canned_analyses(canned_analysis_list) %}
 	<div class="row canned-analysis-row">
 		{% for canned_analysis in canned_analysis_list %}
-			{% for i in range(50) %}
-				<div class="col-4 canned-analysis-col">
-					<div class="canned-analysis-card">
-						<div class="row">
-							<div class="col-5 canned-analysis-preview-col">
-								<a href="#">
-									<img class="canned-analysis-preview-icon" src="{{canned_analysis.canned_analysis_preview_url}}">
-								</a>
-							</div>
-							<div class="col-7 canned-analysis-info-col">
-								<div class="row">
-									<div class="col-12 canned-analysis-title-col">
-										<a href="#" class="canned-analysis-title">
-											{{canned_analysis.canned_analysis_title}}
-										</a>
-										<div class="canned-analysis-tool">
-										{% if canned_analysis.tools|length == 1%}
-											<a href="#">{{canned_analysis.tools[0].tool_name}}</a>
-										{% else %}
-											<a href="#" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" title="Tools"  data-template='<div class="popover canned-analysis-info-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="
-												{% for tool in canned_analysis.tools %}
-													<div class='row canned-analysis-info-popover-row'>
-														<div class='col-12'>
-															<a class='canned-analysis-info-popover-link' href='#'>
-																<img class='canned-analysis-info-popover-icon'src='{{tool.tool_icon_url}}'>
-																<span class='canned-analysis-info-popover-name'>{{tool.tool_name}}</span>
-															</a>
-														</div>
+			<div class="col-4 canned-analysis-col">
+				<div class="canned-analysis-card">
+					<div class="row">
+						<div class="col-5 canned-analysis-preview-col">
+							<a href="{{url_for('analysis_landing', acc=canned_analysis.canned_analysis_accession)}}">
+								<img class="canned-analysis-preview-icon" src="{{canned_analysis.canned_analysis_preview_url}}">
+							</a>
+						</div>
+						<div class="col-7 canned-analysis-info-col">
+							<div class="row">
+								<div class="col-12 canned-analysis-title-col">
+									<a href="{{url_for('analysis_landing', acc=canned_analysis.canned_analysis_accession)}}" class="canned-analysis-title">
+										{{canned_analysis.canned_analysis_title}}
+									</a>
+									<div class="canned-analysis-tool">
+									{% if canned_analysis.tools|length == 1%}
+										<a href="{{url_for('tool_landing', name=canned_analysis.tools[0].tool_name)}}">{{canned_analysis.tools[0].tool_name}}</a>
+									{% else %}
+										<a href="#" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" title="Tools"  data-template='<div class="popover canned-analysis-info-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="
+											{% for tool in canned_analysis.tools %}
+												<div class='row canned-analysis-info-popover-row'>
+													<div class='col-12'>
+														<a class='canned-analysis-info-popover-link' href='{{url_for('tool_landing', name=tool.tool_name)}}'>
+															<img class='canned-analysis-info-popover-icon'src='{{tool.tool_icon_url}}'>
+															<span class='canned-analysis-info-popover-name'>{{tool.tool_name}}</span>
+														</a>
 													</div>
-												{% endfor %}
-											">
-											{{canned_analysis.tools|length}} tools</a>
-										{% endif %}
-										</div>
+												</div>
+											{% endfor %}
+										">
+										{{canned_analysis.tools|length}} tools</a>
+									{% endif %}
 									</div>
 								</div>
-								<i class="fa fa-info-circle canned-analysis-info-icon" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" title="Datasets" data-template='<div class="popover canned-analysis-info-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content container-fluid"></div></div>' data-content="
-										{% for dataset in canned_analysis.datasets %}
-											<div class='row canned-analysis-info-popover-row'>
-												<div class='col-12'>
-													<a class='canned-analysis-info-popover-link' href='#'>
-														<span class='canned-analysis-info-popover-name'>{{dataset.dataset_accession}}</span>
-													</a>
-												</div>
+							</div>
+							<i class="fa fa-info-circle canned-analysis-info-icon" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" title="Datasets" data-template='<div class="popover canned-analysis-info-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content container-fluid"></div></div>' data-content="
+									{% for dataset in canned_analysis.datasets %}
+										<div class='row canned-analysis-info-popover-row'>
+											<div class='col-12'>
+												<a class='canned-analysis-info-popover-link' href='#'>
+													<span class='canned-analysis-info-popover-name'>{{dataset.dataset_accession}}</span>
+												</a>
 											</div>
-										{% endfor %}
-										<div class='popover-title'>
-											Metadata
 										</div>
-										{% for key, value in canned_analysis.metadata.iteritems() %}
-											<div class='row canned-analysis-info-popover-row'>
-												<div class='col-6 canned-analysis-info-popover-metadata-tag'>
-													{{key}}
-												</div>
-												<div class='col-6 canned-analysis-info-popover-metadata-value'>
-													{{value}}
-												</div>
+									{% endfor %}
+									<div class='popover-title'>
+										Metadata
+									</div>
+									{% for key, value in canned_analysis.metadata.iteritems() %}
+										<div class='row canned-analysis-info-popover-row'>
+											<div class='col-6 canned-analysis-info-popover-metadata-tag'>
+												{{key}}
 											</div>
-										{% endfor %}
-								"></i>
-							</div> <!-- .canned-analysis-info-col -->
-						</div>
+											<div class='col-6 canned-analysis-info-popover-metadata-value'>
+												{{value}}
+											</div>
+										</div>
+									{% endfor %}
+							"></i>
+						</div> <!-- .canned-analysis-info-col -->
 					</div>
 				</div>
-			{% endfor %}
+			</div>
 		{% endfor %}
 	</div>
 {% endmacro %}
 
 <!-- Tools -->
-{% macro display_tools(tool_list, dataset_accession) %}
+{% macro display_tools(tool_list, dataset_accession=False) %}
 	<div class="row tool-row">
-		{% for i in range(50) %}
-			{% for tool in tool_list %}
-				<div class="col-3 tool-col">
-					<div class="tool-card">
-						<div class="row">
-							<div class="col-6 tool-icon-col">
-								<a href="#"><img class="tool-icon" src="{{tool.tool_icon_url}}"></a>
-							</div>
-							<div class="col-6 tool-info-col">
-								<a class="tool-name" href="#">{{tool.tool_name}}</a>
-								<a class="tool-developer" href="#">maayanlab</a>
-								<form action="{{url_for('index')}}">
-									<input type="hidden" name="dataset_accession" value="{{dataset_accession}}">
-									<input type="hidden" name="tool_name" value="{{tool.tool_name}}">
-									<button class="btn analyze-button">Analyze</button>
-								</form>
-								<i class="fa fa-info-circle tool-info-icon" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" data-template='<div class="popover tool-info-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="{{tool.tool_description}}"></i>
-							</div>
+		{% for tool in tool_list %}
+			<div class="col-3 tool-col">
+				<div class="tool-card">
+					<div class="row">
+						<div class="col-6 tool-icon-col">
+							<a href="{{url_for('tool_landing', name=tool.tool_name)}}"><img class="tool-icon" src="{{tool.tool_icon_url}}"></a>
+						</div>
+						<div class="col-6 tool-info-col">
+							<a class="tool-name" href="{{url_for('tool_landing', name=tool.tool_name)}}">{{tool.tool_name}}</a>
+							<a class="tool-developer" href="{{url_for('tool_landing', name=tool.tool_name)}}">maayanlab</a>
+							<!-- <form action="{{url_for('index')}}"> -->
+								<!-- <input type="hidden" name="dataset_accession" value="{{dataset_accession}}"> -->
+								<!-- <input type="hidden" name="tool_name" value="{{tool.tool_name}}"> -->
+								<button class="btn analyze-button">Analyze</button>
+							<!-- </form> -->
+							<i class="fa fa-info-circle tool-info-icon" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" data-template='<div class="popover tool-info-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="{{tool.tool_description}}"></i>
 						</div>
 					</div>
 				</div>
-			{% endfor %}
+			</div>
 		{% endfor %}
 	</div>
 {% endmacro %}
 
-<!-- Tools -->
+<!-- Datasets -->
+{% macro display_datasets(dataset_list, tool_name=False) %}
+	<div class="row dataset-row">
+		{% for dataset in dataset_list %}
+			<div class="col-4 dataset-col">
+				<div class="dataset-card">
+					<div class="row">
+						<div class="col-5 dataset-icon-col">
+							<a href="{{url_for('dataset_landing', acc=dataset.dataset_accession)}}"><img class="dataset-icon" src="{{dataset.repository_icon_url}}"></a>
+						</div>
+						<div class="col-7 dataset-info-col">
+							<a class="dataset-accession" href="{{url_for('dataset_landing', acc=dataset.dataset_accession)}}">{{dataset.dataset_accession}}</a>
+							<a class="dataset-title" href="{{url_for('dataset_landing', acc=dataset.dataset_accession)}}">{{dataset.dataset_title}}</a>
+							<!-- <form action="{{url_for('index')}}"> -->
+								<!-- <input type="hidden" name="dataset_accession" value="{{dataset.dataset_accession}}"> -->
+								<!-- <input type="hidden" name="tool_name" value="{{tool_name}}"> -->
+								<button class="btn analyze-button">Analyze</button>
+							<!-- </form> -->
+							<i class="fa fa-info-circle dataset-info-icon" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" data-template='<div class="popover dataset-info-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="{{dataset.dataset_description}}"></i>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+{% endmacro %}
+
+<!-- FAIRness -->
 {% macro display_fairness(fairness_dataframe) %}
-	<table id="fairness-table">
+	<table id="fairness-table" class="hover">
 		<thead>
 			<tr>
 				{% for title in fairness_dataframe.columns %}

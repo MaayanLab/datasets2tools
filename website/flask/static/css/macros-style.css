@@ -291,19 +291,84 @@
 /** DATASETS 
 /*************************/
 
-
-
-/*************************/
-/** FAIRNESS TABLE 
-/*************************/
-
-#dynatable-processing-fairness-table {
-
+.dataset-row {
+	margin-top: 10px;
 }
 
-	#dynatable-processing-fairness-table th {
-		background-color: blue;
+	.dataset-col {
+		padding: 10px 15px;
 	}
 
+		.dataset-card {
+			padding: 10px 15px;
+			background-color: white;
+			border: 1px solid #c2c2c2;
+			border-radius: 5px;
+		}
+
+			.dataset-icon-col {
+				padding: 5px 0px;
+				text-align: center;
+				margin: auto;
+			}
+
+				.dataset-icon {
+					max-width: 60%;
+				}
+
+			.dataset-info-col {
+				padding-left: 3px;
+				margin-top:-3px;
+				padding-top: 0px;
+			}
+
+				.dataset-accession {
+					font-size: 8pt;
+					color: darkblue;
+					display: block;
+					font-weight: 600;
+				}
+
+					.dataset-accession:hover {
+						color: darkblue;
+						text-decoration: none;
+					}
+
+				.dataset-title {
+					font-size: 7pt;
+					font-weight: 300;
+					color: darkblue;
+					margin: 0px;
+					display: block;
+					margin-top: 2px;
+					margin-bottom: 2px;
+				}
+
+					.dataset-title:hover {
+						color: darkblue;
+						text-decoration: none;
+					}
+
+				.dataset-description {
+					font-size: 7pt;
+					margin-bottom: 3px;
+				}
+
+				.dataset-info-icon {
+					position: absolute;
+					bottom: -3px;
+					right: 9px;
+					color: darkgrey;
+					font-size: 10pt;
+					cursor: pointer;
+				}
+
+					.dataset-info-popover {
+						font-size: 8pt;
+					}
+					
+						.dataset-info-icon:focus {
+							outline: none;
+						}
 
 

@@ -1,94 +1,25 @@
 {% extends "base.html" %}
 {% import "macros.html" as macros %}
 
-{% block head %}
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery.dynatable.css') }}">
-{% endblock %}
-
 {% block content %}
 
-	<div id="dataset-container" class="container">
+	<div id="landing-container" class="container">
 
-		<div id="dataset-overview" class="row">
-			<div id="dataset-type-col" class="col-3">
-				<img id="dataset-type-icon" src="{{url_for('static', filename='icons/gene.png')}}">
-			</div>
-			<div id="dataset-info-col" class="col-9">
-				<div class="row">
-					<div class="col-6">
-						<div class="row">
-							<div id="dataset-accession" class="col-12">
-								{{dataset['dataset_accession']}}
-							</div>
-						</div>
-						<div class="row">
-							<div id="dataset-type" class="col-12">
-								{{dataset['dataset_type']}} dataset
-							</div>
-						</div>
-						<div class="row">
-							<div id="dataset-date" class="col-12">
-								Uploaded {{dataset['date']}}
-							</div>
-						</div>
-					</div>
-					<div id="dataset-actions-col" class="col-3">
-						<div class="row">
-							<div class="col-12">
-								<button class="btn" type="button">Analyze</button>
-							</div>
-							<div class="col-12">
-								<button class="btn" type="button">Evaluate</button>
-							</div>
-						</div>
-					</div>
-					<div id="dataset-fairness-col" class="col-3">
-						<div id="fairness-wrapper">
-							<div id="fairness-label">FAIR Metrics</div>
-							<img id="dataset-fairness-icon" src="{{url_for('static', filename='icons/fairness.png')}}">
-						</div>
-					</div>
-				</div>
-			</div>
-		</div> <!-- #dataset-overview -->
-
-		<div id="dataset-tabs" class="row">
-			<ul class="nav nav-tabs" role="tablist">
-				<li class="nav-item">
-					<a class="nav-link active" data-toggle="tab" href="#overview" role="tab">Overview</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" data-toggle="tab" href="#analyses" role="tab">Analyses ({{canned_analysis_list|length}})</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" data-toggle="tab" href="#tools" role="tab">Tools ({{tool_list|length}})</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" data-toggle="tab" href="#fair-metrics" role="tab">FAIR Metrics</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" data-toggle="tab" href="#scripts" role="tab">Scripts</a>
-				</li>
-			</ul>
-		</div> <!-- #dataset-tabs -->
+		{{ macros.landing_page_template(object_data, object_type='dataset') }}
 
 		<div id="dataset-content" class="tab-content">
 
 			<div class="tab-pane active" id="overview" role="tabpanel">
-				{{ macros.display_fairness(fairness_dataframe) }}
+				{{ macros.display_object_overview(object_data.dataset) }}
 			</div> <!-- #overview -->
 
 			<div class="tab-pane" id="analyses" role="tabpanel">
-				{{ macros.display_canned_analyses(canned_analysis_list) }}
+				{{ macros.display_canned_analyses(object_data.canned_analyses) }}
 			</div> <!-- #analyses -->
 
 			<div class="tab-pane" id="tools" role="tabpanel">
-				{{ macros.display_tools(tool_list, dataset.dataset_accession) }}
+				{{ macros.display_tools(object_data.tools) }}
 			</div> <!-- #tools -->
-			<div class="tab-pane" id="fair-metrics" role="tabpanel">
-				{{ macros.display_fairness(fairness_dataframe) }}
-			</div> <!-- #fair-metrics -->
-			<div class="tab-pane" id="scripts" role="tabpanel">scripts</div> <!-- #scripts -->
 		</div> <!-- #dataset-content -->
 
 	</div>
@@ -96,12 +27,10 @@
 {% endblock %}
 
 {% block footer %}
-    <script src="{{ url_for('static', filename='js/jquery.dynatable.js') }}"></script>
+    <script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript">
-		var dynatable = $('#fairness-table').dynatable({
-	    features: {
-	        recordCount: false
-	      },
-		});
+    	$('#fairness-table').DataTable({
+		    paging: false
+    	});
     </script>
 {% endblock %}
