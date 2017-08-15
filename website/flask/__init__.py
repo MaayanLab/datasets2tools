@@ -1,5 +1,5 @@
 # Modules
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -84,8 +84,8 @@ def landing(object_type):
 	if object_type == 'dataset':
 		landing_data = {'dataset': datasets['search_results'][0], 'canned_analyses': canned_analyses, 'tools': tools}
 	elif object_type == 'tool':
-		landing_data = {'dataset': datasets, 'canned_analyses': canned_analyses, 'tool': tools['search_results'][0]}
-	elif object_type == 'analysis':
+		landing_data = {'datasets': datasets, 'canned_analyses': canned_analyses, 'tool': tools['search_results'][0]}
+	elif object_type == 'canned_analysis':
 		landing_data = {'datasets': datasets, 'canned_analysis': canned_analyses['search_results'][0], 'tools': tools}
 	return render_template('landing.html', landing_data=landing_data, object_type=object_type)
 
@@ -103,6 +103,10 @@ def tool_landing():
 def analysis_landing():
 	landing_data = {'datasets': datasets, 'canned_analysis': canned_analyses['search_results'][0], 'tools': tools}
 	return render_template('analysis_landing.html', landing_data=landing_data)
+
+@app.route(entry_point+'/static/<path:path>')
+def static_files(path):
+	return send_from_directory('static', path)
 
 
 if __name__ == "__main__":

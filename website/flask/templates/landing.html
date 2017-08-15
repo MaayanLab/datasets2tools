@@ -3,7 +3,7 @@
 
 {% block head %}
 
-	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/chosen.css') }}">
 
 {% endblock %}
 
@@ -15,10 +15,11 @@
 
 
 {% block footer %}
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+    <script src="{{ url_for('static', filename='js/chosen.jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chosen.proto.min.js') }}"></script>
 	<script type="text/javascript">
 	$('.search-filter-dropdown').each(function(i, elem){
-		$(elem).select2({placeholder: $(elem).attr('id')})
+		$(elem).chosen({width: '100%'});
 	});
 	</script>
 
