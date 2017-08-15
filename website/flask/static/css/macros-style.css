@@ -141,6 +141,7 @@
 				background-color: #f9f9f9;
 				padding: 1px;
 				margin-bottom: 30px;
+				background-color: white;
 			}
 
 				.info-card-title {
@@ -184,11 +185,136 @@
 						margin-right: 5px;
 						font-size: 8pt;
 						font-weight: 500;
+						font-style: normal;
 					}
 
 						.keyword:hover, .keyword:focus {
 							color: white;
 						}
+
+				#general-info {
+
+				}
+
+				#publication-info {
+
+				}
+
+					#publication-tabs {
+						border-bottom: 1px solid #c2c2c2;
+					}
+
+						#publication-tabs .nav {
+							border: none;
+						}
+
+							#publication-tabs .nav-link {
+								border: none;
+								color: black;
+								background-color: transparent;
+								padding: 7px 13px;
+								font-size: 9pt;
+								font-weight: 400;
+								margin: 0px;
+								border-radius: 0px;
+								border-right: 1px solid #c2c2c2;
+							}
+
+								#publication-tabs .nav-link.active {
+									color: #255FA7;
+									background-color: white;
+									border-bottom: 2px solid #255FA7;
+								}
+
+						.info-card-publication {
+							background-color: white;
+							padding: 10px 15px;
+						}
+
+
+							.info-card-publication-title {
+								font-size: 11pt;
+								font-weight: 500;
+							}
+
+							.info-card-publication-authors {
+								font-size: 9pt;
+								font-style: italic;
+								padding-top: 9px;
+								padding-bottom: 9px;
+							}
+
+							.info-card-publication-abstract {
+								font-size: 9pt;
+							}
+
+							.info-card-publication-keywords {
+								font-size: 9pt;
+								padding-top: 9px;
+								padding-bottom: 9px;
+								font-style: italic;
+							}
+
+							.info-card-publication-doi {
+								font-size: 9pt;
+								font-style: italic;
+							}
+
+								.info-card-publication-doi a {
+									font-style: normal;
+								}
+
+				#related-object-info {
+
+				}
+
+					#related-object-row {
+						padding: 10px 25px;
+					}
+
+		#datasets {
+
+		}
+
+		#tools {
+
+		}
+
+		#analyses {
+
+		}
+
+			.object-search-form {
+				margin-left: 15px;
+				margin-top: 15px;
+				margin-bottom: 15px;
+			}
+
+				.object-search-form input {
+					height: 25px;
+					font-size: 9pt;
+					background-color: #f9f9f9;
+					border-radius: 5px 0px 0px 5px;
+					border: 1px solid #c2c2c2;
+					border-right: none;
+				}
+
+				.object-search-form button {
+					height: 25px;
+					width: 25px;
+					background-color: #f9f9f9;
+					border-radius: 0px 5px 5px 0px;
+					border: 1px solid #c2c2c2;
+					border-left: 1px solid rgba(0,0,0,.1);
+					font-size: 11pt;
+					padding: 0px 2px;
+					color: grey;
+					cursor: pointer;
+				}
+
+					.object-search-form button:focus {
+						box-shadow: none;
+					}
 
 
 /*************************/

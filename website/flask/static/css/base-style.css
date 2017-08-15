@@ -53,6 +53,7 @@ html {
 			font-size: 11pt;
 			padding: 0;
 			color: grey;
+			cursor: pointer;
 		}
 
 	.nav-link {

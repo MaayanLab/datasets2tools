@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block head %}
+
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+
+{% endblock %}
+
+{% block content %}
+
+	{{ macros.landing_page_template(landing_data, object_type=object_type) }}
+
+{% endblock %}
+
+
+{% block footer %}
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+	<script type="text/javascript">
+	$('.search-filter-dropdown').each(function(i, elem){
+		$(elem).select2({placeholder: $(elem).attr('id')})
+	});
+	</script>
+
+{% endblock %}
