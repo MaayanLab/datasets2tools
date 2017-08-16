@@ -137,16 +137,27 @@
 
 	{% set colsize = 'col-3' if object_type == 'canned_analysis' else 'col-4' %}
 
-	<a class="filter-button" data-toggle="collapse" href="#{{object_type}}-search-filters" aria-expanded="false" aria-controls="collapseExample">
-		Filters &nbsp&#xf0d7;
-	</a>
+	<form class="object-search-form" action="{{ request.path }}">
 
-	<div id="{{object_type}}-search-filters" class="info-card collapse search-filter-card">
-		<div class="info-card-title">General Filters</div>
-		<form class="object-search-form" action="{{ request.path }}">
+		<div class="row">
+			<div class="col-6">
+				<a class="filter-button" data-toggle="collapse" href="#{{object_type}}-search-filters" aria-expanded="false" aria-controls="#{{object_type}}-search-filters">Filters &nbsp&#xf0d7;</a>
+			</div>
+			{{ set initial_offset = request.args.get('offset', default='1') }}
+			<div class="col-6 text-right">
+				<span class="search-filter-offset-label"> Pages: </span>
+					{% for offset in offsets %}
+						<input type="radio" name="offset" id="{{object_type}}-offset-{{offset}}" value="{{offset}}"{{ ' checked' if ((offset)|string() == initial_offset and object_type == request.args.get('tab')) or (object_type != request.args.get('tab') and offset==1) else ''}}>
+						<label for="{{object_type}}-offset-{{offset}}" class="search-filter-offset">{{offset}}</label>
+					{% endfor %}
+			</div>
+		</div>
+
+		<div id="{{object_type}}-search-filters"  class="info-card collapse search-filter-card">
+			<div class="info-card-title">General Filters</div>
 			<input type="hidden" name="tab" value="{{ object_type }}">
 			<div class="container-fluid">
-				<div class="row">
+				<div class="row search-filter-row">
 					<div class="{{ colsize }}">
 						<div class="object-search-form-label">Search</div>
 						<div class="form-inline">
@@ -172,7 +183,7 @@
 				</div>
 				{% if object_type == 'canned_analysis' %}
 					<div class="info-card-divider">Metadata Filters</div>
-					<div class="row">
+					<div class="row search-filter-row">
 						{% for key, values in search_filters.canned_analysis_metadata.iteritems() %}
 							<div class="col-3">
 								<div class="object-search-form-label">{{key.replace('_', ' ').title()}}</div>
@@ -187,8 +198,8 @@
 					</div>
 				{% endif %}
 			</div>
-		</form>
-	</div>
+		</div>
+	</form>
 
 {% endmacro %}
 
@@ -280,17 +291,17 @@
 				</li>
 				{% if object_type != 'dataset' %}
 					<li class="nav-item">
-						<a class="nav-link" data-toggle="tab" href="#datasets" role="tab">Datasets ({{ landing_data.datasets.search_results|length }})</a>
+						<a class="nav-link" data-toggle="tab" href="#datasets" role="tab">Datasets ({{ landing_data.datasets.count }})</a>
 					</li>
 				{% endif %}
 				{% if object_type != 'tool' %}
 					<li class="nav-item">
-						<a class="nav-link" data-toggle="tab" href="#tools" role="tab">Tools ({{ landing_data.tools.search_results|length }})</a>
+						<a class="nav-link" data-toggle="tab" href="#tools" role="tab">Tools ({{ landing_data.tools.count }})</a>
 					</li>
 				{% endif %}
 				{% if object_type != 'canned_analysis' %}
 					<li class="nav-item">
-						<a class="nav-link" data-toggle="tab" href="#canned_analyses" role="tab">Analyses ({{ landing_data.canned_analyses.search_results|length }})</a>
+						<a class="nav-link" data-toggle="tab" href="#canned_analyses" role="tab">Analyses ({{ landing_data.canned_analyses.count }})</a>
 					</li>
 				{% endif %}
 			</ul>
@@ -377,30 +388,41 @@
 			{% if object_type != 'dataset' %}
 				<div class="tab-pane" id="datasets" role="tabpanel">
 					{{ display_search_filters(landing_data.datasets.search_filters, object_type='dataset') }}
-					<div class="info-card">
-						{% for dataset in landing_data.datasets.search_results %}
-							{{ display_object_card(dataset, object_type='dataset') }}
-						{% endfor %}
+					<div class="info-card associated-object-card">
+						<div class="info-card-title">Datasets<span class="info-card-subtitle">Displaying {{ landing_data.datasets.search_results|length }} of {{ landing_data.datasets.count }} results</span></div>
+						<div class="row object-card-row">
+							{% for dataset in landing_data.datasets.search_results %}
+								{{ display_object_card(dataset, object_type='dataset') }}
+							{% endfor %}
+						</div>
 					</div>
 				</div> <!-- #datasets -->
 			{% endif %}
+
 			{% if object_type != 'tool' %}
 				<div class="tab-pane" id="tools" role="tabpanel">
 					{{ display_search_filters(landing_data.tools.search_filters, object_type='tool') }}
-					<div class="row">
-						{% for tool in landing_data.tools.search_results %}
-							{{ display_object_card(tool, object_type='tool') }}
-						{% endfor %}
+					<div class="info-card associated-object-card">
+						<div class="info-card-title">Tools<span class="info-card-subtitle">Displaying {{ landing_data.tools.search_results|length }} of {{ landing_data.tools.count }} results</span></div>
+						<div class="row object-card-row">
+							{% for tool in landing_data.tools.search_results %}
+								{{ display_object_card(tool, object_type='tool') }}
+							{% endfor %}
+						</div>
 					</div>
 				</div> <!-- #tools -->
 			{% endif %}
+
 			{% if object_type != 'canned_analysis' %}
 				<div class="tab-pane" id="canned_analyses" role="tabpanel">
 					{{ display_search_filters(landing_data.canned_analyses.search_filters, object_type='canned_analysis') }}
-					<div class="row">
-						{% for canned_analysis in landing_data.canned_analyses.search_results %}
-							{{ display_object_card(canned_analysis, object_type='canned_analysis') }}
-						{% endfor %}
+					<div class="info-card associated-object-card">
+						<div class="info-card-title">Canned Analyses<span class="info-card-subtitle">Displaying {{ landing_data.canned_analyses.search_results|length }} of {{ landing_data.canned_analyses.count }} results</span></div>
+						<div class="row object-card-row">
+							{% for canned_analysis in landing_data.canned_analyses.search_results %}
+								{{ display_object_card(canned_analysis, object_type='canned_analysis') }}
+							{% endfor %}
+						</div>
 					</div>
 				</div> <!-- #canned_analyses -->
 			{% endif %}
