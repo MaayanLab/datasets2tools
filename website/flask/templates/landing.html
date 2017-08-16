@@ -18,9 +18,20 @@
     <script src="{{ url_for('static', filename='js/chosen.jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/chosen.proto.min.js') }}"></script>
 	<script type="text/javascript">
-	$('.search-filter-dropdown').each(function(i, elem){
-		$(elem).chosen({width: '100%'});
-	});
+		$('.search-filter-dropdown').each(function(i, elem){
+			$(elem).chosen({width: '100%', allow_single_deselect: true});
+		});
+		$('.object-search-form').change(function() {
+			this.submit();
+		});
+		if (window.location.hash != "") {
+			$('a[href="' + window.location.hash + '"]').click()
+		};
 	</script>
+
+	{% if 'tab' in request.args.keys() %}
+		{% set tab_id = request.args.get('tab').replace('is', 'e')+'s' %}
+		<script type="text/javascript">$('a[href="#{{tab_id}}"]').click();$('#{{tab_id}} .filter-button').click();</script>
+	{% endif %}
 
 {% endblock %}

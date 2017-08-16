@@ -24,25 +24,25 @@
 			<div class="canned-analysis-card">
 				<div class="row">
 					<div class="col-5 canned-analysis-preview-col">
-						<a href="{{ url_for('landing', object_type='canned_analysis', acc=object_data.canned_analysis_accession) }}">
+						<a href="{{ url_for('landing', object_type='canned_analysis', object_identifier=object_data.canned_analysis_accession) }}">
 							<img class="canned-analysis-preview-icon" src="{{ object_data.canned_analysis_preview_url }}">
 						</a>
 					</div>
 					<div class="col-7 canned-analysis-info-col">
 						<div class="row">
 							<div class="col-12 canned-analysis-title-col">
-								<a href="{{ url_for('landing', object_type='canned_analysis', acc=object_data.canned_analysis_accession) }}" class="canned-analysis-title">
+								<a href="{{ url_for('landing', object_type='canned_analysis', object_identifier=object_data.canned_analysis_accession) }}" class="canned-analysis-title">
 									{{ object_data.canned_analysis_title }}
 								</a>
 								<div class="canned-analysis-tool">
 								{% if object_data.tools|length == 1%}
-									<a href="{{ url_for('landing', object_type='tool', name=object_data.tools[0].tool_name) }}">{{ object_data.tools[0].tool_name }}</a>
+									<a href="{{ url_for('landing', object_type='tool', object_identifier=object_data.tools[0].tool_name) }}">{{ object_data.tools[0].tool_name }}</a>
 								{% else %}
 									<a href="#" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" title="Tools"  data-template='<div class="popover canned-analysis-info-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="
 										{% for tool in object_data.tools %}
 											<div class='row canned-analysis-info-popover-row'>
 												<div class='col-12'>
-													<a class='canned-analysis-info-popover-link' href='{{ url_for('landing', object_type='tool', name=tool.tool_name) }}'>
+													<a class='canned-analysis-info-popover-link' href='{{ url_for('landing', object_type='tool', object_identifier=tool.tool_name) }}'>
 														<img class='canned-analysis-info-popover-icon'src='{{ tool.tool_icon_url }}'>
 														<span class='canned-analysis-info-popover-name'>{{ tool.tool_name }}</span>
 													</a>
@@ -59,7 +59,7 @@
 								{% for dataset in object_data.datasets.search_results %}
 									<div class='row canned-analysis-info-popover-row'>
 										<div class='col-12'>
-											<a class='canned-analysis-info-popover-link' href='{{ url_for('landing', object_type='dataset', acc=dataset.dataset_accession) }}'>
+											<a class='canned-analysis-info-popover-link' href='{{ url_for('landing', object_type='dataset', object_identifier=dataset.dataset_accession) }}'>
 												<span class='canned-analysis-info-popover-name'>{{ dataset.dataset_accession }}</span>
 											</a>
 										</div>
@@ -88,11 +88,11 @@
 			<div class="dataset-card">
 				<div class="row">
 					<div class="col-5 dataset-icon-col">
-						<a href="{{ url_for('landing', object_type='dataset', acc=object_data.dataset_accession) }}"><img class="dataset-icon" src="{{ object_data.repository_icon_url }}"></a>
+						<a href="{{ url_for('landing', object_type='dataset', object_identifier=object_data.dataset_accession) }}"><img class="dataset-icon" src="{{ object_data.repository_icon_url }}"></a>
 					</div>
 					<div class="col-7 dataset-info-col">
-						<a class="dataset-accession" href="{{ url_for('landing', object_type='dataset', acc=object_data.dataset_accession) }}">{{ object_data.dataset_accession }}</a>
-						<a class="dataset-title" href="{{ url_for('landing', object_type='dataset', acc=object_data.dataset_accession) }}">{{ object_data.dataset_title }}</a>
+						<a class="dataset-accession" href="{{ url_for('landing', object_type='dataset', object_identifier=object_data.dataset_accession) }}">{{ object_data.dataset_accession }}</a>
+						<a class="dataset-title" href="{{ url_for('landing', object_type='dataset', object_identifier=object_data.dataset_accession) }}">{{ object_data.dataset_title }}</a>
 						<a href="{{ url_for('index', tool_name=tool_name, dataset_accession=object_data.dataset_accession) }}">
 						{% if tool_name %}
 							<a href="{{ url_for('index', tool_name=tool_name, dataset_accession=object_data.dataset_accession) }}">
@@ -111,11 +111,11 @@
 			<div class="tool-card">
 				<div class="row">
 					<div class="col-6 tool-icon-col">
-						<a href="{{ url_for('landing', object_type='tool', name=object_data.tool_name) }}"><img class="tool-icon" src="{{ object_data.tool_icon_url }}"></a>
+						<a href="{{ url_for('landing', object_type='tool', object_identifier=object_data.tool_name) }}"><img class="tool-icon" src="{{ object_data.tool_icon_url }}"></a>
 					</div>
 					<div class="col-6 tool-info-col">
-						<a class="tool-name" href="{{ url_for('landing', object_type='tool', name=object_data.tool_name) }}">{{ object_data.tool_name }}</a>
-						<a class="tool-developer" href="{{ url_for('landing', object_type='tool', name=object_data.tool_name) }}">maayanlab</a>
+						<a class="tool-name" href="{{ url_for('landing', object_type='tool', object_identifier=object_data.tool_name) }}">{{ object_data.tool_name }}</a>
+						<a class="tool-developer" href="{{ url_for('landing', object_type='tool', object_identifier=object_data.tool_name) }}">maayanlab</a>
 						{% if dataset_accession %}
 							<a href="{{ url_for('index', tool_name=object_data.tool_name, dataset_accession=dataset_accession) }}">
 						{% else %}
@@ -137,31 +137,58 @@
 
 	{% set colsize = 'col-3' if object_type == 'canned_analysis' else 'col-4' %}
 
-	<form id="{{ object_type }}-search-form" class="object-search-form">
-		<div class="container-fluid">
-			<div class="row">
-				<div class="{{ colsize }}">
-					<div class="object-search-form-label">Search</div>
-					<div class="form-inline">
-						<input class="form-control" type="text" placeholder="Insert terms...">
-						<button class="btn" type="button">
-							<i class="fa fa-search"></i>
-						</button>
-					</div>
-				</div>
-				{% for key, values in search_filters.iteritems() %}
+	<a class="filter-button" data-toggle="collapse" href="#{{object_type}}-search-filters" aria-expanded="false" aria-controls="collapseExample">
+		Filters &nbsp&#xf0d7;
+	</a>
+
+	<div id="{{object_type}}-search-filters" class="info-card collapse search-filter-card">
+		<div class="info-card-title">General Filters</div>
+		<form class="object-search-form" action="{{ request.path }}">
+			<input type="hidden" name="tab" value="{{ object_type }}">
+			<div class="container-fluid">
+				<div class="row">
 					<div class="{{ colsize }}">
-						<div class="object-search-form-label">{{ key.title() }}</div>
-						<select id="{{ key }}" data-placeholder="Select..." class="search-filter-dropdown" multiple>
-							{% for value in values %}
-								<option value="{{ value }}">{{ value }}</option>
-							{% endfor %}
-						</select>
+						<div class="object-search-form-label">Search</div>
+						<div class="form-inline">
+							<input class="form-control" type="text" placeholder="Insert terms..." name="q">
+							<button class="btn" type="button">
+								<i class="fa fa-search"></i>
+							</button>
+						</div>
 					</div>
-				{% endfor %}
+					{% for key, values in search_filters.iteritems() %}
+						{% if key != 'canned_analysis_metadata' %}
+						<div class="{{ colsize }}">
+							<div class="object-search-form-label">{{ key.title() }}</div>
+							<select data-placeholder="Select..." class="search-filter-dropdown" name="{{ key }}">
+								<option></option>
+								{% for value in values %}
+									<option value="{{ value }}"{{ ' selected' if request.args.get('tab') == object_type and request.args.get(key) == value else '' }}>{{ value }}</option>
+								{% endfor %}
+							</select>
+						</div>
+						{% endif %}
+					{% endfor %}
+				</div>
+				{% if object_type == 'canned_analysis' %}
+					<div class="info-card-divider">Metadata Filters</div>
+					<div class="row">
+						{% for key, values in search_filters.canned_analysis_metadata.iteritems() %}
+							<div class="col-3">
+								<div class="object-search-form-label">{{key.replace('_', ' ').title()}}</div>
+								<select data-placeholder="Select..." class="search-filter-dropdown" name="{{ key }}">
+									<option></option>
+									{% for value in values %}
+										<option value="{{ value }}"{{ ' selected' if request.args.get('tab') == object_type and request.args.get(key) == value else '' }}>{{ value }}</option>
+									{% endfor %}
+								</select>
+							</div>
+						{% endfor %}
+					</div>
+				{% endif %}
 			</div>
-		</div>
-	</form>
+		</form>
+	</div>
 
 {% endmacro %}
 
@@ -349,11 +376,8 @@
 
 			{% if object_type != 'dataset' %}
 				<div class="tab-pane" id="datasets" role="tabpanel">
+					{{ display_search_filters(landing_data.datasets.search_filters, object_type='dataset') }}
 					<div class="info-card">
-						<div class="info-card-title">Datasets</div>
-						{{ display_search_filters(landing_data.datasets.search_filters, object_type='dataset') }}
-					</div>
-					<div class="row">
 						{% for dataset in landing_data.datasets.search_results %}
 							{{ display_object_card(dataset, object_type='dataset') }}
 						{% endfor %}
@@ -362,10 +386,7 @@
 			{% endif %}
 			{% if object_type != 'tool' %}
 				<div class="tab-pane" id="tools" role="tabpanel">
-					<div class="info-card">
-						<div class="info-card-title">Tools</div>
-						{{ display_search_filters(landing_data.tools.search_filters, object_type='tool') }}
-					</div>
+					{{ display_search_filters(landing_data.tools.search_filters, object_type='tool') }}
 					<div class="row">
 						{% for tool in landing_data.tools.search_results %}
 							{{ display_object_card(tool, object_type='tool') }}
@@ -375,10 +396,7 @@
 			{% endif %}
 			{% if object_type != 'canned_analysis' %}
 				<div class="tab-pane" id="canned_analyses" role="tabpanel">
-					<div class="info-card">
-						<div class="info-card-title">Canned Analyses</div>
-						{{ display_search_filters(landing_data.canned_analyses.search_filters, object_type='canned_analysis') }}
-					</div>
+					{{ display_search_filters(landing_data.canned_analyses.search_filters, object_type='canned_analysis') }}
 					<div class="row">
 						{% for canned_analysis in landing_data.canned_analyses.search_results %}
 							{{ display_object_card(canned_analysis, object_type='canned_analysis') }}
