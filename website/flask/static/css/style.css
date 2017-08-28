@@ -1,0 +1,437 @@
+/*************************/
+/** GENERAL LANDING 
+/*************************/
+
+#landing-container {
+	width: 750px;
+}
+
+	#object-overview {
+		background-color: white;
+		border: 1px solid #c2c2c2;
+		margin-top: 35px;
+		border-radius: 7px 7px 0px 0px;
+		font-family: Helvetica;
+	}
+
+		#object-icon-col {
+			border-right: 1px solid #c2c2c2;
+			display: flex;
+			align-items: center;
+			flex-wrap: wrap;
+		}
+
+			#object-icon {
+				width: 100%;
+				margin: auto;
+				padding: 20px;
+			}
+
+				#object-icon.tool {
+					padding: 5px;
+				}
+
+		#object-info-col {
+			margin: auto;
+		}
+
+			#object-info-col .row {
+				margin: 15px -5px;
+			}
+
+				#object-main-title {
+					font-size: 12pt;
+					font-weight: 600;
+				}
+
+					#object-main-title.tool {
+						font-size: 13pt;
+					}
+
+				#object-subtype {
+					font-size: 11pt;
+					font-style: italic;
+				}
+
+				#object-date {
+					font-size: 11pt;
+				}
+
+		#object-actions-col {
+			display:flex;
+			align-items:center;
+		}
+
+			#object-actions-col button {
+				margin: 10px 0px;
+				width: 100%;
+				background-color: #255FA7;
+				color: white;
+				font-weight: 600;
+				cursor: pointer;
+				font-size: 10pt;
+			}
+
+		#object-fairness-col {
+			display: flex;
+			align-items: center;
+			flex-wrap: wrap;
+			border-left: 1px solid #c2c2c2
+		}
+			
+			#object-fairness-col::after {
+				content: "FAIR Metrics";
+				z-index: 10;
+				font-size: 9pt;
+				color: black;
+				top: 25px;
+				left: 25px;
+				position: absolute;
+				text-align: center;
+				font-weight: 600;
+			}
+
+			#object-fairness-icon {
+				width: 100%;
+				padding: 0px;
+				padding-top: 25px;
+				margin: auto;
+			}
+
+	#object-tabs {
+		background-color: white;
+		border: 1px solid #c2c2c2;
+		border-top: none;
+		border-radius: 0 0 7px 7px;
+	}
+
+		#object-tabs .nav {
+			border: none;
+			padding-left: 10px;
+		}
+
+			#object-tabs .nav-link {
+				border: none;
+				color: black;
+				background-color: transparent;
+				padding: 10px 13px;
+				font-size: 10pt;
+				font-weight: 400;
+			}
+
+				#object-tabs .nav-link.active {
+					color: #255FA7;
+					border: none;
+					-webkit-box-shadow: inset 0px -3px 0px 0px rgba(37,95,167,1);
+					-moz-box-shadow: inset 0px -3px 0px 0px rgba(37,95,167,1);
+					box-shadow: inset 0px -3px 0px 0px rgba(37,95,167,1);
+				}
+
+	#object-content {
+		margin-top: 20px;
+	}
+
+		#overview {
+
+		}
+
+			.info-card {
+				border: 1px solid #c2c2c2;
+				border-radius: 7px;
+				background-color: #f9f9f9;
+				padding: 1px;
+				margin-bottom: 20px;
+				background-color: white;
+			}
+
+				.info-card-title {
+					padding: 5px 10px;
+					font-size: 10pt;
+					font-weight: 600;
+					border-bottom: 1px solid #c2c2c2;
+					background-color: #f9f9f9;
+				}
+
+					.info-card-subtitle {
+						float: right;
+						font-size: 9pt;
+						font-weight: 400;
+						font-style: italic;
+					}
+
+				.info-card-divider {
+					margin: 0px -15px;
+					font-size: 10pt;
+					font-weight: 600;
+					border-top: 1px solid #c2c2c2;
+					border-bottom: 1px solid #c2c2c2;
+					padding: 5px 10px;
+					background-color: #f9f9f9;
+				}
+
+				.info-card-table {
+					background-color: white;
+				}
+
+					.info-card-table tr:nth-child(even) { background-color: #f9f9f9; }
+					.info-card-table tr:nth-child(odd) { background-color: white; }
+
+						.info-card-table tr td {
+							padding: 10px 10px;
+						}
+
+							.info-card-table tr td:first-child {
+								font-size: 10pt;
+								font-weight: 600;
+								text-align: right;
+								font-style: italic;
+								min-width: 130px;
+							}
+
+							.info-card-table tr td:nth-child(2) {
+								font-size: 9pt;
+								font-weight: 300;
+								padding-left: 10px;
+								width: 100%;
+							}
+
+					.keyword {
+						background-color: #255FA7;
+						color: white;
+						padding: 3px 7px;
+						border-radius: 3px;
+						margin-right: 5px;
+						font-size: 8pt;
+						font-weight: 500;
+						font-style: normal;
+					}
+
+						.keyword:hover, .keyword:focus {
+							color: white;
+						}
+
+				#general-info {
+
+				}
+
+				#publication-info {
+
+				}
+
+					#publication-tabs {
+						border-bottom: 1px solid #c2c2c2;
+					}
+
+						#publication-tabs .nav {
+							border: none;
+						}
+
+							#publication-tabs .nav-link {
+								border: none;
+								color: black;
+								background-color: transparent;
+								padding: 7px 13px;
+								font-size: 9pt;
+								font-weight: 400;
+								margin: 0px;
+								border-radius: 0px;
+								border-right: 1px solid #c2c2c2;
+							}
+
+								#publication-tabs .nav-link.active {
+									color: #255FA7;
+									background-color: white;
+									border-bottom: 2px solid #255FA7;
+								}
+
+						.info-card-publication {
+							background-color: white;
+							padding: 10px 15px;
+						}
+
+
+							.info-card-publication-title {
+								font-size: 11pt;
+								font-weight: 500;
+							}
+
+							.info-card-publication-authors {
+								font-size: 9pt;
+								font-style: italic;
+								padding-top: 9px;
+								padding-bottom: 9px;
+							}
+
+							.info-card-publication-abstract {
+								font-size: 9pt;
+							}
+
+							.info-card-publication-keywords {
+								font-size: 9pt;
+								padding-top: 9px;
+								padding-bottom: 9px;
+								font-style: italic;
+							}
+
+							.info-card-publication-doi {
+								font-size: 9pt;
+								font-style: italic;
+							}
+
+								.info-card-publication-doi a {
+									font-style: normal;
+								}
+
+				#related-object-info {
+
+				}
+
+					#related-object-row {
+						padding: 10px 25px;
+					}
+
+		#datasets {
+
+		}
+
+		#tools {
+
+		}
+
+		#analyses {
+
+		}
+/*
+			.filter-button {
+				font-size: 9pt;
+				color: black;
+				background-color: #f9f9f9;
+				border: 1px solid #c2c2c2;
+				border-radius: 3px;
+				padding: 5px 10px;
+				font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif, "FontAwesome";
+				margin-bottom: 5px;
+			}
+
+				.filter-button:hover, .filter-button:focus {
+					text-decoration: none;
+					color: black;
+				}
+
+				.search-filter-card {
+					margin-top: 15px;
+					margin-bottom: 0px;
+				}
+
+					.search-filter-card .info-card-title, .search-filter-card .info-card-divider {
+						font-size: 9pt;
+					}
+
+					.search-filter-card.collapsing {
+						-webkit-transition: height 0.00001s;
+						-moz-transition: height 0.00001s;
+						-ms-transition: height 0.00001s;
+						-o-transition: height 0.00001s;
+						transition: height 0.00001s;
+					}
+
+					.search-filter-row {
+						padding-left: 15px;
+						padding-top: 15px;
+						padding-bottom: 15px;
+					}
+
+					.object-search-form {
+					}
+
+						.search-filter-offset-label {
+							font-size: 8pt;
+							margin-right: 5px;
+						}
+
+							.search-filter-offset {
+								font-size: 9pt;
+								display: inline-block;
+								border: 1px solid #c2c2c2;
+								border-radius: 2px;
+								background-color: #f9f9f9;
+								padding: 2px 7px;
+								margin-right: 5px;
+								cursor: pointer;
+							}
+
+							.object-search-form input[type="radio"] {
+								display: none;
+							}
+
+							.object-search-form input[type="radio"]:checked + .search-filter-offset {
+								color: #c2c2c2;
+								border-color: lightgrey;
+								cursor: default;
+							}
+
+						.object-search-form-label {
+							font-size: 8pt;
+							margin-bottom: 5px;
+							padding-left: 3px;
+							font-weight: 600;
+						}
+
+						.object-search-form input {
+							height: 27px;
+							border: 1px solid #aaa;
+							font-size: 9pt;
+							width: 80% !important;
+							border-radius: 3px 0px 0px 3px;
+							background-image: linear-gradient(#eee 1%, #fff 15%);
+						}
+
+							.object-search-form input:focus {
+								border-color: #5897fb;
+							}
+
+						.object-search-form button {
+							height: 27px;
+							width: 27px;
+							border: 1px solid #aaa;
+							border-radius: 0px 3px 3px 0px;
+							border-left: none;
+							font-size: 10pt;
+							padding: 0px 2px;
+							background-color: #f9f9f9;
+							color: grey;
+							cursor: pointer;
+						}
+
+							.object-search-form button:focus {
+								box-shadow: none;
+							}
+
+						.object-search-form .chosen-container {
+							font-size: 8pt;
+						}
+
+							.object-search-form .chosen-choices {
+								border-radius: 3px;
+								border: 1px solid #c2c2c2;
+							}
+
+							.object-search-form .result-selected {
+								display: none !important;
+							}
+*/
+				.associated-object-card {
+					margin-top: 15px;
+				}
+
+					.associated-object-label {
+						font-size: 10pt;
+						padding-left: 25px;
+						padding-top: 15px;
+						font-weight: 300;
+					}
+
+					.search-results-wrapper {
+						padding: 10px 25px;
+					}
+

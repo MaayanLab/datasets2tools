@@ -9,7 +9,241 @@
 
 {% block content %}
 
-	{{ macros.landing_page_template(landing_data, object_type=object_type) }}
+	<div id="landing-container" class="container">
+		<div id="object-overview" class="row">
+			<div id="object-icon-col" class="{{ 'col-2' if object_type == 'tool' else 'col-3' }}">
+				{% if object_type == 'dataset' %}
+					<img id="object-icon" src="{{ url_for('static', filename='icons/gene.png') }}">
+				{% elif object_type == 'tool' %}
+					<img id="object-icon" class='tool' src="{{ landing_data.tool.tool_icon_url }}">
+				{% elif object_type == 'canned_analysis' %}
+					<img id="object-icon" src="{{ landing_data.canned_analysis.canned_analysis_preview_url }}">
+				{% endif %}
+			</div>
+			<div id="object-info-col" class="{{ 'col-6' if object_type == 'tool' else 'col-5' }}">
+				<div class="row">
+					<div id="object-main-title" class="col-12 {{ 'tool' if object_type == 'tool' }}">
+						{% if object_type == 'dataset' %}
+							{{ landing_data.dataset.dataset_title }}
+						{% elif object_type == 'tool' %}
+							{{ landing_data.tool.tool_name }}
+						{% elif object_type == 'canned_analysis' %}
+							{{ landing_data.canned_analysis.canned_analysis_title }}
+						{% endif %}
+					</div>
+				</div>
+				<div class="row">
+					<div id="object-subtype" class="col-12">
+						{% if object_type == 'dataset' %}
+							{{ landing_data.dataset.dataset_type }} Dataset
+						{% elif object_type == 'tool' %}
+							Computational Tool
+						{% elif object_type == 'canned_analysis' %}
+							Canned Analysis
+						{% endif %}
+					</div>
+				</div>
+
+			</div>
+			<div id="object-actions-col" class="col-2">
+				<div class="row">
+					{% if object_type == 'dataset' %}
+						<div class="col-12">
+							<form action="{{ url_for('index', dataset_accession=landing_data.dataset.dataset_accession) }}">
+								<button class="btn" type="submit">Analyze</button>
+							</form>
+						</div>
+						<div class="col-12">
+							<form action="{{ url_for('index') }}">
+								<button class="btn" type="submit">Evaluate</button>
+							</form>
+						</div>
+					{% elif object_type == 'tool' %}
+						<div class="col-12">
+							<form action="{{ url_for('index', tool_name=landing_data.tool.tool_name) }}">
+								<button class="btn" type="submit">Analyze</button>
+							</form>
+						</div>
+						<div class="col-12">
+							<form action="{{ url_for('index') }}">
+								<button class="btn" type="submit">Evaluate</button>
+							</form>
+						</div>
+					{% elif object_type == 'canned_analysis' %}
+						<div class="col-12">
+							<form action="{{ landing_data.canned_analysis.canned_analysis_url }}">
+								<button class="btn" type="submit">View</button>
+							</form>
+						</div>
+						<div class="col-12">
+							<form action="{{ url_for('index') }}">
+								<button class="btn" type="submit">Evaluate</button>
+							</form>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+			<div id="object-fairness-col" class="col-2">
+				<img id="object-fairness-icon" src="{{ url_for('static', filename='icons/fairness.png') }}">
+			</div>
+		</div> <!-- #object-overview -->
+
+		<div id="object-tabs" class="row">
+			<ul class="nav nav-tabs" role="tablist">
+				<li class="nav-item">
+					<a class="nav-link active" data-toggle="tab" href="#overview" role="tab">Overview</a>
+				</li>
+				{% if object_type != 'dataset' %}
+					<li class="nav-item">
+						<a class="nav-link" data-toggle="tab" href="#datasets" role="tab">Datasets ({{ landing_data.datasets.count }})</a>
+					</li>
+				{% endif %}
+				{% if object_type != 'tool' %}
+					<li class="nav-item">
+						<a class="nav-link" data-toggle="tab" href="#tools" role="tab">Tools ({{ landing_data.tools.count }})</a>
+					</li>
+				{% endif %}
+				{% if object_type != 'canned_analysis' %}
+					<li class="nav-item">
+						<a class="nav-link" data-toggle="tab" href="#canned_analyses" role="tab">Analyses ({{ landing_data.canned_analyses.count }})</a>
+					</li>
+				{% endif %}
+			</ul>
+		</div> <!-- #object-tabs -->
+
+		<div id="object-content" class="tab-content">
+			<div class="tab-pane active" id="overview" role="tabpanel">
+				<div id="general-info" class="info-card">
+					<div class="info-card-title">General Information</div>
+					<table class="info-card-table">
+						{% if object_type == 'dataset' %}
+							<tr><td>Title</td><td>{{ landing_data[object_type]['dataset_title'] }}</td></tr>
+							<tr><td>Description</td><td>{{ landing_data[object_type]['dataset_description'] }}</td></tr>
+							<tr><td>Landing Page</td><td><a href="{{ landing_data[object_type]['dataset_landing_url'] }}">{{ landing_data[object_type]['dataset_landing_url'] }}</a></td></tr>
+							<tr><td>Repository</td><td><a href="{{ landing_data[object_type]['repository_homepage_url'] }}">{{ landing_data[object_type]['repository_name'] }}</a></td></tr>
+							<tr><td>Accession</td><td>{{ landing_data[object_type]['dataset_accession'] }}</td></tr>
+							<tr><td>Upload Date</td><td>{{ landing_data[object_type]['date'] }}</td></tr>
+							<tr>
+						{% elif object_type == 'tool' %}
+							<tr><td>Description</td><td>{{ landing_data[object_type]['tool_description'] }}</td></tr>
+							<tr><td>Homepage</td><td><a href="tool_homepage_url">{{ landing_data[object_type]['tool_homepage_url'] }}</a></td></tr>
+						{% elif object_type == 'canned_analysis' %}
+							<tr><td>Title</td><td>{{ landing_data[object_type]['canned_analysis_title'] }}</td></tr>
+							<tr><td>Description</td><td>{{ landing_data[object_type]['canned_analysis_description'] }}</td></tr>
+							<tr><td>Analysis URL</td><td><a href="{{ landing_data[object_type]['canned_analysis_url'] }}">{{ landing_data[object_type]['canned_analysis_url'] }}</a></td></tr>
+							<tr><td>Accession</td><td>{{ landing_data[object_type]['canned_analysis_accession'] }}</td></tr>
+							<tr><td>Upload Date</td><td>{{ landing_data[object_type]['date'] }}</td></tr>
+							<tr><td>Uploader</td><td><a href="#">maayanlab</a></td></tr>
+						{% endif %}
+						<td>Keywords</td><td>{% for keyword in landing_data[object_type]['keywords'] %} <a href="#" class="keyword">{{ keyword }}</a> {% endfor %} </td></tr>
+					</table>
+				</div> <!-- #general-info -->
+
+				{% if object_type == 'tool' and landing_data[object_type]['publications']|length > 0 %}
+					<div id="publication-info" class="info-card">
+						<div class="info-card-title">Publications</div>
+						<div id="publication-tabs">
+							<ul class="nav nav-tabs" role="tablist">
+								{% for publication in landing_data[object_type]['publications'] %}
+									<li class="nav-item">
+										<a class="nav-link{{' active' if loop.index == 1}}" data-toggle="tab" href="#publication-{{loop.index}}" role="tab">{{ publication['journal'] }} ({{ publication['year'] }})</a>
+									</li>
+								{% endfor %}
+							</ul>
+						</div>
+						<div class="tab-content">
+							{% for publication in landing_data[object_type]['publications'] %}
+								<div class="tab-pane {{ 'active' if loop.index == 1 }}" id="publication-{{loop.index}}" role="tabpanel">
+									<div class="info-card-publication">
+										<div class="info-card-publication-title">{{ publication['publication_title'] }}</div>
+										<div class="info-card-publication-authors">{{ publication['authors'] }}</div>
+										<div class="info-card-publication-abstract">{{ publication['abstract'] }}</div>
+										<div class="info-card-publication-keywords">Keywords: {% for keyword in publication['keywords'] %}<span class="keyword">{{keyword}}</span>{% endfor %}</div>
+										<div class="info-card-publication-doi">DOI: <a href="https://doi.org/{{ publication['doi'] }}">https://doi.org/{{ publication['doi'] }}</a></div>
+									</div>
+								</div>
+							{% endfor %}
+						</div>
+					</div> <!-- #publication-info -->
+				{% endif %}
+
+				{% if object_type == 'canned_analysis' and landing_data[object_type]['metadata']|length > 0 %}
+					<div id="metadata-info" class="info-card">
+						<div class="info-card-title">Metadata</div>
+						<table class="info-card-table">
+							{% for key, value in landing_data[object_type]['metadata'].iteritems() %}
+								<tr><td>{{ key }}</td><td>{{ value }}</td></tr>
+							{% endfor %}
+						</table>
+					</div> <!-- #metadata-info -->
+				{% endif %}
+
+				<div id="related-object-info" class="info-card">
+					<div class="info-card-title">Related {{ object_type.replace('canned_analysis', 'Analyse').title()+'s' }}</div>
+					<div id="related-object-row" class="row">
+						{% for related_object in landing_data[object_type]['related_objects'] %}
+							{{ macros.display_object_card(related_object, object_type=object_type) }}
+						{% endfor %}
+					</div>
+				</div> <!-- #related-objects -->
+
+			</div> <!-- #overview -->
+
+			{% if object_type != 'dataset' %}
+				<div class="tab-pane" id="datasets" role="tabpanel">
+					<div class="info-card associated-object-card">
+						<div class="info-card-title">Datasets</div>
+						<div class="row">
+							<div class="col-12 associated-object-label">
+								{% if object_type == 'tool' %}
+									The following is a list of datasets for which there are available canned analyses generated by the tool.
+								{% elif object_type == 'canned_analysis' %}
+									The following is a list of the datasets which have been used to perform the analysis.
+								{% endif %}
+							</div>
+						</div>
+						{{ macros.display_search_results(landing_data.datasets.search_filters, landing_data.datasets.search_results, object_type='dataset', page_type='landing') }}
+					</div>
+				</div> <!-- #datasets -->
+			{% endif %}
+
+			{% if object_type != 'tool' %}
+				<div class="tab-pane" id="tools" role="tabpanel">
+					<div class="info-card associated-object-card">
+						<div class="info-card-title">Tools</div>
+						<div class="row">
+							<div class="col-12 associated-object-label">
+								{% if object_type == 'dataset' %}
+									The following is a list of computational tools which have been used to perform analyses on the dataset.
+								{% elif object_type == 'canned_analysis' %}
+									The following is a list of the computational tools which have been used to perform the analysis.
+								{% endif %}
+							</div>
+						</div>
+						{{ macros.display_search_results(landing_data.tools.search_filters, landing_data.tools.search_results, object_type='tool', page_type='landing') }}
+					</div>
+				</div> <!-- #tools -->
+			{% endif %}
+
+			{% if object_type != 'canned_analysis' %}
+				<div class="tab-pane" id="canned_analyses" role="tabpanel">
+					<div class="info-card associated-object-card">
+						<div class="info-card-title">Canned Analyses</div>
+						<div class="row">
+							<div class="col-12 associated-object-label">
+								{% if object_type == 'dataset' %}
+									The following is a list of canned analyses generated using the dataset.
+								{% elif object_type == 'tool' %}
+									The following is a list of canned analyses generated using the tool.
+								{% endif %}
+							</div>
+						</div>
+						{{ macros.display_search_results(landing_data.canned_analyses.search_filters, landing_data.canned_analyses.search_results, object_type='canned_analysis', page_type='landing') }}
+					</div>
+				</div> <!-- #canned_analyses -->
+			{% endif %}
+		</div> <!-- #object-content -->
+	</div>
 
 {% endblock %}
 
