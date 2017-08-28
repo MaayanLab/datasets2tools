@@ -73,9 +73,7 @@
 			}
 
 		#object-fairness-col {
-			display: flex;
-			align-items: center;
-			flex-wrap: wrap;
+			padding-top: 40px;
 			border-left: 1px solid #c2c2c2
 		}
 			
@@ -84,19 +82,29 @@
 				z-index: 10;
 				font-size: 9pt;
 				color: black;
-				top: 25px;
+				top: 15px;
 				left: 25px;
 				position: absolute;
 				text-align: center;
 				font-weight: 600;
 			}
 
-			#object-fairness-icon {
-				width: 100%;
-				padding: 0px;
-				padding-top: 25px;
-				margin: auto;
+			.object-fairness-col svg {
+				margin-top: 15px;
 			}
+
+				.fairness-tooltip {
+					font-size: 9pt;
+					text-align: left;
+				}
+
+					.fairness-score {
+
+					}
+
+					.fairness-question {
+
+					}
 
 	#object-tabs {
 		background-color: white;
@@ -301,6 +309,186 @@
 		#analyses {
 
 		}
+
+			.associated-object-card {
+				margin-top: 15px;
+			}
+
+				.associated-object-label {
+					font-size: 10pt;
+					padding-left: 25px;
+					padding-top: 15px;
+					font-weight: 300;
+				}
+
+		#fairness {
+
+		}
+
+			#fairness-table {
+				margin: 15px 15px;
+				font-size: 10pt;
+			}
+
+				#fairness-table th {
+					font-weight: 500;
+					padding-bottom: 5px;
+					padding-right: 13px;
+					vertical-align: bottom;
+				}
+
+				#fairness-table tr {
+					border-bottom: 2px solid #ddd;
+					font-weight: 300;
+				}
+
+					#fairness-table tr td:first-child {
+						width: 60%;
+						padding: 10px 5px;
+					}
+
+					.yes-but-comment {
+						visibility: hidden;
+					}
+
+			#fairness-button {
+				background-color: white;
+				margin-left: 15px;
+				border: 1px solid #c2c2c2;
+				font-size: 11pt;
+				margin-bottom: 15px;
+				cursor: pointer;
+			}
+
+				#fairness-button:hover {
+					background-color: #f9f9f9;
+				}
+
+
+
+
+
+/*************************/
+/** GENERAL LANDING 
+/*************************/
+
+	.search-results-wrapper {
+		padding: 10px 25px;
+	}
+
+			.filter-button {
+				font-size: 9pt;
+				color: black;
+				background-color: #f9f9f9;
+				border: 1px solid #c2c2c2;
+				border-radius: 3px;
+				padding: 5px 10px;
+				font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif, "FontAwesome";
+				margin-bottom: 5px;
+			}
+
+				.filter-button:hover, .filter-button:focus {
+					text-decoration: none;
+					color: black;
+				}
+
+			.search-filter-card {
+				margin-top: 5px;
+				border: 1px solid #c9c9c9;
+				padding-top: 10px;
+				padding-bottom: 10px;
+				background-color: #f9f9f9;
+				border-radius: 5px;
+				padding-left: 15px;
+				padding-right: 15px;
+			}
+
+				.search-form-label {
+					font-size: 10pt;
+					margin-bottom: 5px;
+					padding-left: 3px;
+					font-weight: 300;
+				}
+
+				.search-filter-row input {
+					height: 27px;
+					border: 1px solid #aaa;
+					font-size: 10pt;
+					width: 80% !important;
+					border-radius: 3px 0px 0px 3px;
+					font-weight: 300;
+					padding-left: 5px;
+				}
+
+					.search-filter-row input:focus {
+						border-color: #aaa;
+					}
+
+				.search-filter-row button {
+					height: 27px;
+					width: 27px;
+					border: 1px solid #aaa;
+					border-radius: 0px 3px 3px 0px;
+					border-left: none;
+					font-size: 10pt;
+					padding: 0px 2px;
+					background-color: white;
+					color: grey;
+					cursor: pointer;
+				}
+
+					.search-filter-row button:focus {
+						box-shadow: none;
+					}
+
+				.search-filter-row .chosen-single {
+					background-color: white !important;
+					background-image: none !important;
+					padding-top: 5px;
+					padding-bottom: 5px;
+				}
+
+					.search-filter-row .chosen-single span {
+						font-weight: 300;
+					}
+
+		.object-card-row {
+
+		}
+
+		.search-offsets-row {
+
+		}
+
+			.search-results-number {
+				font-size: 9pt;
+			}
+
+			.search-filter-offset-label {
+				font-size: 9pt;
+				margin-right: 5px;
+			}
+
+				.search-filter-offset {
+					font-size: 9pt;
+					display: inline-block;
+					border: 1px solid #c2c2c2;
+					border-radius: 2px;
+					background-color: #f9f9f9;
+					padding: 2px 7px;
+					margin-right: 5px;
+					cursor: pointer;
+				}
+
+				.search-offsets-row input[type="radio"] {
+					display: none;
+				}
+
+				.search-offsets-row input[type="radio"]:checked + .search-filter-offset {
+					color: #c2c2c2;
+					border-color: lightgrey;
+					cursor: default;
+
 /*
 			.filter-button {
 				font-size: 9pt;
@@ -420,18 +608,4 @@
 								display: none !important;
 							}
 */
-				.associated-object-card {
-					margin-top: 15px;
-				}
-
-					.associated-object-label {
-						font-size: 10pt;
-						padding-left: 25px;
-						padding-top: 15px;
-						font-weight: 300;
-					}
-
-					.search-results-wrapper {
-						padding: 10px 25px;
-					}
 

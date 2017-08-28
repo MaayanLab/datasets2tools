@@ -43,48 +43,36 @@
 						{% endif %}
 					</div>
 				</div>
-
 			</div>
 			<div id="object-actions-col" class="col-2">
 				<div class="row">
-					{% if object_type == 'dataset' %}
-						<div class="col-12">
-							<form action="{{ url_for('index', dataset_accession=landing_data.dataset.dataset_accession) }}">
-								<button class="btn" type="submit">Analyze</button>
-							</form>
-						</div>
-						<div class="col-12">
-							<form action="{{ url_for('index') }}">
-								<button class="btn" type="submit">Evaluate</button>
-							</form>
-						</div>
-					{% elif object_type == 'tool' %}
-						<div class="col-12">
-							<form action="{{ url_for('index', tool_name=landing_data.tool.tool_name) }}">
-								<button class="btn" type="submit">Analyze</button>
-							</form>
-						</div>
-						<div class="col-12">
-							<form action="{{ url_for('index') }}">
-								<button class="btn" type="submit">Evaluate</button>
-							</form>
-						</div>
-					{% elif object_type == 'canned_analysis' %}
-						<div class="col-12">
-							<form action="{{ landing_data.canned_analysis.canned_analysis_url }}">
-								<button class="btn" type="submit">View</button>
-							</form>
-						</div>
-						<div class="col-12">
-							<form action="{{ url_for('index') }}">
-								<button class="btn" type="submit">Evaluate</button>
-							</form>
-						</div>
-					{% endif %}
+					<div class="col-12">
+						{% if object_type == 'dataset' %}
+							<a href="{{ landing_data.dataset.dataset_landing_url }}">
+								<button class="btn">View</button>
+							</a>
+						{% elif object_type == 'tool' %}
+							<a href="{{ landing_data.tool.tool_homepage_url }}">
+								<button class="btn">View</button>
+							</a>
+						{% elif object_type == 'canned_analysis' %}
+							<a href="{{ landing_data.canned_analysis.canned_analysis_url }}">
+								<button class="btn">View</button>
+							</a>
+						{% endif %}
+					</div>
+					<div class="col-12">
+						<button id="evaluate-button" class="btn" type="submit">Evaluate</button>
+					</div>
 				</div>
 			</div>
 			<div id="object-fairness-col" class="col-2">
-				<img id="object-fairness-icon" src="{{ url_for('static', filename='icons/fairness.png') }}">
+				<svg height="95px" width="95px">
+					{% set w = 23 %}
+					{% for fairness_data in landing_data[object_type]['fairness'] %}
+						 <rect x="{{ ((loop.index-1) % 4)*w }}" y="{{ (((loop.index)/4)|round(0, 'ceil')-1)*w }}" width="{{w-2}}px" height="{{w-2}}px" fill="grey" data-value="{{fairness_data.fairness_score}}" data-toggle="tooltip" data-placement="bottom" data-animation="false" data-html="true" title="<div class='fairness-tooltip'><div class='fairness-score'><b>Score:</b> {{fairness_data.fairness_score|round(2, 'floor')}}</div><div class='fairness-question'><b>{{loop.index}}.</b> {{fairness_data.fairness_question}}</div></div>"/>
+					{% endfor %}
+				</svg>
 			</div>
 		</div> <!-- #object-overview -->
 
@@ -108,6 +96,9 @@
 						<a class="nav-link" data-toggle="tab" href="#canned_analyses" role="tab">Analyses ({{ landing_data.canned_analyses.count }})</a>
 					</li>
 				{% endif %}
+				<li class="nav-item">
+					<a class="nav-link" data-toggle="tab" href="#fairness" role="tab">FAIR Metrics</a>
+				</li>
 			</ul>
 		</div> <!-- #object-tabs -->
 
@@ -186,7 +177,6 @@
 						{% endfor %}
 					</div>
 				</div> <!-- #related-objects -->
-
 			</div> <!-- #overview -->
 
 			{% if object_type != 'dataset' %}
@@ -242,6 +232,22 @@
 					</div>
 				</div> <!-- #canned_analyses -->
 			{% endif %}
+
+			<div class="tab-pane" id="fairness" role="tabpanel">
+				<div id="fairness-info" class="info-card">
+					<div class="info-card-title">FAIR Evaluation</div>
+					<form id="fairness-form" action="{{url_for('index')}}">
+						<table id="fairness-table">
+							<tr><th>Question</th><th>Yes</th><th>No</th><th>Yes, but:</th><th>Comments</th></tr>
+							{% for fairness_data in landing_data[object_type]['fairness']%}
+								<tr><td>{{loop.index}}. {{fairness_data.fairness_question}}</td><td><input type="radio" name="fairness-question-{{loop.index}}" value="yes" required></td><td><input type="radio" name="fairness-question-{{loop.index}}" value="no"></td><td><input type="radio" name="fairness-question-{{loop.index}}" value="yes-but"></td><td><input type="text" class="yes-but-comment" name="fairness-question-{{loop.index}}-comment"></td></tr>
+							{% endfor %}
+						</table>
+						<button id="fairness-button" class="btn" type="submit">Submit</button>
+					</form>
+				</div>
+			</div> <!-- #fairness -->
+
 		</div> <!-- #object-content -->
 	</div>
 
@@ -251,6 +257,7 @@
 {% block footer %}
     <script src="{{ url_for('static', filename='js/chosen.jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/chosen.proto.min.js') }}"></script>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
 	<script type="text/javascript">
 		$('.search-filter-dropdown').each(function(i, elem){
 			$(elem).chosen({width: '100%', allow_single_deselect: true});
@@ -261,6 +268,20 @@
 		if (window.location.hash != "") {
 			$('a[href="' + window.location.hash + '"]').click()
 		};
+		color = d3.scaleLinear().domain([-1, 1]).interpolate(d3.interpolateRgb).range([d3.rgb(255,0,0), d3.rgb(0,0,255)]);
+		$('#object-fairness-col rect').each(function(i, elem) {
+			$(elem).attr('fill', color($(elem).attr('data-value')));
+		});
+		$('#fairness-table input[type="radio"]').change(function(evt) {
+			if ($(evt.target).val() === 'yes-but') {
+				$(evt.target).parents('tr').find('.yes-but-comment').css('visibility', 'visible');
+			} else {
+				$(evt.target).parents('tr').find('.yes-but-comment').css('visibility', 'hidden');
+			}
+		});
+		$('#evaluate-button').click(function(evt) {
+			$('a[href="#fairness"]').click();
+		});
 	</script>
 
 	{% if 'tab' in request.args.keys() %}

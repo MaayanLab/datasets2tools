@@ -1,4 +1,4 @@
-<!-- Object Cards -->
+radio<!-- Object Cards -->
 {% macro display_object_card(object_data, object_type) %}
 
 	{% if object_type == 'canned_analysis' %}
@@ -119,69 +119,37 @@
 
 	{% set colsize = 'col-3' if object_type == 'canned_analysis' else 'col-4' %}
 
-	<form class="object-search-form" action="{{ request.path }}">
+	<div class="col-12">
+		<a class="filter-button" data-toggle="collapse" href="#{{object_type}}-search-filters" aria-expanded="false" aria-controls="#{{object_type}}-search-filters">Filters &nbsp&#xf0d7;</a>
+	</div>
 
+	<div id="{{object_type}}-search-filters" class="info-card collapse search-filter-card col-12">
 		<div class="row">
-			<div class="col-6">
-				<a class="filter-button" data-toggle="collapse" href="#{{object_type}}-search-filters" aria-expanded="false" aria-controls="#{{object_type}}-search-filters">Filters &nbsp&#xf0d7;</a>
-			</div>
-			{% set offsets = [1,2,3] %}
-			<div class="col-6 text-right">
-				<span class="search-filter-offset-label"> Pages: </span>
-					{% for offset in offsets %}
-						<input type="radio" name="offset" id="{{object_type}}-offset-{{offset}}" value="{{offset}}"{{ ' checked' if ((offset)|string() == request.args.get('offset', default='1') and object_type == request.args.get('tab')) or (object_type != request.args.get('tab') and offset==1) else ''}}>
-						<label for="{{object_type}}-offset-{{offset}}" class="search-filter-offset">{{offset}}</label>
-					{% endfor %}
-			</div>
-		</div>
-
-		<div id="{{object_type}}-search-filters"  class="info-card collapse search-filter-card">
-			<div class="info-card-title">General Filters</div>
-			<input type="hidden" name="tab" value="{{ object_type }}">
-			<div class="container-fluid">
-				<div class="row search-filter-row">
-					<div class="{{ colsize }}">
-						<div class="object-search-form-label">Search</div>
-						<div class="form-inline">
-							<input class="form-control" type="text" placeholder="Insert terms..." name="q">
-							<button class="btn" type="button">
-								<i class="fa fa-search"></i>
-							</button>
-						</div>
-					</div>
-					{% for key, values in search_filters.iteritems() %}
-						{% if key != 'canned_analysis_metadata' %}
-						<div class="{{ colsize }}">
-							<div class="object-search-form-label">{{ key.title() }}</div>
-							<select data-placeholder="Select..." class="search-filter-dropdown" name="{{ key }}">
-								<option></option>
-								{% for value in values %}
-									<option value="{{ value }}"{{ ' selected' if request.args.get('tab') == object_type and request.args.get(key) == value else '' }}>{{ value }}</option>
-								{% endfor %}
-							</select>
-						</div>
-						{% endif %}
-					{% endfor %}
+			<div class="{{ colsize }}">
+				<div class="search-form-label">Search</div>
+				<div class="form-inline">
+					<input class="form-control" type="text" placeholder="Search..." name="q">
+					<button class="btn" type="button">
+						<i class="fa fa-search"></i>
+					</button>
 				</div>
-				{% if object_type == 'canned_analysis' %}
-					<div class="info-card-divider">Metadata Filters</div>
-					<div class="row search-filter-row">
-						{% for key, values in search_filters.canned_analysis_metadata.iteritems() %}
-							<div class="col-3">
-								<div class="object-search-form-label">{{key.replace('_', ' ').title()}}</div>
-								<select data-placeholder="Select..." class="search-filter-dropdown" name="{{ key }}">
-									<option></option>
-									{% for value in values %}
-										<option value="{{ value }}"{{ ' selected' if request.args.get('tab') == object_type and request.args.get(key) == value else '' }}>{{ value }}</option>
-									{% endfor %}
-								</select>
-							</div>
-						{% endfor %}
+			</div>
+
+			{% for key, values in search_filters.iteritems() %}
+				{% if key != 'canned_analysis_metadata' %}
+					<div class="{{ colsize }}">
+						<div class="search-form-label">{{ key.title() }}</div>
+						<select data-placeholder="Select..." class="search-filter-dropdown" name="{{ key }}">
+							<option></option>
+							{% for value in values %}
+								<option value="{{ value }}"{{ ' selected' if request.args.get('tab') == object_type and request.args.get(key) == value else '' }}>{{ value }}</option>
+							{% endfor %}
+						</select>
 					</div>
 				{% endif %}
-			</div>
+			{% endfor %}
 		</div>
-	</form>
+	</div>
 
 {% endmacro %}
 
@@ -190,21 +158,22 @@
 
 	<div class="row search-results-wrapper">
 		<div class="col-12">
-			<div class="row search-filter-row">
-				<div class="col-12">
-					{{ display_search_filters(search_filters, object_type, page_type) }}
-				</div>
+			<div class="row search-filter-row" style="display: none;">
+				{{ display_search_filters(search_filters, object_type, page_type) }}
 			</div>
 			<div class="row object-card-row">
 				{% for object_data in object_list %}
 					{{ display_object_card(object_data, object_type) }}
 				{% endfor %}
 			</div>
-			<div class="row search-pages-row">
-				<div class="col-12 text-right">
+			<div class="row search-offsets-row" style="display: none;">
+				<div class="col-6 text-left">
+					<span class="search-results-number">Displaying 3 of 3 results.</span>
+				</div>
+				<div class="col-6 text-right">
 					<span class="search-filter-offset-label"> Pages: </span>
 					{% for offset in [1,2,3] %}
-						<input type="radio" name="offset" id="{{object_type}}-offset-{{offset}}" value="{{offset}}"{{ ' checked' if ((offset)|string() == request.args.get('offset', default='1') and object_type == request.args.get('tab')) or (object_type != request.args.get('tab') and offset==1) else ''}}>
+						<input type="radio" name="offset" id="{{object_type}}-offset-{{offset}}" value="{{offset}}"{{ ' checked' if offset == 1}}>
 						<label for="{{object_type}}-offset-{{offset}}" class="search-filter-offset">{{offset}}</label>
 					{% endfor %}
 				</div>
