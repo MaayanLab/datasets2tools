@@ -96,6 +96,10 @@ def landing(object_type, object_identifier):
 		abort(404)
 	return render_template('landing.html', landing_data=landing_data, object_type=object_type)
 
+@app.route(entry_point+'/search')
+def search():
+	return render_template('search.html', search_data=datasets, object_type='dataset')
+
 @app.route(entry_point+'/static/<path:path>')
 def static_files(path):
 	return send_from_directory('static', path)

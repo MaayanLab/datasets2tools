@@ -10,7 +10,7 @@
 		{% set card_landing_url = url_for('landing', object_type=object_type, object_identifier=object_data.dataset_accession) %}
 		{% set card_colsize = 'col-6' %}
 		{% set image_colsize = 4 %}
-		{% set max_description_length = 100 %}
+		{% set max_description_length  = 100 %}
 	{% elif object_type == 'tool' %}
 		{% set card_title = object_data.tool_name %}
 		{% set card_description = object_data.tool_description %}
@@ -50,52 +50,49 @@
 
 {% endmacro %}
 
-<!-- Search Filters -->
-{% macro display_search_filters(search_filters, object_type, page_type) %}
-
+<!-- Search Results -->
+{% macro display_filter_options(search_filters, object_type) %}
 	{% set colsize = 'col-3' if object_type == 'canned_analysis' else 'col-4' %}
-
-	<div class="row search-row">
-		<div class="col-6 text-left">
-			<div class="form-inline">
-				<input class="form-control" type="text" placeholder="Search..." name="q">
-				<button class="btn" type="button">
-					<i class="fa fa-search"></i>
-				</button>
+	{% for key, values in search_filters.iteritems() %}
+		{% if key != 'canned_analysis_metadata' %}
+			<div class="{{ colsize }}">
+				<div class="search-option-label">{{ key.title() }}</div>
+				<select data-placeholder="Select..." class="search-option-dropdown" name="{{ key }}">
+					<option></option>
+					{% for value in values %}
+						<option value="{{ value }}"{{ ' selected' if request.args.get('tab') == object_type and request.args.get(key) == value else '' }}>{{ value }}</option>
+					{% endfor %}
+				</select>
 			</div>
-		</div>
-		<div class="col-6 text-right">
-			<a class="filter-button">Filters&nbsp&nbsp</a>
-		</div>
-	</div>
-	<div class="options-wrapper">
-		<div class="row options-row">
-			{% for key, values in search_filters.iteritems() %}
-				{% if key != 'canned_analysis_metadata' %}
-					<div class="{{ colsize }}">
-						<div class="option-label">{{ key.title() }}</div>
-						<select data-placeholder="Select..." class="option-dropdown" name="{{ key }}">
-							<option></option>
-							{% for value in values %}
-								<option value="{{ value }}"{{ ' selected' if request.args.get('tab') == object_type and request.args.get(key) == value else '' }}>{{ value }}</option>
-							{% endfor %}
-						</select>
-					</div>
-				{% endif %}
-			{% endfor %}
-		</div>
-	</div>
-
+		{% endif %}
+	{% endfor %}
 {% endmacro %}
 
 <!-- Search Results -->
-{% macro display_search_results(search_filters, object_list, object_type, page_type) %}
+{% macro display_search_results(search_filters, object_list, object_type) %}
 
 	<div class="row search-results-wrapper">
 		<div class="col-12">
 			<div class="row search-filters-row">
 				<div class="col-12">
-					{{ display_search_filters(search_filters, object_type, page_type) }}
+					<div class="row search-row">
+						<div class="col-6 text-left">
+							<div class="form-inline">
+								<input class="form-control" type="text" placeholder="Search..." name="q">
+								<button class="btn" type="button">
+									<i class="fa fa-search"></i>
+								</button>
+							</div>
+						</div>
+						<div class="col-6 text-right">
+							<a class="filter-button">Filters&nbsp&nbsp</a>
+						</div>
+					</div>
+					<div class="search-options-wrapper">
+						<div class="row search-options-row">
+							{{ display_filter_options(search_filters, object_type) }}
+						</div>
+					</div>
 				</div>
 			</div>
 			<hr width="100%" class="my-1">

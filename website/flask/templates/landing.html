@@ -186,11 +186,11 @@
 					<div class="info-card associated-object-card">
 						<div class="info-card-title">
 							Datasets
-							<span class="info-card-subtitle">List of datasets {% if object_type=='tool' %} analyzed by the tool {% elif object_type=='canned_analysis' %} used to generate the analysis {% endif %}</span>
+							<span class="info-card-subtitle">{% if object_type=='tool' %} analyzed by the tool {% elif object_type=='canned_analysis' %} used in the analysis {% endif %}</span>
 						</div>
 						<div class="row">
 						</div>
-						{{ macros.display_search_results(landing_data.datasets.search_filters, landing_data.datasets.search_results, object_type='dataset', page_type='landing') }}
+						{{ macros.display_search_results(landing_data.datasets.search_filters, landing_data.datasets.search_results, object_type='dataset') }}
 					</div>
 				</div> <!-- #datasets -->
 			{% endif %}
@@ -200,11 +200,11 @@
 					<div class="info-card associated-object-card">
 						<div class="info-card-title">
 							Tools
-							<span class="info-card-subtitle">List of tools {% if object_type=='dataset' %} which have analyzed the dataset {% elif object_type=='canned_analysis' %} used to generate the analysis {% endif %}</span>
+							<span class="info-card-subtitle">{% if object_type=='dataset' %} used to analyze the dataset {% elif object_type=='canned_analysis' %} used in the analysis {% endif %}</span>
 						</div>
 						<div class="row">
 						</div>
-						{{ macros.display_search_results(landing_data.tools.search_filters, landing_data.tools.search_results, object_type='tool', page_type='landing') }}
+						{{ macros.display_search_results(landing_data.tools.search_filters, landing_data.tools.search_results, object_type='tool') }}
 					</div>
 				</div> <!-- #tools -->
 			{% endif %}
@@ -214,11 +214,11 @@
 					<div class="info-card associated-object-card">
 						<div class="info-card-title">
 							Canned Analyses
-							<span class="info-card-subtitle">List of analyses {% if object_type=='dataset' %} generated with the dataset {% elif object_type=='tool' %} generated with the tool {% endif %}</span>
+							<span class="info-card-subtitle">{% if object_type=='dataset' %} generated with the dataset {% elif object_type=='tool' %} generated with the tool {% endif %}</span>
 						</div>
 						<div class="row">
 						</div>
-						{{ macros.display_search_results(landing_data.canned_analyses.search_filters, landing_data.canned_analyses.search_results, object_type='canned_analysis', page_type='landing') }}
+						{{ macros.display_search_results(landing_data.canned_analyses.search_filters, landing_data.canned_analyses.search_results, object_type='canned_analysis') }}
 					</div>
 				</div> <!-- #canned_analyses -->
 			{% endif %}
@@ -257,9 +257,9 @@
 	<script src="https://d3js.org/d3.v4.min.js"></script>
 	<script type="text/javascript">
 		$('.filter-button').click(function(evt){
-			$(evt.target).parents('.col-12').find('.options-wrapper').toggle();
+			$(evt.target).parents('.col-12').find('.search-options-wrapper').toggle();
 		});	
-		$('.option-dropdown').each(function(i, elem){
+		$('.search-option-dropdown').each(function(i, elem){
 			$(elem).chosen({width: '100%', allow_single_deselect: true});
 		});
 		$('.object-search-form').change(function() {
