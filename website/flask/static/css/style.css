@@ -166,10 +166,11 @@
 				}
 
 					.info-card-subtitle {
-						float: right;
+						padding-left: 7px;
 						font-size: 9pt;
 						font-weight: 400;
-						font-style: italic;
+						color: #a1a1a1;
+						text-align: right;
 					}
 
 				.info-card-text {
@@ -381,53 +382,23 @@
 					background-color: #f9f9f9;
 				}
 
-
-
-
-
 /*************************/
-/** GENERAL LANDING 
+/** SEARCH
 /*************************/
 
 	.search-results-wrapper {
 		padding: 10px 25px;
 	}
 
-			.filter-button {
-				font-size: 9pt;
-				color: black;
-				background-color: #f9f9f9;
-				border: 1px solid #c2c2c2;
-				border-radius: 3px;
-				padding: 5px 10px;
-				font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif, "FontAwesome";
-				margin-bottom: 5px;
+		.search-filters-row {
+			padding-top: 7px;
+			padding-bottom: 10px;
+		}
+
+			.search-row {
 			}
 
-				.filter-button:hover, .filter-button:focus {
-					text-decoration: none;
-					color: black;
-				}
-
-			.search-filter-card {
-				margin-top: 5px;
-				border: 1px solid #c9c9c9;
-				padding-top: 10px;
-				padding-bottom: 10px;
-				background-color: #f9f9f9;
-				border-radius: 5px;
-				padding-left: 15px;
-				padding-right: 15px;
-			}
-
-				.search-form-label {
-					font-size: 10pt;
-					margin-bottom: 5px;
-					padding-left: 3px;
-					font-weight: 300;
-				}
-
-				.search-filter-row input {
+				.search-row input {
 					height: 27px;
 					border: 1px solid #aaa;
 					font-size: 10pt;
@@ -437,11 +408,11 @@
 					padding-left: 5px;
 				}
 
-					.search-filter-row input:focus {
+					.search-row input:focus {
 						border-color: #aaa;
 					}
 
-				.search-filter-row button {
+				.search-row button {
 					height: 27px;
 					width: 27px;
 					border: 1px solid #aaa;
@@ -454,18 +425,69 @@
 					cursor: pointer;
 				}
 
-					.search-filter-row button:focus {
+					.search-row button:focus {
 						box-shadow: none;
 					}
 
-				.search-filter-row .chosen-single {
-					background-color: white !important;
+				.sort-by-select {
+					font-size: 9pt;
+					color: black;
+					background-color: #f9f9f9;
+					border: 1px solid #c2c2c2;
+					border-radius: 3px;
+					margin-bottom: 5px;
+					cursor: pointer;
+				}
+
+					.sort-by-select option {
+						font-size: 9pt;
+						color: black;
+						background-color: #f9f9f9;
+						border: 1px solid #c2c2c2;
+						border-radius: 3px;
+						margin-bottom: 15px !important;
+						cursor: pointer;
+					}
+
+				.filter-button {
+					font-size: 9pt;
+					color: black;
+					background-color: #f9f9f9;
+					border: 1px solid #c2c2c2;
+					border-radius: 3px;
+					padding: 5px 10px;
+					padding-right: 10px;
+					margin-bottom: 5px;
+					cursor: pointer;
+				}
+
+					.filter-button::after {
+						content: "\f0d7";
+						font-family: "FontAwesome";
+					}
+
+			.options-wrapper {
+				display: none;
+			}
+
+			.options-row {
+				padding-top: 10px;
+			}
+
+				.option-label {
+					font-size: 9pt;
+					padding-left: 3px;
+				}
+
+				.options-row .chosen-single {
+					background-color: #f9f9f9 !important;
 					background-image: none !important;
 					padding-top: 5px;
 					padding-bottom: 5px;
+					border-radius: 3px !important;
 				}
 
-					.search-filter-row .chosen-single span {
+					.options-row .chosen-single span {
 						font-weight: 300;
 					}
 
@@ -474,7 +496,7 @@
 		}
 
 		.search-offsets-row {
-
+			padding-top: 7px;
 		}
 
 			.search-results-number {
