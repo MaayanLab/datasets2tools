@@ -67,12 +67,14 @@
 				</div>
 			</div>
 			<div id="object-fairness-col" class="col-2">
+				<div id="fairness-label">FAIR Metrics</div>
 				<svg height="95px" width="95px">
 					{% set w = 23 %}
 					{% for fairness_data in landing_data[object_type]['fairness'] %}
 						 <rect x="{{ ((loop.index-1) % 4)*w }}" y="{{ (((loop.index)/4)|round(0, 'ceil')-1)*w }}" width="{{w-2}}px" height="{{w-2}}px" fill="grey" data-value="{{fairness_data.fairness_score}}" data-toggle="tooltip" data-placement="bottom" data-animation="false" data-html="true" title="<div class='fairness-tooltip'><div class='fairness-score'><b>Score:</b> {{fairness_data.fairness_score|round(2, 'floor')}}</div><div class='fairness-question'><b>{{loop.index}}.</b> {{fairness_data.fairness_question}}</div></div>"/>
 					{% endfor %}
 				</svg>
+				<div id="fairness-evaluation-number">{{ 3 }} evaluations</div>
 			</div>
 		</div> <!-- #object-overview -->
 
@@ -108,11 +110,11 @@
 					<div class="info-card-title">General Information</div>
 					<table class="info-card-table">
 						{% if object_type == 'dataset' %}
+							<tr><td>Accession</td><td>{{ landing_data[object_type]['dataset_accession'] }}</td></tr>
 							<tr><td>Title</td><td>{{ landing_data[object_type]['dataset_title'] }}</td></tr>
 							<tr><td>Description</td><td>{{ landing_data[object_type]['dataset_description'] }}</td></tr>
 							<tr><td>Landing Page</td><td><a href="{{ landing_data[object_type]['dataset_landing_url'] }}">{{ landing_data[object_type]['dataset_landing_url'] }}</a></td></tr>
 							<tr><td>Repository</td><td><a href="{{ landing_data[object_type]['repository_homepage_url'] }}">{{ landing_data[object_type]['repository_name'] }}</a></td></tr>
-							<tr><td>Accession</td><td>{{ landing_data[object_type]['dataset_accession'] }}</td></tr>
 							<tr><td>Upload Date</td><td>{{ landing_data[object_type]['date'] }}</td></tr>
 							<tr>
 						{% elif object_type == 'tool' %}
@@ -133,7 +135,7 @@
 				{% if object_type == 'tool' and landing_data[object_type]['publications']|length > 0 %}
 					<div id="publication-info" class="info-card">
 						<div class="info-card-title">Publications</div>
-						<div id="publication-tabs">
+						<div class="info-card-tabs">
 							<ul class="nav nav-tabs" role="tablist">
 								{% for publication in landing_data[object_type]['publications'] %}
 									<li class="nav-item">
@@ -236,15 +238,38 @@
 			<div class="tab-pane" id="fairness" role="tabpanel">
 				<div id="fairness-info" class="info-card">
 					<div class="info-card-title">FAIR Evaluation</div>
-					<form id="fairness-form" action="{{url_for('index')}}">
-						<table id="fairness-table">
-							<tr><th>Question</th><th>Yes</th><th>No</th><th>Yes, but:</th><th>Comments</th></tr>
-							{% for fairness_data in landing_data[object_type]['fairness']%}
-								<tr><td>{{loop.index}}. {{fairness_data.fairness_question}}</td><td><input type="radio" name="fairness-question-{{loop.index}}" value="yes" required></td><td><input type="radio" name="fairness-question-{{loop.index}}" value="no"></td><td><input type="radio" name="fairness-question-{{loop.index}}" value="yes-but"></td><td><input type="text" class="yes-but-comment" name="fairness-question-{{loop.index}}-comment"></td></tr>
-							{% endfor %}
-						</table>
-						<button id="fairness-button" class="btn" type="submit">Submit</button>
-					</form>
+					<div class="info-card-tabs">
+						<ul class="nav nav-tabs" role="tablist">
+							<li class="nav-item">
+								<a class="nav-link active" data-toggle="tab" href="#fairness-evaluation-results" role="tab">Results</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" data-toggle="tab" href="#fairness-evaluation-form" role="tab">Form</a>
+							</li>
+						</ul>
+					</div>
+					<div class="tab-content">
+						<div class="tab-pane active" id="fairness-evaluation-results" role="tabpanel">
+							Results
+						</div>
+						<div class="tab-pane" id="fairness-evaluation-form" role="tabpanel">
+							{% if current_user.is_authenticated %}
+							<form id="fairness-form" action="{{url_for('index')}}">
+								<table id="fairness-table">
+									<tr><th>Question</th><th>Yes</th><th>No</th><th>Yes, but:</th><th>Comments</th></tr>
+									{% for fairness_data in landing_data[object_type]['fairness']%}
+										<tr><td>{{loop.index}}. {{fairness_data.fairness_question}}</td><td><input type="radio" name="fairness-question-{{loop.index}}" value="yes" required></td><td><input type="radio" name="fairness-question-{{loop.index}}" value="no"></td><td><input type="radio" name="fairness-question-{{loop.index}}" value="yes-but"></td><td><input type="text" class="yes-but-comment" name="fairness-question-{{loop.index}}-comment"></td></tr>
+									{% endfor %}
+								</table>
+								<button id="fairness-button" class="btn" type="submit">Submit</button>
+							</form>
+							{% else %}
+								<div class="info-card-text">
+									Sorry, you must be signed in to evaluate this object. <br> <br> <button id="sign-in" type="button" class="btn" data-toggle="modal" data-target="#login-modal"> Sign In </button>
+								</div>
+							{% endif %}
+						</div>
+					</div>
 				</div>
 			</div> <!-- #fairness -->
 

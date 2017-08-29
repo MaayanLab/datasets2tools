@@ -1,116 +1,52 @@
-radio<!-- Object Cards -->
+<!-- Object Cards -->
 {% macro display_object_card(object_data, object_type) %}
 
-	{% if object_type == 'canned_analysis' %}
-		<div class="col-4 canned-analysis-col">
-			<div class="canned-analysis-card">
-				<div class="row">
-					<div class="col-5 canned-analysis-preview-col">
-						<a href="{{ url_for('landing', object_type='canned_analysis', object_identifier=object_data.canned_analysis_accession) }}">
-							<img class="canned-analysis-preview-icon" src="{{ object_data.canned_analysis_preview_url }}">
-						</a>
-					</div>
-					<div class="col-7 canned-analysis-info-col">
-						<div class="row">
-							<div class="col-12 canned-analysis-title-col">
-								<a href="{{ url_for('landing', object_type='canned_analysis', object_identifier=object_data.canned_analysis_accession) }}" class="canned-analysis-title">
-									{{ object_data.canned_analysis_title }}
-								</a>
-								<div class="canned-analysis-tool">
-								{% if object_data.tools|length == 1%}
-									<a href="{{ url_for('landing', object_type='tool', object_identifier=object_data.tools[0].tool_name) }}">{{ object_data.tools[0].tool_name }}</a>
-								{% else %}
-									<a href="#" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" title="Tools"  data-template='<div class="popover canned-analysis-info-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="
-										{% for tool in object_data.tools %}
-											<div class='row canned-analysis-info-popover-row'>
-												<div class='col-12'>
-													<a class='canned-analysis-info-popover-link' href='{{ url_for('landing', object_type='tool', object_identifier=tool.tool_name) }}'>
-														<img class='canned-analysis-info-popover-icon'src='{{ tool.tool_icon_url }}'>
-														<span class='canned-analysis-info-popover-name'>{{ tool.tool_name }}</span>
-													</a>
-												</div>
-											</div>
-										{% endfor %}
-									">
-									{{ object_data.tools|length }} tools</a>
-								{% endif %}
-								</div>
-							</div>
-						</div>
-						<i class="fa fa-info-circle canned-analysis-info-icon" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" title="Datasets" data-template='<div class="popover canned-analysis-info-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content container-fluid"></div></div>' data-content="
-								{% for dataset in object_data.datasets.search_results %}
-									<div class='row canned-analysis-info-popover-row'>
-										<div class='col-12'>
-											<a class='canned-analysis-info-popover-link' href='{{ url_for('landing', object_type='dataset', object_identifier=dataset.dataset_accession) }}'>
-												<span class='canned-analysis-info-popover-name'>{{ dataset.dataset_accession }}</span>
-											</a>
-										</div>
-									</div>
-								{% endfor %}
-								<div class='popover-title'>
-									Metadata
-								</div>
-								{% for key, value in object_data.metadata.iteritems() %}
-									<div class='row canned-analysis-info-popover-row'>
-										<div class='col-6 canned-analysis-info-popover-metadata-tag'>
-											{{ key }}
-										</div>
-										<div class='col-6 canned-analysis-info-popover-metadata-value'>
-											{{ value }}
-										</div>
-									</div>
-								{% endfor %}
-						"></i>
-					</div> <!-- .canned-analysis-info-col -->
-				</div>
-			</div>
-		</div>
-	{% elif object_type == 'dataset' %}
-		<div class="col-4 dataset-col">
-			<div class="dataset-card">
-				<div class="row">
-					<div class="col-5 dataset-icon-col">
-						<a href="{{ url_for('landing', object_type='dataset', object_identifier=object_data.dataset_accession) }}"><img class="dataset-icon" src="{{ object_data.repository_icon_url }}"></a>
-					</div>
-					<div class="col-7 dataset-info-col">
-						<a class="dataset-accession" href="{{ url_for('landing', object_type='dataset', object_identifier=object_data.dataset_accession) }}">{{ object_data.dataset_accession }}</a>
-						<a class="dataset-title" href="{{ url_for('landing', object_type='dataset', object_identifier=object_data.dataset_accession) }}">{{ object_data.dataset_title }}</a>
-						<a href="{{ url_for('index', tool_name=tool_name, dataset_accession=object_data.dataset_accession) }}">
-						{% if tool_name %}
-							<a href="{{ url_for('index', tool_name=tool_name, dataset_accession=object_data.dataset_accession) }}">
-						{% else %}
-							<a href="{{ url_for('index', dataset_accession=object_data.dataset_accession) }}">
-						{% endif %}
-							<button class="btn analyze-button">Analyze</button>
-						</a>
-						<i class="fa fa-info-circle dataset-info-icon" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" data-template='<div class="popover dataset-info-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="{{ object_data.dataset_description }}"></i>
-					</div>
-				</div>
-			</div>
-		</div>
+	{% if object_type == 'dataset' %}
+		{% set card_title = object_data.dataset_accession %}
+		{% set card_source = 'Gene Expression Omnibus' %}
+		{% set card_source_url = object_data.repository_homepage_url %}
+		{% set card_description = object_data.dataset_title %}
+		{% set card_icon_url = url_for('static', filename='icons/gene.png') %}
+		{% set card_landing_url = url_for('landing', object_type=object_type, object_identifier=object_data.dataset_accession) %}
+		{% set card_colsize = 'col-6' %}
+		{% set image_colsize = 4 %}
+		{% set max_description_length = 100 %}
 	{% elif object_type == 'tool' %}
-		<div class="col-3 tool-col">
-			<div class="tool-card">
+		{% set card_title = object_data.tool_name %}
+		{% set card_description = object_data.tool_description %}
+		{% set card_icon_url = object_data.tool_icon_url %}
+		{% set card_landing_url = url_for('landing', object_type=object_type, object_identifier=object_data.tool_name) %}
+		{% set card_colsize = 'col-4' %}
+		{% set image_colsize = 5 %}
+		{% set max_description_length = 100 %}
+	{% elif object_type == 'canned_analysis' %}
+		{% set card_title = object_data.canned_analysis_title %}
+		{% set card_source = 'maayanlab' %}
+		{% set card_source_url = '#' %}
+		{% set card_description = object_data.canned_analysis_description %}
+		{% set card_icon_url = object_data.canned_analysis_preview_url %}
+		{% set card_landing_url = url_for('landing', object_type=object_type, object_identifier=object_data.canned_analysis_accession) %}
+		{% set card_colsize = 'col-6' %}
+		{% set image_colsize = 5 %}
+		{% set max_description_length = 100 %}
+	{% endif %}
+
+		<div class="{{ card_colsize }} card-col">
+			<div class="card-wrapper {{object_type}}-card">
 				<div class="row">
-					<div class="col-6 tool-icon-col">
-						<a href="{{ url_for('landing', object_type='tool', object_identifier=object_data.tool_name) }}"><img class="tool-icon" src="{{ object_data.tool_icon_url }}"></a>
+					<div class="col-{{ image_colsize }} card-icon-col">
+						<a href="{{ card_landing_url }}"><img class="card-icon" src="{{ card_icon_url }}"></a>
 					</div>
-					<div class="col-6 tool-info-col">
-						<a class="tool-name" href="{{ url_for('landing', object_type='tool', object_identifier=object_data.tool_name) }}">{{ object_data.tool_name }}</a>
-						<a class="tool-developer" href="{{ url_for('landing', object_type='tool', object_identifier=object_data.tool_name) }}">maayanlab</a>
-						{% if dataset_accession %}
-							<a href="{{ url_for('index', tool_name=object_data.tool_name, dataset_accession=dataset_accession) }}">
-						{% else %}
-							<a href="{{ url_for('index', tool_name=object_data.tool_name) }}">
-						{% endif %}
-							<button class="btn analyze-button">Analyze</button>
-						</a>
-						<i class="fa fa-info-circle tool-info-icon" tabindex="0" data-toggle="popover" data-placement="bottom" data-trigger="focus" data-html="true" data-template='<div class="popover tool-info-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="{{ object_data.tool_description }}"></i>
+					<div class="col-{{ 12-image_colsize }} card-info-col">
+						<a class="card-title" href="{{ card_landing_url }}">{{ card_title }}</a>
+						{% if object_type == 'tool' %} <div class="tool-metrics">{{ '30 citations' }}</div> {% endif %}
+						{% if object_type == 'dataset' or object_type == 'canned_analysis' %} <a href="{{ card_source_url }}" class="card-source">{{ card_source }}</a> {% endif %}
+						<div class="card-description" data-toggle="tooltip" data-placement="bottom" data-animation="false" data-html="true" data-template='<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner card-description-tooltip"></div></div>' title="{{ card_description if card_description|length > max_description_length else ''}}">{{ card_description[:max_description_length]+'...' if card_description|length > max_description_length else card_description }}</div>
+						<i class="fa fa-info-circle card-info-icon"></i>
 					</div>
 				</div>
 			</div>
 		</div>
-	{% endif %}
 
 {% endmacro %}
 

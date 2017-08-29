@@ -1,330 +1,88 @@
 /*************************/
-/** CANNED ANALYSIS 
+/** CARD
 /*************************/
 
-.canned-analysis-row {
+.card-row {
 }
 
-	.canned-analysis-col {
+	.card-col {
 		padding: 10px 15px;
 	}
 
-		.canned-analysis-card {
-			padding: 13px;
+		.card-wrapper {
+			padding: 0.4rem 1rem;
 			background-color: white;
 			border: 1px solid #c2c2c2;
-			border-radius: 5px;
+		    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+	        border-top-color: rgb(229, 230, 233);
+		    border-right-color: rgb(223, 224, 228);
+		    border-bottom-color: rgb(208, 209, 213);
+		    border-left-color: rgb(223, 224, 228);
+		    border-radius: .2rem;
 		}
 
-			.canned-analysis-preview-col {
-				margin: auto;
-			}
-
-				.canned-analysis-preview-icon {
-					max-width: 100%;
-				}
-
-			.canned-analysis-info-col {
-				padding-left: 0px;
-			}
-
-				.canned-analysis-title-col {
-					height: 60px;
-				}
-
-					.canned-analysis-title {
-						font-size: 8pt;
-						color: darkblue;
-						line-height: 1.5;
-						font-weight: 600;
-						display: block;
-					}
-
-				.canned-analysis-tool {
-
-				}
-
-					.canned-analysis-tool a {
-						font-size: 8pt;
-						color: darkblue;
-						font-weight: 400;
-					}
-
-						.canned-analysis-tool a:hover, .canned-analysis-tool a:focus {
-							outline: none;
-						}
-
-					.canned-analysis-tool-popover {
-						padding: 0px;
-					}
-						
-						.canned-analysis-tool-popover ul {
-							list-style: none;
-							padding: 0px;
-							margin: 0px;
-						}
-
-							.canned-analysis-tool-popover ul a {
-								font-size: 8pt;
-								color: darkblue;
-								font-weight: 400;
-							}
-
-				.canned-analysis-info-icon {
-					position: absolute;
-					bottom: -7px;
-					right: 9px;
-					color: darkgrey;
-					cursor: pointer;
-					font-size: 10pt;
-				}
-
-					.canned-analysis-info-icon:focus {
-						outline: none;
-					}
-
-					.canned-analysis-info-popover {
-						width: 200px;
-						font-size: 8pt;
-					}
-
-						.canned-analysis-info-popover .popover-title {
-							padding: 5px 10px;
-							margin-bottom: 0px;
-							font-weight: 600;
-							text-align: left;
-							font-size: 9pt;
-						}
-
-						.canned-analysis-info-popover .popover-content {
-							padding: 0px;
-						}
-
-							.canned-analysis-info-popover-row {
-								border-bottom: 1px solid #f2f2f2;
-								padding: 5px 0px;
-								margin-left: auto;
-								margin-right: auto;
-							}
-
-								.canned-analysis-info-popover-row .col-12 {
-									padding-left: 10px;
-								}
-
-									.canned-analysis-info-popover-link {
-										color: darkblue;
-										text-decoration: none;
-										display: table;										
-									}
-
-										.canned-analysis-info-popover-link:hover {
-											color: darkblue;
-										}
-
-										.canned-analysis-info-popover-icon {
-											height: 15px;
-											margin-right: 9px;
-											display: table-cell;
-											vertical-align: middle;
-										}
-
-										.canned-analysis-info-popover-name {
-											display: table-cell;
-											vertical-align: middle;
-										}
-
-									.canned-analysis-info-popover-dataset-link {
-										color: darkblue;
-										text-decoration: none;
-										display: table;
-									}
-
-										.canned-analysis-info-popover-dataset-link:hover {
-											color: darkblue;
-										}
-
-									.canned-analysis-info-popover-metadata-tag {
-										font-weight: 600;
-										font-style: italic;
-										padding-left: 10px;
-									}
-
-									.canned-analysis-info-popover-metadata-value {
-										text-align: right;
-										font-weight: 200;
-										padding-right: 10px;
-									}
-
-/*************************/
-/** TOOLS 
-/*************************/
-
-.tool-row {
-}
-
-	.tool-col {
-		padding: 10px 15px;
-	}
-
-		.tool-card {
-			padding: 7px 13px;
-			background-color: white;
-			border: 1px solid #c2c2c2;
-			border-radius: 5px;
-		}
-
-			.tool-icon-col {
-				padding: 5px 0px;
+			.card-icon-col {
+				padding: 0.5rem 0.7rem;
 				text-align: center;
 				margin: auto;
 			}
 
-				.tool-icon {
-					max-width: 60%;
+				.card-icon {
+					width: 100%;
+					margin: auto;
 				}
 
-			.tool-info-col {
-				padding-left: 3px;
-				margin-top:-3px;
-				padding-top: 0px;
+			.card-info-col {
+				padding: 0.5rem 0.2rem 0.5rem 0.1rem;
 			}
 
-				.tool-name {
-					font-size: 8pt;
+				.card-title {
+					font-size: 9pt;
 					color: darkblue;
 					font-weight: 600;
-				}
-
-					.tool-name:hover {
-						color: darkblue;
-					}
-
-				.tool-developer {
-					font-size: 7pt;
-					font-weight: 300;
-					color: darkblue;
-					margin: 0px;
 					display: block;
-					margin-top: 2px;
-					margin-bottom: 2px;
+					margin-bottom: 0px;
 				}
 
-					.tool-developer:hover {
+					.card-title:hover {
 						color: darkblue;
 					}
 
-				.tool-description {
+				.card-source {
+					font-size: 7pt;
+					margin-top: 3px;
+					margin-bottom: 5px;
+					color: darkblue;
+					display: block
+				}
+
+				.tool-metrics {
+					font-size: 7pt;
+					font-style: italic;
+					margin-top: 1px;
+					margin-bottom: 5px;
+					color: #757575;
+				}
+
+				.card-description {
 					font-size: 7pt;
 					margin-bottom: 3px;
+					color: black;
+					font-weight: 400;
 				}
 
-				.analyze-button {
-					font-size: 7pt;
-					background-color: #255FA7;
-					color: white;
-					margin-top: 0px;
-					padding: 3px 5px;
-					font-weight: 500;
-					cursor: pointer;
-				}
-
-				.tool-info-icon {
-					position: absolute;
-					bottom: -3px;
-					right: 9px;
-					color: darkgrey;
-					font-size: 10pt;
-					cursor: pointer;
-				}
-
-					.tool-info-popover {
-						font-size: 8pt;
-					}
-					
-						.tool-info-icon:focus {
-							outline: none;
-						}
-
-
-/*************************/
-/** DATASETS 
-/*************************/
-
-.dataset-row {
-}
-
-	.dataset-col {
-		padding: 10px 15px;
-	}
-
-		.dataset-card {
-			padding: 10px 15px;
-			background-color: white;
-			border: 1px solid #c2c2c2;
-			border-radius: 5px;
-		}
-
-			.dataset-icon-col {
-				padding: 5px 0px;
-				text-align: center;
-				margin: auto;
-			}
-
-				.dataset-icon {
-					max-width: 60%;
-				}
-
-			.dataset-info-col {
-				padding-left: 3px;
-				margin-top:-3px;
-				padding-top: 0px;
-			}
-
-				.dataset-accession {
+				.card-description-tooltip {
 					font-size: 8pt;
-					color: darkblue;
-					display: block;
-					font-weight: 600;
+					padding: 7px 15px;
+					text-align: justify;
+					max-width: 300px;
 				}
 
-					.dataset-accession:hover {
-						color: darkblue;
-					}
-
-				.dataset-title {
-					font-size: 7pt;
-					font-weight: 300;
-					color: darkblue;
-					margin: 0px;
-					display: block;
-					margin-top: 2px;
-					margin-bottom: 2px;
-				}
-
-					.dataset-title:hover {
-						color: darkblue;
-					}
-
-				.dataset-description {
-					font-size: 7pt;
-					margin-bottom: 3px;
-				}
-
-				.dataset-info-icon {
+				.card-info-icon {
+					color: #757575;
 					position: absolute;
-					bottom: -3px;
-					right: 9px;
-					color: darkgrey;
+					right: 0.5rem;
+					bottom: 0rem;
 					font-size: 10pt;
-					cursor: pointer;
 				}
-
-					.dataset-info-popover {
-						font-size: 8pt;
-					}
-					
-						.dataset-info-icon:focus {
-							outline: none;
-						}
-
 

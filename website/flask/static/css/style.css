@@ -73,24 +73,29 @@
 			}
 
 		#object-fairness-col {
-			padding-top: 40px;
 			border-left: 1px solid #c2c2c2
 		}
 			
-			#object-fairness-col::after {
-				content: "FAIR Metrics";
-				z-index: 10;
+			#fairness-label {
 				font-size: 9pt;
 				color: black;
-				top: 15px;
-				left: 25px;
-				position: absolute;
 				text-align: center;
 				font-weight: 600;
+				padding-top: 10px;
+				padding-bottom: 5px;
+			}
+			
+			#fairness-evaluation-number {
+				z-index: 10;
+				font-size: 8pt;
+				color: #757575;
+				text-align: center;
+				font-weight: 300;
+				margin-top: -3px;
+				padding-bottom: 5px;
 			}
 
 			.object-fairness-col svg {
-				margin-top: 15px;
 			}
 
 				.fairness-tooltip {
@@ -167,6 +172,12 @@
 						font-style: italic;
 					}
 
+				.info-card-text {
+					font-size: 10pt;
+					text-align: center;
+					padding: 40px 0px;
+				}
+
 				.info-card-divider {
 					margin: 0px -15px;
 					font-size: 10pt;
@@ -226,15 +237,18 @@
 
 				}
 
-					#publication-tabs {
+					.info-card-tabs {
 						border-bottom: 1px solid #c2c2c2;
 					}
 
-						#publication-tabs .nav {
+						.info-card-tabs .nav {
 							border: none;
+							background-color: #fcfcfc;
+							padding-top: 5px;
+							padding-left: 3px;
 						}
 
-							#publication-tabs .nav-link {
+							.info-card-tabs .nav-link {
 								border: none;
 								color: black;
 								background-color: transparent;
@@ -242,14 +256,14 @@
 								font-size: 9pt;
 								font-weight: 400;
 								margin: 0px;
-								border-radius: 0px;
-								border-right: 1px solid #c2c2c2;
+								border-radius: 3px 3px 0px 0px;
 							}
 
-								#publication-tabs .nav-link.active {
+								.info-card-tabs .nav-link.active {
 									color: #255FA7;
 									background-color: white;
-									border-bottom: 2px solid #255FA7;
+									border: 1px solid #c2c2c2;
+									border-bottom: 2px solid white;
 								}
 
 						.info-card-publication {
@@ -352,12 +366,15 @@
 					}
 
 			#fairness-button {
-				background-color: white;
+				background-color: #255FA7;
+				border-radius: 5px;
+				padding: 0.5rem 0.7rem;
+				margin-right: 0px;
 				margin-left: 15px;
-				border: 1px solid #c2c2c2;
-				font-size: 11pt;
-				margin-bottom: 15px;
+				color: white;
 				cursor: pointer;
+				font-size: 10pt;
+				margin-bottom: 10px;
 			}
 
 				#fairness-button:hover {
