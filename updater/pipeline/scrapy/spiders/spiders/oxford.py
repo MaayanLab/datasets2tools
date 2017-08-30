@@ -2,7 +2,7 @@ import scrapy, os, json
 from inline_requests import inline_requests
 
 # Check URL
-check_url = lambda x: not any([x.css('::text').extract_first().lower() == 'supplementary data', x.css('::text').extract_first().lower() == 'supplementary information', '@' in x.css('::text').extract_first(), x.css('::attr("href")').extract_first() == None])
+check_url = lambda x: not any(['supplementary' in x.css('::text').extract_first().lower(), '@' in x.css('::text').extract_first(), x.css('::attr("href")').extract_first() == None])
 
 class JournalSpider(scrapy.Spider):
 
@@ -15,7 +15,7 @@ class JournalSpider(scrapy.Spider):
     def parse(self, response):
 
         # Get minimum year
-        from_year = 2017
+        from_year = 2015
 
         # Loop through years
         for year_link in response.css('.widget-instance-OUP_Issues_Year_List div a::attr(href)').extract():
@@ -53,7 +53,7 @@ class JournalSpider(scrapy.Spider):
         journal_name = split_url[3]
 
         # Get base directory
-        basedir = os.getcwd().replace('/pipeline/scrapy', '/articles')
+        basedir = os.getcwd().replace('/pipeline/scrapy', '/journals')
 
         # If database
         if journal_name == 'database':
@@ -68,7 +68,7 @@ class JournalSpider(scrapy.Spider):
             for i, article_link in enumerate(response.css('.viewArticleLink::attr(href)').extract()):
 
                 # Stop
-                if i == 10:
+                if i == 25:
                     break
                 
                 # Parse archive
@@ -76,7 +76,7 @@ class JournalSpider(scrapy.Spider):
 
                 # Get data
                 articles['article_data'].append({
-                    'article_title': article.css('.wi-article-title::text').extract_first().strip(),
+                    'article_title': ''.join(article.css('.wi-article-title::text, .wi-article-title em::text').extract()).strip(),
                     'authors': article.css('.al-author-name .info-card-name::text').extract(),
                     'doi': article.css('.ww-citation-primary a::text').extract_first(),
                     'abstract': [[p.css('strong::text').extract_first(), ''.join(p.css(':not(strong)::text, :not(strong) em::text').extract()).strip()] for p in article.css('.abstract p')],

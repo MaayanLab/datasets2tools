@@ -2,7 +2,7 @@ import scrapy, os, json, re
 from inline_requests import inline_requests
 
 # Check URL
-check_url = lambda x: not any([x.css('::text').extract_first().lower() == 'supplementary data', x.css('::text').extract_first().lower() == 'supplementary information', '@' in x.css('::text').extract_first(), x.css('::attr("href")').extract_first() == None])
+check_url = lambda x: not any(['supplementary' in x.css('::text').extract_first().lower(), '@' in x.css('::text').extract_first(), x.css('::attr("href")').extract_first() == None])
 
 class JournalSpider(scrapy.Spider):
 
@@ -14,7 +14,7 @@ class JournalSpider(scrapy.Spider):
     def parse(self, response):
 
         # Get minimum volume
-        from_volume = 18
+        from_volume = 11
 
         # Get volumes
         volumes = set([int(x) for x in response.css('.search__volume-selector option::attr("value")').extract() if x != ''])
@@ -43,7 +43,7 @@ class JournalSpider(scrapy.Spider):
         volume = re.search('volume=(.*)\&searchType', response.url).group(1)
 
         # Get base directory
-        outfile = os.getcwd().replace('/pipeline/scrapy', '/articles/bmc-bioinformatics/bmc-bioinformatics_vol_')+volume+'.json'
+        outfile = os.getcwd().replace('/pipeline/scrapy', '/journals/bmc-bioinformatics/bmc-bioinformatics_vol_')+volume+'.json'
 
         # Check if outfile exists
         if not os.path.exists(outfile) or int(volume) == latest_volume:
@@ -52,7 +52,7 @@ class JournalSpider(scrapy.Spider):
             for i, article_link in enumerate(response.css('.ResultsList .fulltexttitle::attr(href)').extract()):
 
                 # Stop
-                if i == 50:
+                if i == 25:
                     break
                 
                 # Parse archive

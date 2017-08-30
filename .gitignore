@@ -1,4 +1,6 @@
 *.DS_Store
-updater/articles
+updater/0*
 .gitignore~
 *.pyc
+*.sqlite
+*-checkpoint.ipynb
