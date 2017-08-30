@@ -1,6 +1,9 @@
 import scrapy, os, json
 from inline_requests import inline_requests
 
+# Check URL
+check_url = lambda x: not any([x.css('::text').extract_first().lower() == 'supplementary data', x.css('::text').extract_first().lower() == 'supplementary information', '@' in x.css('::text').extract_first(), x.css('::attr("href")').extract_first() == None])
+
 class JournalSpider(scrapy.Spider):
 
     # Setup
@@ -65,7 +68,7 @@ class JournalSpider(scrapy.Spider):
             for i, article_link in enumerate(response.css('.viewArticleLink::attr(href)').extract()):
 
                 # Stop
-                if i == 3:
+                if i == 10:
                     break
                 
                 # Parse archive
@@ -76,8 +79,9 @@ class JournalSpider(scrapy.Spider):
                     'article_title': article.css('.wi-article-title::text').extract_first().strip(),
                     'authors': article.css('.al-author-name .info-card-name::text').extract(),
                     'doi': article.css('.ww-citation-primary a::text').extract_first(),
-                    'abstract': [[p.css('::text').extract_first().replace(':', ''), ''.join(p.css('::text').extract()[1:]).strip()] for p in article.css('.abstract p')],
-                    'date': article.css('.citation-date::text').extract_first()
+                    'abstract': [[p.css('strong::text').extract_first(), ''.join(p.css(':not(strong)::text, :not(strong) em::text').extract()).strip()] for p in article.css('.abstract p')],
+                    'date': article.css('.citation-date::text').extract_first(),
+                    'links': list(set([a.css('::attr("href")').extract_first() for a in article.css('.abstract a') if check_url(a)]))
                 })
 
             # Save data
