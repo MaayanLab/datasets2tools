@@ -53,6 +53,14 @@
 <!-- Search Results -->
 {% macro display_filter_options(search_filters, object_type) %}
 	{% set colsize = 'col-3' if object_type == 'canned_analysis' else 'col-4' %}
+	<div class="{{ colsize }}">
+		<div class="search-option-label">Sort by</div>
+		<select data-placeholder="Select..." class="search-sort-dropdown" name="sort_by">
+			<option value="relevance"{{ ' selected' if request.args.get('sort_by') == 'relevance' and request.args.get('object_type') == object_type}}>Relevance</option>
+			<option value="newest"{{ ' selected' if request.args.get('sort_by') == 'newest' and request.args.get('object_type') == object_type }}>Newest</option>
+			<option value="oldest"{{ ' selected' if request.args.get('sort_by') == 'oldest' and request.args.get('object_type') == object_type }}>Oldest</option>
+		</select>
+	</div>
 	{% for key, values in search_filters.iteritems() %}
 		{% if key != 'canned_analysis_metadata' %}
 			<div class="{{ colsize }}">
@@ -60,60 +68,80 @@
 				<select data-placeholder="Select..." class="search-option-dropdown" name="{{ key }}">
 					<option></option>
 					{% for value in values %}
-						<option value="{{ value }}"{{ ' selected' if request.args.get('tab') == object_type and request.args.get(key) == value else '' }}>{{ value }}</option>
+						<option value="{{ value }}"{{ ' selected' if request.args.get('object_type') == object_type and request.args.get(key) == value else '' }}>{{ value }}</option>
 					{% endfor %}
 				</select>
 			</div>
 		{% endif %}
 	{% endfor %}
+	{% if object_type == 'canned_analysis' %}
+		{% for key, values in search_filters.canned_analysis_metadata.iteritems() %}
+				<div class="{{ colsize }}">
+					<div class="search-option-label">{{ key.replace('_', ' ').title() }}</div>
+					<select data-placeholder="Select..." class="search-option-dropdown" name="{{ key }}">
+						<option></option>
+						{% for value in values %}
+							<option value="{{ value }}"{{ ' selected' if request.args.get('object_type') == object_type and request.args.get(key) == value else '' }}>{{ value }}</option>
+						{% endfor %}
+					</select>
+				</div>
+		{% endfor %}
+	{% endif %}
 {% endmacro %}
 
 <!-- Search Results -->
 {% macro display_search_results(search_filters, object_list, object_type) %}
 
 	<div class="row search-results-wrapper">
-		<div class="col-12">
-			<div class="row search-filters-row">
-				<div class="col-12">
-					<div class="row search-row">
-						<div class="col-6 text-left">
-							<div class="form-inline">
-								<input class="form-control" type="text" placeholder="Search..." name="q">
-								<button class="btn" type="button">
-									<i class="fa fa-search"></i>
-								</button>
+		<form class="landing-search-form">
+			<input type="hidden" name="object_type" value="{{ object_type }}">
+			<div class="col-12">
+				<div class="row search-filters-row">
+					<div class="col-12">
+						<div class="row search-row">
+							<div class="col-6 text-left">
+								<div class="form-inline">
+									<input class="form-control" type="text" placeholder="Search..." name="q"{{ ' value='+request.args.get('q') if request.args.get('q', default='') != ''}}>
+									<button class="btn" type="button">
+										<i class="fa fa-search"></i>
+									</button>
+								</div>
+							</div>
+							<div class="col-6 text-right">
+								<a class="filter-button">Filters&nbsp&nbsp</a>
 							</div>
 						</div>
-						<div class="col-6 text-right">
-							<a class="filter-button">Filters&nbsp&nbsp</a>
-						</div>
-					</div>
-					<div class="search-options-wrapper">
-						<div class="row search-options-row">
-							{{ display_filter_options(search_filters, object_type) }}
+						<div class="search-options-wrapper">
+							<hr width="100%">
+							<div class="row search-options-row">
+								{{ display_filter_options(search_filters, object_type) }}
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-			<hr width="100%" class="my-1">
-			<div class="row object-card-row">
-				{% for object_data in object_list %}
-					{{ display_object_card(object_data, object_type) }}
-				{% endfor %}
-			</div>
-			<div class="row search-offsets-row">
-				<div class="col-6 text-left">
-					<span class="search-results-number">Displaying 3 of 3 results.</span>
-				</div>
-				<div class="col-6 text-right">
-					<span class="search-filter-offset-label"> Pages: </span>
-					{% for offset in [1,2,3] %}
-						<input type="radio" name="offset" id="{{object_type}}-offset-{{offset}}" value="{{offset}}"{{ ' checked' if offset == 1}}>
-						<label for="{{object_type}}-offset-{{offset}}" class="search-filter-offset">{{offset}}</label>
+				<hr width="100%" class="my-1">
+				<div class="row object-card-row">
+					{% for object_data in object_list %}
+						{{ display_object_card(object_data, object_type) }}
 					{% endfor %}
 				</div>
+				<div class="row search-number-card-row">
+					<div class="col-6 text-left">
+						{% for offset in [1,2,3] %}
+							<input type="radio" name="offset" id="{{object_type}}-offset-{{offset}}" value="{{offset}}"{{ ' checked' if request.args.get('offset', default=1)|int == offset }}>
+							<label for="{{object_type}}-offset-{{offset}}" class="search-filter-number-card">{{offset}}</label>
+						{% endfor %}
+					</div>
+					<div class="col-6 text-right">
+						{% for page_size in [10,20,30] %}
+							<input type="radio" name="page_size" id="{{object_type}}-page-size-{{page_size}}" value="{{page_size}}"{{ ' checked' if request.args.get('page_size', default=10)|int == page_size }}>
+							<label for="{{object_type}}-page-size-{{page_size}}" class="search-filter-number-card">{{page_size}}</label>
+						{% endfor %}
+						<span class="search-filter-number-label"> per page </span>
+					</div>
+				</div>
 			</div>
-		</div>
+		</form>
 	</div>
 
 {% endmacro %}

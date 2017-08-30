@@ -94,11 +94,25 @@ def landing(object_type, object_identifier):
 		landing_data = {'datasets': datasets, 'canned_analysis': canned_analyses['search_results'][0], 'tools': tools}
 	else:
 		abort(404)
-	return render_template('landing.html', landing_data=landing_data, object_type=object_type)
+	offset = request.args.get('offset', default=1, type=int)
+	page_size = request.args.get('page_size', default=10, type=int)
+	sort_by = request.args.get('sort_by', default='relevance', type=str)
+	q = request.args.get('q', default='', type=str)
+	return render_template('landing.html', landing_data=landing_data, object_type=object_type, offset=offset, page_size=page_size, sort_by=sort_by, q=q)
 
 @app.route(entry_point+'/search')
 def search():
-	return render_template('search.html', search_data=datasets, object_type='dataset')
+	object_type = request.args.get('object_type', default='canned_analysis', type=str)
+	offset = request.args.get('offset', default=1, type=int)
+	page_size = request.args.get('page_size', default=10, type=int)
+	sort_by = request.args.get('sort_by', default='relevance', type=str)
+	if object_type=='canned_analysis':
+		search_data=canned_analyses
+	elif object_type=='dataset':
+		search_data=datasets
+	elif object_type=='tool':
+		search_data=tools
+	return render_template('search.html', search_data=search_data, object_type=object_type, offset=offset, page_size=page_size, sort_by=sort_by)
 
 @app.route(entry_point+'/static/<path:path>')
 def static_files(path):

@@ -262,6 +262,9 @@
 		$('.search-option-dropdown').each(function(i, elem){
 			$(elem).chosen({width: '100%', allow_single_deselect: true});
 		});
+		$('.search-sort-dropdown').each(function(i, elem){
+			$(elem).chosen({width: '90%', "disable_search": true});
+		});
 		$('.object-search-form').change(function() {
 			this.submit();
 		});
@@ -281,11 +284,19 @@
 		});
 		$('#evaluate-button').click(function(evt) {
 			$('a[href="#fairness"]').click();
+		});	
+		$('.landing-search-form').submit(function() {
+		    $(':input', this).filter(function() {
+		        return this.value.length == 0;
+		    }).prop('disabled', true);
+		});
+		$('.landing-search-form').change(function(evt){
+			$(evt.target).parents('.landing-search-form').submit();
 		});
 	</script>
 
-	{% if 'tab' in request.args.keys() %}
-		{% set tab_id = request.args.get('tab').replace('is', 'e')+'s' %}
+	{% if 'object_type' in request.args.keys() %}
+		{% set tab_id = request.args.get('object_type').replace('is', 'e')+'s' %}
 		<script type="text/javascript">$('a[href="#{{tab_id}}"]').click();$('#{{tab_id}} .filter-button').click();</script>
 	{% endif %}
 

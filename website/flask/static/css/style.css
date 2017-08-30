@@ -391,7 +391,7 @@
 
 		.search-filters-row {
 			padding-top: 7px;
-			padding-bottom: 10px;
+			padding-bottom: 15px;
 		}
 
 			.search-row {
@@ -469,32 +469,36 @@
 				display: none;
 			}
 
-			.search-options-row {
-				padding-top: 10px;
-			}
-
-				.search-option-label {
-					font-size: 9pt;
-					padding-left: 3px;
+				.search-options-wrapper hr {
+					margin-top: 14px;
+					margin-bottom: 0px;
 				}
 
-				.search-options-row .chosen-single {
-					background-color: #f9f9f9 !important;
-					background-image: none !important;
-					padding-top: 5px;
-					padding-bottom: 5px;
-					border-radius: 3px !important;
+				.search-options-row {
 				}
 
-					.search-options-row .chosen-single span {
-						font-weight: 300;
+					.search-option-label {
+						font-size: 9pt;
+						padding-left: 3px;
+						padding-top: 15px;
 					}
+
+					.search-options-row .chosen-single {
+						background-color: #f9f9f9 !important;
+						background-image: none !important;
+						padding-top: 5px;
+						border-radius: 3px !important;
+					}
+
+						.search-options-row .chosen-single span {
+							font-weight: 300;
+						}
 
 		.object-card-row {
 
 		}
 
-		.search-offsets-row {
+		.search-number-card-row {
 			padding-top: 7px;
 		}
 
@@ -502,12 +506,12 @@
 				font-size: 9pt;
 			}
 
-			.search-filter-offset-label {
+			.search-filter-number-label {
 				font-size: 9pt;
 				margin-right: 5px;
 			}
 
-				.search-filter-offset {
+				.search-filter-number-card {
 					font-size: 9pt;
 					display: inline-block;
 					border: 1px solid #c2c2c2;
@@ -518,11 +522,11 @@
 					cursor: pointer;
 				}
 
-				.search-offsets-row input[type="radio"] {
+				.search-number-card-row input[type="radio"] {
 					display: none;
 				}
 
-				.search-offsets-row input[type="radio"]:checked + .search-filter-offset {
+				.search-number-card-row input[type="radio"]:checked + .search-filter-number-card {
 					color: #c2c2c2;
 					border-color: lightgrey;
 					cursor: default;
@@ -533,7 +537,7 @@
 /*************************/
 
 #search-container {
-	margin-top: 50px;
+	margin-top: 30px;
 	width: 750px;
 }
 
@@ -579,7 +583,7 @@
 			}
 
 	#search-tab-row {
-		padding-top: 25px;
+		padding-top: 20px;
 	}
 
 		.search-tab-col {
@@ -587,14 +591,19 @@
 		}
 
 			.search-tab {
-				border: 1px solid #c2c2c2;
-				padding: 10px 17px;
+				padding: 10px 20px;
 				cursor: pointer;
-				border-radius: 3px 3px 0px 0px;
 				font-size: 10pt;
 				font-weight: 500;
 				margin-bottom: 0px;
+				color: #b1b1b1;
+				border: 1px solid #f2f2f2;
 				border-bottom: none;
+			}
+
+			.search-tab:hover {
+				background-color: #f9f9f9;
+				color: #a1a1a1;
 			}
 
 			.search-tab-col input[type="radio"] {
@@ -605,13 +614,26 @@
 				.search-tab-col input[type="radio"]:checked + .search-tab {
 					background-color: white;
 					color: #255FA7;
-					box-shadow: inset 0px -3px 0px 0px rgba(37,95,167,1);
+					border: 1px solid #c2c2c2;
+					border-top: 3px solid #255FA7;
+					border-bottom: none;
+					position: relative;
 				}
+
+					.search-tab-col input[type="radio"]:checked + .search-tab::after {
+						content:" ";
+						position:absolute;
+						left: 0px;
+						width:100%;
+						height:50%;
+						background-color: white;
+						display: block;
+					}
 
 
 	#search-results-wrapper-row {
 		border: 1px solid #c2c2c2;
-		border-radius: 5px;
+		border-radius: 1px;
 		background-color: white;
 	}
 
@@ -628,10 +650,7 @@
 					font-style: italic;
 					font-weight: 300;
 					margin: auto;
-				}
-
-				#search-filters-row hr {
-					margin-top: 10px;
+					margin-bottom: -3px;
 				}
 
 		#search-results-row {
@@ -642,14 +661,18 @@
 			display: none;
 		}
 
+			#search-options-wrapper hr {
+				margin-bottom: -5px;
+			}
+
 			#search-options-row {
 				padding-left: 25px;
-				padding-top: 7px;
 			}
 
 				#search-option-label {
 					font-size: 9pt;
 					padding-left: 3px;
+					margin-top: 7px;
 				}
 
 				#search-options-row .chosen-single {
@@ -662,16 +685,18 @@
 						font-weight: 300;
 					}
 
-		#search-offsets-row {
+		#search-number-card-row {
 			padding-top: 10px;
 			padding-bottom: 5px;
+			padding-left: 25px;
+			padding-right: 25px;
 		}
 
-			#search-offsets-row input[type="radio"] {
+			#search-number-card-row input[type="radio"] {
 				display: none;
 			}
 
-			#search-offsets-row input[type="radio"]:checked + .search-filter-offset {
+			#search-number-card-row input[type="radio"]:checked + .search-filter-number-card {
 				color: #c2c2c2;
 				border-color: lightgrey;
 				cursor: default;
