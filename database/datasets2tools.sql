@@ -28,7 +28,7 @@ CREATE TABLE dataset (
 	FOREIGN KEY (dataset_type_fk) REFERENCES dataset_type(id)
 );
 
-CREATE TABLE dataset_similarity (
+CREATE TABLE related_dataset (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`source_dataset_fk` INT,
 	`target_dataset_fk` INT,
@@ -47,7 +47,7 @@ CREATE TABLE tool (
 	`tool_icon_url` VARCHAR(255)
 );
 
-CREATE TABLE tool_similarity (
+CREATE TABLE related_tool (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`source_tool_fk` INT,
 	`target_tool_fk` INT,
@@ -72,17 +72,9 @@ CREATE TABLE article (
 	`authors` TEXT,
 	`date` DATE,
 	`doi` VARCHAR(255) UNIQUE,
-	FOREIGN KEY (journal_fk) REFERENCES journal(id)
+	FOREIGN KEY (journal_fk) REFERENCES journal(id),
+	FOREGIN KEY (tool_fk) REFERENCES tool(id)
 );
-
-CREATE TABLE article_to_tool (
-	`id` INT AUTO_INCREMENT PRIMARY KEY,
-	`article_fk` INT,
-	`tool_fk` INT,
-	FOREIGN KEY (article_fk) REFERENCES article(id),
-	FOREIGN KEY (tool_fk) REFERENCES tool(id)
-);
-
 
 ### Canned analysis
 
@@ -94,7 +86,7 @@ CREATE TABLE canned_analysis (
 	`canned_analysis_preview_url` VARCHAR(255)
 );
 
-CREATE TABLE canned_analysis_similarity (
+CREATE TABLE related_canned_analysis (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`source_canned_analysis_fk` INT,
 	`target_canned_analysis_fk` INT,

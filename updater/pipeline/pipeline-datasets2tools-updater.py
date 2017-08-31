@@ -14,7 +14,11 @@
 from ruffus import *
 import sys, os, glob, json, urllib2
 import pandas as pd
+import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Table, MetaData
 
 ##### 2. Custom modules #####
 # Pipeline running
@@ -30,6 +34,9 @@ spiders = ['oxford', 'bmc_bioinformatics']
 
 # Database engine
 engine = create_engine('mysql://root:MyNewPass@localhost/datasets2tools')
+
+# Session maker
+Session = sessionmaker(bind=engine)
 
 ##### 2. R Connection #####
 
@@ -100,6 +107,9 @@ def getTools(infile, outfile):
 		
 		# Add tool name column
 		tool_dataframe['tool_name'] = [x.split(':')[0].replace('"', '') if ':' in x else None for x in tool_dataframe['article_title']]
+
+		# Remove long names without parentheses
+		tool_dataframe['tool_name'] = [None if x and len(x) > 50 and '(' not in x else x for x in tool_dataframe['tool_name']]
 		
 		# Drop rows with no names
 		tool_dataframe.drop([index for index, rowData in tool_dataframe.iterrows() if not rowData['tool_name']], inplace=True)
@@ -111,26 +121,26 @@ def getTools(infile, outfile):
 		# Drop article title
 		tool_dataframe.drop('article_title', inplace=True, axis=1)
 		
-	# # Check if tool link works
-	# indices_to_drop = []
+	# Check if tool link works
+	indices_to_drop = []
 
-	# # Loop through indicies
-	# for index, rowData in tool_dataframe.iterrows():
+	# Loop through indicies
+	for index, rowData in tool_dataframe.iterrows():
 
-	# 	# Try to connect
-	# 	try:
+		# Try to connect
+		try:
+			# Check URL
+			if 'http' in rowData['tool_homepage_url']: #urllib2.urlopen(rowData['tool_homepage_url']).getcode() in (200, 401)
+				pass
+			else:
+				# Append
+				indices_to_drop.append(index)
+		except:
+				# Append
+				indices_to_drop.append(index)
 
-	# 		if urllib2.urlopen(rowData['tool_homepage_url']).getcode() in (200, 401):
-	# 			pass
-	# 		else:
-	# 			# Append
-	# 			indices_to_drop.append(index)
-	# 	except:
-	# 		# Append
-	# 		indices_to_drop.append(index)
-
-	# # Drop
-	# tool_dataframe.drop(indices_to_drop, inplace=True)
+	# Drop
+	tool_dataframe.drop(indices_to_drop, inplace=True)
 
 	# Write
 	tool_dataframe.to_csv(outfile, sep='\t', index=False, encoding='utf-8')
@@ -191,7 +201,7 @@ def getArticleSimilarity(infiles, outfile):
 	abstract_dataframe = pd.concat([pd.read_table(x)[['abstract', 'doi']] for x in infiles])
 
 	# Fix abstract
-	abstract_dataframe['abstract'] = [' '.join([abstract_tuple[1] for abstract_tuple in json.loads(x)['abstract'] if str(abstract_tuple[0]).lower() not in [u'contact:', u'availability and implementation', u'supplementary information']]) for x in abstract_dataframe['abstract']]
+	abstract_dataframe['abstract'] = [' '.join([abstract_tuple[1] for abstract_tuple in json.loads(x)['abstract'] if abstract_tuple[0] and abstract_tuple[0].lower() not in [u'contact:', u'availability and implementation', u'supplementary information']]) for x in abstract_dataframe['abstract']]
 
 	# Process abstracts
 	processed_abstracts = [P.process_text(x) for x in abstract_dataframe['abstract']]
@@ -200,8 +210,8 @@ def getArticleSimilarity(infiles, outfile):
 	similarity_dataframe, keyword_dataframe = P.extract_text_similarity_and_keywords(processed_abstracts, labels=abstract_dataframe['doi'])
 
 	# Write
-	similarity_dataframe.to_csv(outfile, sep='\t', index=True)
 	keyword_dataframe.to_csv(outfile.replace('similarity.txt', 'keywords.txt'), sep='\t', index=True)
+	similarity_dataframe.to_csv(outfile, sep='\t', index=True)
 
 #############################################
 ########## 5. Get article metrics
@@ -252,8 +262,14 @@ def getToolSimilarity(infiles, outfile):
 	# Rename similarity
 	tool_similarity_dataframe = pd.read_table(similarityInfile, index_col='doi').loc[tool_dois.keys(), tool_dois.keys()].rename(index=tool_dois, columns=tool_dois)
 
+	# Fill diagonal
+	np.fill_diagonal(tool_similarity_dataframe.values, np.nan)
+
+	# Melt tool similarity
+	melted_tool_similarity_dataframe = pd.melt(tool_similarity_dataframe.reset_index('doi').rename(columns={'doi': 'source_tool_name'}), id_vars='source_tool_name', var_name='target_tool_name', value_name='similarity').dropna()
+
 	# Write
-	tool_similarity_dataframe.to_csv(outfile, sep='\t', index=True)
+	melted_tool_similarity_dataframe.to_csv(outfile, sep='\t', index=False)
 
 #############################################
 ########## 7. Upload Data
@@ -263,7 +279,7 @@ def getToolSimilarity(infiles, outfile):
 
 @follows(mkdir('07-upload_data'))
 
-@files([[getArticles], [getTools], ['04-article_similarity/article_keywords.txt'], [getArticleMetrics], [getToolSimilarity]],
+@files([[getArticles], [getTools], '04-article_similarity/article_keywords.txt', getArticleMetrics, getToolSimilarity],
 	   '07-upload_data/upload_data.txt')
 
 def uploadData(infiles, outfile):
@@ -271,14 +287,43 @@ def uploadData(infiles, outfile):
 	# Split infiles
 	articleFiles, toolFiles, keywordFile, metricsFile, similarityFile = infiles
 
-	# Get data
+	# Get article data
+	article_dataframe =  pd.concat([pd.read_table(x) for x in articleFiles])
+
+	# Get tool data
+	tool_dataframe =  pd.concat([pd.read_table(x) for x in toolFiles])
+
+	
 	dataframes_to_upload = {
 		'article': pd.concat([pd.read_table(x) for x in articleFiles]),
 		'tool': pd.concat([pd.read_table(x) for x in toolFiles])
 	}
 
-	# Get IDs
-	object_ids = {object_type: upload_and_get_ids(dataframe_to_upload) for object_type, dataframes_to_upload in dataframes_to_upload.iteritems()}
+	# Create session
+	session = Session()
+
+	# Upload and get IDs of tools and articles
+	tool_id_dataframe = P.upload_and_get_ids(dataframes_to_upload['tool'], object_type='tool', engine)
+	object_ids = {object_type: P.upload_and_get_ids(dataframe_to_upload, object_type, engine) for object_type, dataframe_to_upload in dataframes_to_upload.iteritems()}
+
+	# Commit
+	session.commit()
+
+	# Prepare dataframes ready to upload
+	dataframes_ready_to_upload = {
+		'article_to_tool': dataframes_to_upload['tool'].merge(object_ids['article'], on='doi', how='left').merge(object_ids['tool'], on='tool_name', how='left')[['article_fk', 'tool_fk']],
+		'related_tool': pd.read_table(similarityFile).groupby(['source_tool_name'])['target_tool_name','similarity'].apply(lambda x: x.nlargest(10, columns=['similarity'])).reset_index().drop('level_1', axis=1).merge(object_ids['tool'], left_on='source_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'source_tool_fk'}).merge(object_ids['tool'], left_on='target_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'target_tool_fk'})[['source_tool_fk', 'target_tool_fk', 'similarity']]#.dropna()
+	}
+
+	# Truncate similarity
+	engine.execute('TRUNCATE TABLE related_tool;')
+
+	# Loop through prepared dataframes
+	for table_name, dataframe_ready_to_upload in dataframes_ready_to_upload.iteritems():
+
+		# Upload
+		engine.execute(Table(table_name, MetaData(), autoload=True, autoload_with=engine).insert().prefix_with('IGNORE'), dataframe_ready_to_upload.to_dict(orient='records'))
+
 
 
 #################################################################

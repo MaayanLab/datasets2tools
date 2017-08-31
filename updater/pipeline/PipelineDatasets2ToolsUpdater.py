@@ -15,8 +15,7 @@ from ruffus import *
 import pandas as pd
 import nltk, re, sklearn, json, urllib2
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sqlalchemy import create_engine, Table, MetaData
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Table, MetaData
 from datetime import datetime
 
 ##### 2. Custom modules #####
@@ -167,12 +166,6 @@ def upload_and_get_ids(dataframe_to_upload, table_name, engine, identifiers={'to
     if 'date' in dataframe_to_upload.columns and fix_date:
         dataframe_to_upload['date'] = [datetime.strptime(x, fix_date) for x in dataframe_to_upload['date']]
 
-    # Session maker
-    Session = sessionmaker(bind=engine)
-
-    # Create session
-    session = Session()
-
     # Get table object
     table = Table(table_name, MetaData(), autoload=True, autoload_with=engine)
 
@@ -189,14 +182,7 @@ def upload_and_get_ids(dataframe_to_upload, table_name, engine, identifiers={'to
     result_dataframe = pd.DataFrame(table_data.fetchall(), columns=table_data.keys())[['id', identifier_column]]
 
     # Merge IDs
-    id_dataframe = dataframe_to_upload.merge(result_dataframe, on=identifier_column, how='left')
-
-    # Convert to dict
-    id_dict = id_dataframe.set_index(identifier_column)['id'].to_dict()
-    
-    # Commit
-    session.commit()
+    id_dataframe = dataframe_to_upload.merge(result_dataframe, on=identifier_column, how='left')[['id', identifier_column]].rename(columns={'id': table_name+'_fk'})
 
     # Return
-    return id_dict
-
+    return id_dataframe
