@@ -1,0 +1,2 @@
+def upload_analyses(canned_analysis_dataframe):
+	return canned_analysis_dataframe

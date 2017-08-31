@@ -702,6 +702,26 @@
 				cursor: default;
 			}
 
+/*************************/
+/** CONTRIBUTE
+/*************************/
 
+#contribute-container {
+	margin-top: 30px;
+}
 
+	#contribute-title {
+		font-size: 25pt;
+		font-weight: 300;
+		margin-bottom: 0px;
+	}
 
+	#contribute-text {
+		font-size: 11pt;
+		font-weight: 300;
+		margin-bottom: 0px;
+	}
+
+	#dropzone-row {
+		margin-top: 20px;
+	}

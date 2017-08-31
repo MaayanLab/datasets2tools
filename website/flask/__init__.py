@@ -4,8 +4,12 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import pandas as pd
-import os, json, random
+import os, json, random, sys
 from sqlalchemy.exc import IntegrityError
+from flask_dropzone import Dropzone
+from StringIO import StringIO
+sys.path.append('static/py')
+import API
 
 # Configure
 app = Flask(__name__)
@@ -15,6 +19,7 @@ app.config['SECRET_KEY'] = 'Thisissupposedtobesecret!'
 db = SQLAlchemy(app)
 engine = db.engine
 entry_point = '/datasets2tools'
+dropzone = Dropzone(app)
 
 # Lists
 fairness = [{"fairness_question": "The tool is hosted in one or more well-used repositories, if relevant repositories exist.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Source code is shared on a public repository.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Code is written in an open-source, free programming language.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "The tool inputs standard data format(s) consistent with community practice.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "All previous versions of the tool are made available.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Web-based version is available (in addition to desktop version).", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Source code is documented.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Pipelines that use the tool have been standardized and provide detailed usage guidelines.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "A tutorial page is provided for the tool.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Example datasets are provided.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Licensing information is provided on the tool's landing page.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Information is provided describing how to cite the tool.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Version information is provided for the tool.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "A paper about the tool has been published.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Video tutorials for the tool are available.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Contact information is provided for the originator(s) of the tool.", "fairness_score": random.uniform(-1, 1)}]
@@ -113,6 +118,17 @@ def search():
 	elif object_type=='tool':
 		search_data=tools
 	return render_template('search.html', search_data=search_data, object_type=object_type, offset=offset, page_size=page_size, sort_by=sort_by)
+
+@app.route(entry_point+'/contribute')
+def contribute():
+	return render_template('contribute.html')
+
+@app.route(entry_point+'/api/upload/analysis', methods=['POST'])
+def upload_analysis_api():
+	canned_analysis_dataframe = pd.read_table(StringIO(request.files['file'].read()))
+	print canned_analysis_dataframe
+	upload_results = API.upload_analyses(canned_analysis_dataframe)
+	return ''
 
 @app.route(entry_point+'/static/<path:path>')
 def static_files(path):

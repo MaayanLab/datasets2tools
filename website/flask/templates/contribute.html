@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block head %}
+
+    {{ dropzone.load() }}
+
+{% endblock %}
+
+{% block content %}
+
+	<div id="contribute-container" class="container">
+		<div class="row">
+			<div class="col-12">
+				<p id="contribute-title">Contribute</p>
+				<hr width="50%" align="left" class="my-2">
+				<p id="contribute-text">Drop a table containing canned analyses below to upload them to the database.</p>
+			</div>
+		</div>
+
+		<div id="dropzone-row" class="row">
+			<div class="col-12">
+				<form action="{{ url_for('upload_analysis_api') }}" class="dropzone" id="myDropzone" method="POST" enctype="multipart/form-data">
+				</form>
+			</div>
+		</div>
+	</div>
+
+{% endblock %}
+
+
+{% block footer %}
+
+{% endblock %}
