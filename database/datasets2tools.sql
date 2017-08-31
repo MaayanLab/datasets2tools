@@ -69,6 +69,7 @@ CREATE TABLE article (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`journal_fk` INT,
 	`tool_fk` INT,
+	`article_title` TEXT,
 	`abstract` TEXT,
 	`authors` TEXT,
 	`date` DATE,
