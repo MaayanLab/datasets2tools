@@ -14,7 +14,7 @@ class JournalSpider(scrapy.Spider):
     def parse(self, response):
 
         # Get minimum volume
-        from_volume = 9
+        from_volume = 10
 
         # Get volumes
         volumes = set([int(x) for x in response.css('.search__volume-selector option::attr("value")').extract() if x != ''])
@@ -43,7 +43,7 @@ class JournalSpider(scrapy.Spider):
         volume = re.search('volume=(.*)\&searchType', response.url).group(1)
 
         # Get base directory
-        outfile = os.getcwd().replace('/pipeline/scrapy', '/journals/bmc-bioinformatics/bmc-bioinformatics_vol_')+volume+'.json'
+        outfile = os.getcwd().replace('/pipeline/scrapy', '/01-journals/bmc-bioinformatics/bmc-bioinformatics_vol_')+volume+'.json'
 
         # Check if outfile exists
         if not os.path.exists(outfile) or int(volume) == latest_volume:
@@ -51,16 +51,12 @@ class JournalSpider(scrapy.Spider):
             # Loop through articles
             for i, article_link in enumerate(response.css('.ResultsList .fulltexttitle::attr(href)').extract()):
 
-                # Stop
-                if i == 50:
-                    break
-                
                 # Parse archive
                 article = yield scrapy.Request('https://bmcbioinformatics.biomedcentral.com'+article_link)
 
                 # Get data
                 articles['article_data'].append({
-                    'article_title': article.css('.ArticleTitle::text').extract_first(),
+                    'article_title': ''.join(article.css('.ArticleTitle::text, .ArticleTitle em::text').extract()),
                     'authors': [x.replace(u'\u00a0', ' ') for x in article.css('.u-listReset .AuthorName::text').extract()],
                     'doi': article.css('.ArticleDOI a::text').extract_first(),
                     'abstract': [[div.css('.Heading::text').extract_first().strip(), ''.join(div.css('.Para::text, .Para span::text').extract()).strip()] for div in article.css('.Abstract .AbstractSection')],

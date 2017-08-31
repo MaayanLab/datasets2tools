@@ -15,7 +15,7 @@ class JournalSpider(scrapy.Spider):
     def parse(self, response):
 
         # Get minimum year
-        from_year = 2017
+        from_year = 2010
 
         # Loop through years
         for year_link in response.css('.widget-instance-OUP_Issues_Year_List div a::attr(href)').extract():
@@ -49,7 +49,7 @@ class JournalSpider(scrapy.Spider):
         journal_name = split_url[3]
 
         # Get base directory
-        basedir = os.getcwd().replace('/pipeline/scrapy', '/journals')
+        basedir = os.getcwd().replace('/pipeline/scrapy', '/01-journals')
 
         # If database
         if journal_name == 'database':
@@ -63,16 +63,12 @@ class JournalSpider(scrapy.Spider):
             # Loop through articles
             for i, article_link in enumerate(response.css('.viewArticleLink::attr(href)').extract()):
 
-                # Stop
-                if i == 25:
-                    break
-                
                 # Parse archive
-                article = yield scrapy.Request('https://academic.oup.com/'+article_link)
+                article = yield scrapy.Request('https://academic.oup.com'+article_link)
 
                 # Get data
                 articles['article_data'].append({
-                    'article_title': ''.join(article.css('.wi-article-title::text, .wi-article-title em::text').extract()).strip(),
+                    'article_title': ''.join(article.css('.wi-article-title::text, .wi-article-title em::text').extract()).strip(), #add span
                     'authors': article.css('.al-author-name .info-card-name::text').extract(),
                     'doi': article.css('.ww-citation-primary a::text').extract_first(),
                     'abstract': [[p.css('strong::text').extract_first(), ''.join(p.css(':not(strong)::text, :not(strong) em::text').extract()).strip()] for p in article.css('.abstract p')],
