@@ -1,0 +1,60 @@
+# Get dataset FKs
+dataset_accessions = set([dataset_accession for dataset_accessions in canned_analysis_dataframe['datasets'] for dataset in dataset_accessions])
+#insert ignore dataset_accessions
+#select dataset.id, dataset_accession where dataset_accession in dataset_accessions
+
+# Get tool FKs
+tool_names = set([tool_name for tool_names in canned_analysis_dataframe['tools'] for tool_name in tool_names])
+#insert ignore tool_names
+#select tool.id, tool_name where tool_name in tool_names
+
+# Get tool FKs
+tool_names = set([tool_name for tool_names in canned_analysis_dataframe['tools'] for tool_name in tool_names])
+#insert ignore tool_names
+#select tool.id, tool_name where tool_name in tool_names
+
+
+get_upload_ids(data_to_upload=[{'tool_name': 'Enrichr'}, {'tool_name': 'L1000CDS2'}], table_name='tool'):
+
+	# if table_name == 'tool' identifier = 'tool_name' elif table_name == 'dataset' identifier == 'dataset_accession' elif table_name == 'canned_analysis' identifier == 'canned_analysis_url'
+	# insert ignore into table_name data_to_upload
+	# upload_id_dataframe = select identifier from table_name where identifier in identifiers
+	# upload_ids = {'Enrichr': 1, 'L1000CDS2': 2}
+	# return upload_ids
+
+upload_fk_dataframe(object_column):
+	# flattened_dataframe = pd.DataFrame([[[rowData['canned_analysis_url'], associated_object] for associated_object in rowData[object_column]] for index, rowData in canned_analysis_dataframe.iterrows()], names=['canned_analysis', object_column])
+	# for column in flattened_dataframe.columns:
+		# flattened_dataframe[column] = [upload_ids[column][x] for x in flattened_dataframe[column]]
+		# flattened_dataframe.rename(columns={column: column+'_fk'}, inplace=True)
+	# upload
+
+upload_metadata():
+	# metadata_dataframe = pd.DataFrame()
+	# for index, rowData in canned_analysis_dataframe.iterrows():
+		# dataframe_to_append = pd.Series(rowData['metadata']).to_frame().reset_index()
+		# dataframe_to_append['canned_analysis_fk'] = upload_ids['canned_analysis'][rowData['canned_analysis_url']]
+		# metadata_dataframe = pd.concat([metadata_dataframe, dataframe_to_append])
+	# insert ignore into term metadata_dataframe['term_names'].unique()
+	# term_fk_dataframe = select term_name from term where term_name in metadata_dataframe['term_names'].unique()
+	# metadata_dataframe = metadata_dataframe.merge(term_fk_dataframe, on='term_name').drop('term_name')
+	# insert into canned_analysis_metadata
+
+	
+
+
+
+##### 
+
+# data to upload
+data_to_upload = {
+	'dataset': [{'dataset_accession': x} for x in set([dataset_accession for dataset_accessions in canned_analysis_dataframe['datasets'] for dataset in dataset_accessions])],
+	'tool': [{'tool_name': x} for x in set([tool_name for tool_names in canned_analysis_dataframe['tools'] for tool_name in tool_names])],
+	'canned_analysis': [dict(rowData) for index, rowData in canned_analysis_dataframe.drop(['datasets', 'tools', 'metadata'], axis=1).iterrows()],
+}
+
+# upload ids
+upload_ids = {object_type: get_upload_ids(data_to_upload[object_type], table_name=object_type)}
+
+# fk dataframes
+fk_dataframes = {object_type: get_fk_dataframe(column=object_type) for object_type in ['dataset', 'tool']}
