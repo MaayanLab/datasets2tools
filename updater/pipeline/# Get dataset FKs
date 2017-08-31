@@ -1,13 +1,12 @@
 
 get_upload_ids(data_to_upload=[{'tool_name': 'Enrichr'}, {'tool_name': 'L1000CDS2'}], table_name='tool'):
-
 	# if table_name == 'tool' identifier = 'tool_name' elif table_name == 'dataset' identifier == 'dataset_accession' elif table_name == 'canned_analysis' identifier == 'canned_analysis_url'
 	# insert ignore into table_name data_to_upload
 	# upload_id_dataframe = select identifier from table_name where identifier in identifiers
 	# upload_ids = {'Enrichr': 1, 'L1000CDS2': 2}
 	# return upload_ids
 
-upload_fk_dataframe(object_column):
+upload_fk_dataframe(object_column='dataset'):
 	# flattened_dataframe = pd.DataFrame([[[rowData['canned_analysis_url'], associated_object] for associated_object in rowData[object_column]] for index, rowData in canned_analysis_dataframe.iterrows()], names=['canned_analysis', object_column])
 	# for column in flattened_dataframe.columns:
 		# flattened_dataframe[column] = [upload_ids[column][x] for x in flattened_dataframe[column]]
@@ -37,6 +36,7 @@ data_to_upload = {
 	'canned_analysis': [dict(rowData) for index, rowData in canned_analysis_dataframe.drop(['datasets', 'tools', 'metadata'], axis=1).iterrows()],
 }
 
+# loop through object types
 for object_type in ['canned_analysis', 'dataset', 'tool']:
 
 	# upload ids
