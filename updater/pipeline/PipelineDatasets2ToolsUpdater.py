@@ -157,14 +157,27 @@ def metrics_from_doi(doi):
 #######################################################
 
 #############################################
-########## 1. Get Upload IDs
+########## 1. Fix dates
+#############################################
+
+def fix_dates(dataframe_to_upload, format='%d %B %Y'):
+
+    # Fix date
+    dataframe_to_upload['date'] = [datetime.strptime(x, format) for x in dataframe_to_upload['date']]
+
+    # Return
+    return dataframe_to_upload
+
+
+#############################################
+########## 2. Get Upload IDs
 #############################################
 
 def upload_and_get_ids(dataframe_to_upload, table_name, engine, identifiers={'tool': 'tool_name', 'dataset': 'dataset_accession', 'canned_analysis': 'canned_analysis_url', 'article': 'doi', 'term': 'term_name'}, fix_date='%d %B %Y'):
 
     # Fix date
     if 'date' in dataframe_to_upload.columns and fix_date:
-        dataframe_to_upload['date'] = [datetime.strptime(x, fix_date) for x in dataframe_to_upload['date']]
+        dataframe_to_upload = fix_dates(dataframe_to_upload, fix_date)
 
     # Get table object
     table = Table(table_name, MetaData(), autoload=True, autoload_with=engine)

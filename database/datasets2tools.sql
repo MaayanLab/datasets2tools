@@ -7,14 +7,14 @@ USE `datasets2tools`;
 CREATE TABLE repository (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`repository_name` VARCHAR(50) UNIQUE,
-	`repository_homepage_url` VARCHAR(255),
-	`repository_icon_url` VARCHAR(255)
+	`repository_homepage_url` TEXT,
+	`repository_icon_url` TEXT
 );
 
 CREATE TABLE dataset_type (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`dataset_type_name` VARCHAR(50),
-	`dataset_type_icon_url` VARCHAR(255)
+	`dataset_type_icon_url` TEXT
 );
 
 CREATE TABLE dataset (
@@ -43,8 +43,8 @@ CREATE TABLE tool (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`tool_name` VARCHAR(100) UNIQUE,
 	`tool_description` TEXT,
-	`tool_homepage_url` VARCHAR(255),
-	`tool_icon_url` VARCHAR(255)
+	`tool_homepage_url` TEXT,
+	`tool_icon_url` TEXT
 );
 
 CREATE TABLE related_tool (
@@ -62,18 +62,19 @@ CREATE TABLE journal (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`journal_name` VARCHAR(50) UNIQUE,
 	`journal_description` TEXT,
-	`journal_homepage_url` VARCHAR(255)
+	`journal_homepage_url` TEXT
 );
 
 CREATE TABLE article (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`journal_fk` INT,
+	`tool_fk` INT,
 	`abstract` TEXT,
 	`authors` TEXT,
 	`date` DATE,
 	`doi` VARCHAR(255) UNIQUE,
 	FOREIGN KEY (journal_fk) REFERENCES journal(id),
-	FOREGIN KEY (tool_fk) REFERENCES tool(id)
+	FOREIGN KEY (tool_fk) REFERENCES tool(id)
 );
 
 ### Canned analysis
@@ -82,8 +83,8 @@ CREATE TABLE canned_analysis (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`canned_analysis_title` VARCHAR(255),
 	`canned_analysis_description` TEXT,
-	`canned_analysis_url` VARCHAR(255) UNIQUE,
-	`canned_analysis_preview_url` VARCHAR(255)
+	`canned_analysis_url` TEXT,
+	`canned_analysis_preview_url` TEXT
 );
 
 CREATE TABLE related_canned_analysis (
