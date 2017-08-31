@@ -18,6 +18,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:MyNewPass@localhost/datasets2tools'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'Thisissupposedtobesecret!'
+app.config['DROPZONE_MAX_FILE_SIZE'] = 10
 db = SQLAlchemy(app)
 engine = db.engine
 entry_point = '/datasets2tools'
@@ -130,10 +131,11 @@ def contribute():
 
 @app.route(entry_point+'/api/upload/analysis', methods=['POST'])
 def upload_analysis_api():
+	print 'uploading...'
 	canned_analysis_dataframe = pd.read_table(StringIO(request.files['file'].read()))
 	session = Session()
 	upload_results = API.upload_analyses(canned_analysis_dataframe, engine, session)
-	print upload_results
+	session.commit()
 	return upload_results
 
 @app.route(entry_point+'/static/<path:path>')

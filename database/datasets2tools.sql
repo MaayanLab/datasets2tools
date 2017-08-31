@@ -84,7 +84,7 @@ CREATE TABLE canned_analysis (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`canned_analysis_title` VARCHAR(255),
 	`canned_analysis_description` TEXT,
-	`canned_analysis_url` TEXT,
+	`canned_analysis_url` VARCHAR(255) UNIQUE,
 	`canned_analysis_preview_url` TEXT
 );
 
@@ -123,7 +123,7 @@ CREATE TABLE canned_analysis_metadata (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`canned_analysis_fk` INT,
 	`term_fk` INT,
-	`value` VARCHAR(255),
+	`value` TEXT,
 	FOREIGN KEY (canned_analysis_fk) REFERENCES canned_analysis(id),
 	FOREIGN KEY (term_fk) REFERENCES term(id)
 );
