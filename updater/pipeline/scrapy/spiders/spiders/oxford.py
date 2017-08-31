@@ -15,7 +15,7 @@ class JournalSpider(scrapy.Spider):
     def parse(self, response):
 
         # Get minimum year
-        from_year = 2015
+        from_year = 2017
 
         # Loop through years
         for year_link in response.css('.widget-instance-OUP_Issues_Year_List div a::attr(href)').extract():
@@ -31,10 +31,6 @@ class JournalSpider(scrapy.Spider):
 
         # Loop through archives
         for i, issue_link in enumerate(response.css('.widget-instance-OUP_Issues_List div a::attr(href)').extract()):
-
-            # Stop
-            if i == 1:
-                break
                 
             # Parse archive
             yield scrapy.Request('https://academic.oup.com'+issue_link, callback=self.parse_issue)

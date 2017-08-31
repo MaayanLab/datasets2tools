@@ -18,6 +18,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 ##### 2. Custom modules #####
 # Pipeline running
+sys.path.append('pipeline')
+import PipelineDatasets2ToolsUpdater as P
 
 #############################################
 ########## 2. General Setup
@@ -43,18 +45,19 @@ spiders = ['oxford', 'bmc_bioinformatics']
 ########## 1. Run Spiders
 #############################################
 
-@originate(None)
+def spiderJobs():
+	for spider in spiders:
+		yield [None, spider]
 
-def runSpiders(outfile):
+@files(spiderJobs)
+
+def runSpiders(infile, outfile):
 
 	# Change directory
 	os.chdir('pipeline/scrapy')
 	
-	# Loop through spiders
-	for spider in spiders:
-
-		# Run
-		os.system('scrapy crawl '+spider)
+	# Run
+	os.system('scrapy crawl '+outfile)
 
 	# Move back
 	os.chdir('../..')
@@ -63,7 +66,7 @@ def runSpiders(outfile):
 ########## 2. Tool Table
 #############################################
 
-# @follows(runSpiders)
+@follows(runSpiders)
 
 @follows(mkdir('02-tools'))
 
@@ -187,7 +190,7 @@ def getArticles(infiles, outfile):
 ########## 4. Article Similarity
 #############################################
 
-@follows(getArticles)
+# @follows(getArticles)
 
 @follows(mkdir('04-article_similarity'))
 
@@ -202,21 +205,45 @@ def getArticleSimilarity(infiles, outfile):
 	# Fix abstract
 	abstract_dataframe['abstract'] = [' '.join([abstract_tuple[1] for abstract_tuple in json.loads(x)['abstract'] if abstract_tuple[0] not in [u'Contact:', u'Availability and implementation', u'Supplementary information']]) for x in abstract_dataframe['abstract']]
 
-	# Get dict
-	abstract_dict = abstract_dataframe.set_index('doi').to_dict()['abstract']
+	# Process abstracts
+	processed_abstracts = [P.process_text(x) for x in abstract_dataframe['abstract']]
 
-	# Get vectorizer
-	vect = TfidfVectorizer(min_df=1)
-
-	# Compute similarity
-	tfidf = vect.fit_transform(abstract_dict.values())
-
-	# Get similarity dataframe
-	similarity_dataframe = pd.melt(pd.DataFrame((tfidf * tfidf.T).A, columns=abstract_dict.keys(), index=abstract_dict.keys()).reset_index(), id_vars='index').rename(columns={'index': 'source_abstract', 'variable': 'target_abstract'})
+	# Get similarity and keywords
+	similarity_dataframe, keyword_dataframe = P.extract_text_similarity_and_keywords(processed_abstracts, labels=abstract_dataframe['doi'])
 
 	# Write
-	similarity_dataframe.to_csv(outfile, sep='\t', index=False)
- 
+	similarity_dataframe.to_csv(outfile, sep='\t', index=True)
+	keyword_dataframe.to_csv(outfile.replace('similarity.txt', 'keywords.txt'), sep='\t', index=True)
+
+#############################################
+########## 5. Tool Similarity
+#############################################
+
+# @follows(getArticleSimilarity)
+
+@follows(mkdir('05-tool_similarity'))
+
+@merge((getTools, getArticleSimilarity, '04-article_similarity/article_keywords.txt'),
+	   '05-tool_similarity/tool_similarity.txt')
+
+def getToolSimilarity(infiles, outfile):
+
+	# Initialize dataframe
+	abstract_dataframe = pd.concat([pd.read_table(x)[['abstract', 'doi']] for x in infiles])
+
+	# Fix abstract
+	abstract_dataframe['abstract'] = [' '.join([abstract_tuple[1] for abstract_tuple in json.loads(x)['abstract'] if abstract_tuple[0] not in [u'Contact:', u'Availability and implementation', u'Supplementary information']]) for x in abstract_dataframe['abstract']]
+
+	# Process abstracts
+	processed_abstracts = [P.process_text(x) for x in abstract_dataframe['abstract']]
+
+	# Get similarity and keywords
+	similarity_dataframe, keyword_dataframe = P.extract_text_similarity_and_keywords(processed_abstracts, labels=abstract_dataframe['doi'])
+
+	# Write
+	similarity_dataframe.to_csv(outfile, sep='\t', index=True)
+	keyword_dataframe.to_csv(outfile.replace('similarity.txt', 'keywords.txt'), sep='\t', index=True)
+
 #################################################################
 #################################################################
 ############### .  ########################################
@@ -239,5 +266,5 @@ def getArticleSimilarity(infiles, outfile):
 ########## Run pipeline
 ##################################################
 ##################################################
-pipeline_run([sys.argv[-1]], multiprocess=1, verbose=1)
+pipeline_run([sys.argv[-1]], multiprocess=2, verbose=1)
 print('Done!')

@@ -14,7 +14,7 @@ class JournalSpider(scrapy.Spider):
     def parse(self, response):
 
         # Get minimum volume
-        from_volume = 11
+        from_volume = 9
 
         # Get volumes
         volumes = set([int(x) for x in response.css('.search__volume-selector option::attr("value")').extract() if x != ''])
@@ -52,7 +52,7 @@ class JournalSpider(scrapy.Spider):
             for i, article_link in enumerate(response.css('.ResultsList .fulltexttitle::attr(href)').extract()):
 
                 # Stop
-                if i == 25:
+                if i == 50:
                     break
                 
                 # Parse archive
