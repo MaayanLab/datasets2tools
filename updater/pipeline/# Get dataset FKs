@@ -1,18 +1,3 @@
-# Get dataset FKs
-dataset_accessions = set([dataset_accession for dataset_accessions in canned_analysis_dataframe['datasets'] for dataset in dataset_accessions])
-#insert ignore dataset_accessions
-#select dataset.id, dataset_accession where dataset_accession in dataset_accessions
-
-# Get tool FKs
-tool_names = set([tool_name for tool_names in canned_analysis_dataframe['tools'] for tool_name in tool_names])
-#insert ignore tool_names
-#select tool.id, tool_name where tool_name in tool_names
-
-# Get tool FKs
-tool_names = set([tool_name for tool_names in canned_analysis_dataframe['tools'] for tool_name in tool_names])
-#insert ignore tool_names
-#select tool.id, tool_name where tool_name in tool_names
-
 
 get_upload_ids(data_to_upload=[{'tool_name': 'Enrichr'}, {'tool_name': 'L1000CDS2'}], table_name='tool'):
 
@@ -40,7 +25,6 @@ upload_metadata():
 	# metadata_dataframe = metadata_dataframe.merge(term_fk_dataframe, on='term_name').drop('term_name')
 	# insert into canned_analysis_metadata
 
-	
 
 
 
@@ -53,8 +37,19 @@ data_to_upload = {
 	'canned_analysis': [dict(rowData) for index, rowData in canned_analysis_dataframe.drop(['datasets', 'tools', 'metadata'], axis=1).iterrows()],
 }
 
-# upload ids
-upload_ids = {object_type: get_upload_ids(data_to_upload[object_type], table_name=object_type)}
+for object_type in ['canned_analysis', 'dataset', 'tool']:
 
-# fk dataframes
-fk_dataframes = {object_type: get_fk_dataframe(column=object_type) for object_type in ['dataset', 'tool']}
+	# upload ids
+	upload_ids = {object_type: get_upload_ids(data_to_upload[object_type], table_name=object_type) for object_type in ['canned_analysis', 'dataset', 'tool']}
+
+	# it not analysis
+	if object_type == 'canned_analysis':
+
+		# upload metadata
+		upload_metadata()
+
+	else:
+
+		# fk dataframes
+		[upload_fk_dataframe(column=object_type) for object_type in ['dataset', 'tool']]
+
