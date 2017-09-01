@@ -132,27 +132,36 @@
 					</table>
 				</div> <!-- #general-info -->
 
-				{% if object_type == 'tool' and landing_data[object_type]['publications']|length > 0 %}
+				{% if object_type == 'tool' and landing_data[object_type]['articles']|length > 0 %}
 					<div id="publication-info" class="info-card">
 						<div class="info-card-title">Publications</div>
 						<div class="info-card-tabs">
 							<ul class="nav nav-tabs" role="tablist">
-								{% for publication in landing_data[object_type]['publications'] %}
+								{% for publication in landing_data[object_type]['articles'] %}
 									<li class="nav-item">
-										<a class="nav-link{{' active' if loop.index == 1}}" data-toggle="tab" href="#publication-{{loop.index}}" role="tab">{{ publication['journal'] }} ({{ publication['year'] }})</a>
+										<a class="nav-link{{' active' if loop.index == 1}}" data-toggle="tab" href="#publication-{{loop.index}}" role="tab">{{ publication['journal_name'] }} ({{ publication['date'].year }})</a>
 									</li>
 								{% endfor %}
 							</ul>
 						</div>
 						<div class="tab-content">
-							{% for publication in landing_data[object_type]['publications'] %}
+							{% for publication in landing_data[object_type]['articles'] %}
 								<div class="tab-pane {{ 'active' if loop.index == 1 }}" id="publication-{{loop.index}}" role="tabpanel">
 									<div class="info-card-publication">
-										<div class="info-card-publication-title">{{ publication['publication_title'] }}</div>
+										<div class="info-card-publication-title">{{ publication['article_title'] }}</div>
 										<div class="info-card-publication-authors">{{ publication['authors'] }}</div>
-										<div class="info-card-publication-abstract">{{ publication['abstract'] }}</div>
+										<div class="info-card-publication-abstract">
+											{% for section_title, section_text in publication['abstract']['abstract'] %}
+												<div class="info-card-publication-abstract-section">
+													{% if section_title != '' %}
+														<span class="info-card-publication-abstract-section-title">{{ section_title }}</span>
+													{% endif %}
+													<span class="info-card-publication-abstract-section-text">{{ section_text }}</span>
+												</div>
+											{% endfor %}
+										</div>
 										<div class="info-card-publication-keywords">Keywords: {% for keyword in publication['keywords'] %}<span class="keyword">{{keyword}}</span>{% endfor %}</div>
-										<div class="info-card-publication-doi">DOI: <a href="https://doi.org/{{ publication['doi'] }}">https://doi.org/{{ publication['doi'] }}</a></div>
+										<div class="info-card-publication-doi">DOI: <a href="{{ publication['doi'] }}">{{ publication['doi'] }}</a></div>
 									</div>
 								</div>
 							{% endfor %}

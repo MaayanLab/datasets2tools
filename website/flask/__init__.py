@@ -100,13 +100,13 @@ def index():
 
 @app.route(entry_point+'/landing/<object_type>/<object_identifier>')
 def landing(object_type, object_identifier):
+	session = Session()
 	if object_type == 'dataset':
-		landing_data = {'dataset': datasets['search_results'][0], 'canned_analyses': canned_analyses, 'tools': tools}
+		landing_data = {'dataset': datasets['search_results'][0],'canned_analyses': canned_analyses, 'tools': tools}
 	elif object_type == 'tool':
-		table = Table('tool', MetaData(), autoload=True, autoload_with=engine)
-		tool_data = engine.execute(table.select().where(table.columns['tool_name'] == object_identifier)).fetchall()
-		print tool_data
-		landing_data = {'datasets': datasets, 'canned_analyses': canned_analyses, 'tool': tools['search_results'][0]}
+		object_data = search_database({'tool_name': object_identifier}, object_type, session, metadata)
+		object_data['related_objects'] = get_related_objects(object_data['id'], object_type, session, metadata)
+		landing_data = {'datasets': datasets, 'canned_analyses': canned_analyses, 'tool': object_data}
 	elif object_type == 'canned_analysis':
 		landing_data = {'datasets': datasets, 'canned_analysis': canned_analyses['search_results'][0], 'tools': tools}
 	else:

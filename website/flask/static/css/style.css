@@ -288,6 +288,20 @@
 								font-size: 9pt;
 							}
 
+								.info-card-publication-abstract-section {
+									font-size: 9pt;
+									margin-bottom: 5px;
+								}
+	
+									.info-card-publication-abstract-section-title {
+										font-weight: 600;
+										font-style: italic;
+									}
+
+									.info-card-publication-abstract-section-text {
+										font-size: 9pt;
+									}
+
 							.info-card-publication-keywords {
 								font-size: 9pt;
 								padding-top: 9px;
