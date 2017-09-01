@@ -1,6 +1,7 @@
 import json
 import pandas as pd
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import or_, and_
 
 query = {'q': '', 'dataset_accession': '', 'tool_name': '', }
 
@@ -9,34 +10,62 @@ def process_query(query_dict, object_type, session, metadata):
 	# Initialize query object
 	query = session.query(metadata.tables[object_type].columns['id']).distinct()
 
-	# Dataset
+	# Check if object is dataset or tool
 	if object_type == 'dataset' or object_type == 'tool':
 
 		# Check if canned analysis in query
 		if 'canned_analysis_fk' in query_dict.keys():
 
 			# Expand query and filter by canned analysis
-			query = query.join(metadata.tables['analysis_to_'+object_type]).filter(metadata.tables['analysis_to_'+object_type].columns['canned_analysis_fk'] == query_dict.pop('canned_analysis_fk'))
-
-		# Dataset cross-search (search datasets analyzed by tool)
-		if object_type == 'dataset' and 'tool_name' in query_dict.keys():
-
-			# Expand query and filter by tool
-			query = query.join(metadata.tables['analysis_to_dataset']) \
+			query = query.join(metadata.tables['analysis_to_'+object_type]) \
 						 .join(metadata.tables['canned_analysis']) \
-						 .join(metadata.tables['analysis_to_tool']) \
-						 .join(metadata.tables['tool']) \
-						 .filter(metadata.tables['tool'].columns['tool_name'] == query_dict.pop('tool_name'))
+						 .filter(metadata.tables['canned_analysis'].columns['id'] == query_dict.pop('canned_analysis_fk'))
 
-		# Tool cross-search (search tools with analyses of dataset)
-		if object_type == 'tool' and 'dataset_accession' in query_dict.keys():
+		# Dataset cases
+		if object_type == 'dataset':
 
-			# Expand query and filter by tool
-			query = query.join(metadata.tables['analysis_to_tool']) \
-						 .join(metadata.tables['canned_analysis']) \
-						 .join(metadata.tables['analysis_to_dataset']) \
-						 .join(metadata.tables['dataset']) \
-						 .filter(metadata.tables['dataset'].columns['dataset_accession'] == query_dict.pop('dataset_accession'))
+			# Dataset cross-search (search datasets analyzed by tool)
+			if 'tool_name' in query_dict.keys():
+
+				# Expand query and filter by tool
+				query = query.join(metadata.tables['analysis_to_dataset']) \
+							 .join(metadata.tables['canned_analysis']) \
+							 .join(metadata.tables['analysis_to_tool']) \
+							 .join(metadata.tables['tool']) \
+							 .filter(metadata.tables['tool'].columns['tool_name'] == query_dict.pop('tool_name'))
+
+			# Dataset text search
+			if 'q' in query_dict.keys():
+
+				# Get query
+				q = '%'+query_dict.pop('q')+'%'
+
+				# Perform text search
+				query = query.filter(or_(metadata.tables['dataset'].columns['dataset_title'].like(q),
+										 metadata.tables['dataset'].columns['dataset_description'].like(q)))
+
+		# Tool cases
+		if object_type == 'tool':
+
+			# Tool cross-search (search tools with analyses of dataset)
+			if 'dataset_accession' in query_dict.keys():
+
+				# Expand query and filter by tool
+				query = query.join(metadata.tables['analysis_to_tool']) \
+							 .join(metadata.tables['canned_analysis']) \
+							 .join(metadata.tables['analysis_to_dataset']) \
+							 .join(metadata.tables['dataset']) \
+							 .filter(metadata.tables['dataset'].columns['dataset_accession'] == query_dict.pop('dataset_accession'))
+
+			# Tool text search
+			if 'q' in query_dict.keys():
+
+				# Get query
+				q = '%'+query_dict.pop('q')+'%'
+
+				# Perform text search
+				query = query.filter(or_(metadata.tables['tool'].columns['tool_name'].like(q),
+										 metadata.tables['tool'].columns['tool_description'].like(q)))
 
 		# Check if regular queries
 		if len(query_dict) > 0:
@@ -54,37 +83,47 @@ def process_query(query_dict, object_type, session, metadata):
 		query = query.join(metadata.tables['analysis_to_dataset']) \
 					 .join(metadata.tables['analysis_to_tool']) \
 					 .join(metadata.tables['dataset']) \
+					 .join(metadata.tables['repository']) \
 					 .join(metadata.tables['tool'])
 
-		# Check if dataset
+		# Check if dataset has been specified
 		if 'dataset_accession' in query_dict.keys():
 
 			# Filter by dataset
 			query = query.filter(metadata.tables['dataset'].columns['dataset_accession'] == query_dict.pop('dataset_accession'))
 
-		# Check if tool
+		# Check if tool has been specified
 		if 'tool_name' in query_dict.keys():
 
 			# Filter by dataset
 			query = query.filter(metadata.tables['tool'].columns['tool_name'] == query_dict.pop('tool_name'))
 
-		# If text search
+		# Canned analysis text search
 		if 'q' in query_dict.keys():
 
+			# Get query
+			q = '%'+query_dict.pop('q')+'%'
+
 			# Perform text search
-			pass
+			query = query.filter(or_(metadata.tables['canned_analysis'].columns['canned_analysis_title'].like(q),
+									 metadata.tables['canned_analysis'].columns['canned_analysis_description'].like(q)))
 
 		# All terms left should be metadata
 		if len(query_dict) > 0:
 
-			# Perform metadata query
-			pass
+			# Expand query with metadata
+			query = query.join(metadata.tables['canned_analysis_metadata']) \
+						 .join(metadata.tables['term'])
+
+			# Loop through metadata keys and values
+			for term_name, value in query_dict.iteritems():
+
+				# Perform metadata query
+				query = query.filter(and_(metadata.tables['term'].columns['term_name'] == term_name,
+										  metadata.tables['canned_analysis_metadata'].columns['value'] == value))
 
 	# Get ID list
 	ids = [x[0] for x in query.all()]
-
-	print object_type
-	print ids
 
 	# Return ids
 	return ids
@@ -96,7 +135,9 @@ def get_object_data(object_id, object_type, session, metadata, get_related=False
 	if object_type == 'dataset':
 		
 		# Perform dataset query
-		dataset_query = session.query(metadata.tables['dataset'], metadata.tables['repository']).join(metadata.tables['repository']).filter(metadata.tables['dataset'].columns['id'] == object_id).all()
+		dataset_query = session.query(metadata.tables['dataset'], metadata.tables['repository']) \
+							   .join(metadata.tables['repository']) \
+							   .filter(metadata.tables['dataset'].columns['id'] == object_id).all()
 
 		# Get tool data
 		object_data = [x._asdict() for x in dataset_query][0]
@@ -105,13 +146,16 @@ def get_object_data(object_id, object_type, session, metadata, get_related=False
 	elif object_type == 'tool':
 		
 		# Perform tool query
-		tool_query = session.query(metadata.tables['tool']).filter(metadata.tables['tool'].columns['id'] == object_id)
+		tool_query = session.query(metadata.tables['tool']) \
+							.filter(metadata.tables['tool'].columns['id'] == object_id)
 
 		# Get tool data
 		object_data = {key: value for key, value in zip(metadata.tables[object_type].columns.keys(), tool_query.all()[0])}
 
 		# Perform article query
-		article_query = session.query(metadata.tables['article'], metadata.tables['journal']).join(metadata.tables['journal']).filter(metadata.tables['article'].columns['tool_fk'] == object_id).all()
+		article_query = session.query(metadata.tables['article'], metadata.tables['journal']) \
+							   .join(metadata.tables['journal']) \
+							   .filter(metadata.tables['article'].columns['tool_fk'] == object_id).all()
 
 		# Get article data
 		object_data['articles'] = [x._asdict() for x in article_query]
@@ -126,13 +170,28 @@ def get_object_data(object_id, object_type, session, metadata, get_related=False
 	elif object_type == 'canned_analysis':
 				
 		# Perform analysis query
-		canned_analysis_query = session.query(metadata.tables['canned_analysis']).filter(metadata.tables['canned_analysis'].columns['id'] == object_id).all()
+		canned_analysis_query = session.query(metadata.tables['canned_analysis'], metadata.tables['tool'], metadata.tables['dataset'], metadata.tables['repository']) \
+										.join(metadata.tables['analysis_to_tool']) \
+										.join(metadata.tables['tool']) \
+										.join(metadata.tables['analysis_to_dataset']) \
+										.join(metadata.tables['dataset']) \
+										.join(metadata.tables['repository']) \
+									    .filter(metadata.tables['canned_analysis'].columns['id'] == object_id).all()
 
-		# Get tool data
+		# Perform metadata query
+		canned_analysis_metadata_query = session.query(metadata.tables['canned_analysis_metadata'].columns['value'], metadata.tables['term'].columns['term_name']) \
+												.join(metadata.tables['term']) \
+												.filter(metadata.tables['canned_analysis_metadata'].columns['canned_analysis_fk'] == object_id).all()
+
+		# Get canned analysis data
 		object_data = [x._asdict() for x in canned_analysis_query][0]
 
+		# Get metadata
+		object_data['metadata'] = pd.DataFrame([metadata_query_result._asdict() for metadata_query_result in canned_analysis_metadata_query]).set_index('term_name').to_dict()['value']
+
 	# Perform keyword query
-	keyword_query = session.query(metadata.tables['keyword'].columns['keyword']).filter(metadata.tables['keyword'].columns[object_type+'_fk'] == object_id).all()
+	keyword_query = session.query(metadata.tables['keyword'].columns['keyword']) \
+						   .filter(metadata.tables['keyword'].columns[object_type+'_fk'] == object_id).all()
 	
 	# Get keyword data
 	object_data['keywords'] = [x[0] for x in keyword_query]
@@ -141,7 +200,8 @@ def get_object_data(object_id, object_type, session, metadata, get_related=False
 	if get_related:
 
 		# Perform related object query
-		related_object_query = session.query(metadata.tables['related_'+object_type].columns['_'.join(['target', object_type,'fk'])]).filter(metadata.tables['related_'+object_type].columns['_'.join(['source', object_type,'fk'])] == object_id)
+		related_object_query = session.query(metadata.tables['related_'+object_type].columns['_'.join(['target', object_type,'fk'])]) \
+									  .filter(metadata.tables['related_'+object_type].columns['_'.join(['source', object_type,'fk'])] == object_id)
 
 		# Get ids
 		object_data['related_objects'] = [get_object_data(x[0], object_type, session, metadata, get_related=False) for x in related_object_query.all()]

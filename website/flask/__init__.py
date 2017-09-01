@@ -126,6 +126,7 @@ def landing(object_type, object_identifier):
 	page_size = request.args.get('page_size', default=10, type=int)
 	sort_by = request.args.get('sort_by', default='relevance', type=str)
 	q = request.args.get('q', default='', type=str)
+	session.close()
 	return render_template('landing.html', landing_data=landing_data, object_type=object_type, offset=offset, page_size=page_size, sort_by=sort_by, q=q)
 
 @app.route(entry_point+'/search')
@@ -145,6 +146,15 @@ def search():
 @app.route(entry_point+'/contribute')
 def contribute():
 	return render_template('contribute.html')
+
+@app.route(entry_point+'/testsearch')
+def testsearch():
+	session = Session()
+	query_dict = request.args.to_dict()
+	object_type = query_dict.pop('object_type')
+	results = json.dumps(search_database(query_dict, object_type, session, metadata))
+	session.close()
+	return results
 
 @app.route(entry_point+'/api/upload/analysis', methods=['POST'])
 def upload_analysis_api():
