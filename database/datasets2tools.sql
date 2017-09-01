@@ -20,10 +20,11 @@ CREATE TABLE dataset_type (
 CREATE TABLE dataset (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`repository_fk` INT,
+	`dataset_type_fk` INT,
 	`dataset_accession` VARCHAR(30) UNIQUE NOT NULL,
 	`dataset_title` VARCHAR(255),
 	`dataset_description` TEXT,
-	`dataset_type_fk` INT,
+	`dataset_landing_url` TEXT,
 	FOREIGN KEY (repository_fk) REFERENCES repository(id),
 	FOREIGN KEY (dataset_type_fk) REFERENCES dataset_type(id)
 );

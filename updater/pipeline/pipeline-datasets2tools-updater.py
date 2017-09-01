@@ -16,7 +16,7 @@ import sys, os, glob, json, urllib2
 import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, and_, or_
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Table, MetaData
 
@@ -37,6 +37,12 @@ engine = create_engine('mysql://root:MyNewPass@localhost/datasets2tools')
 
 # Session maker
 Session = sessionmaker(bind=engine)
+
+# Create metadata 
+metadata = MetaData()
+
+# Bind metadata
+metadata.reflect(bind=engine)
 
 ##### 2. R Connection #####
 
@@ -265,17 +271,17 @@ def getToolSimilarity(infiles, outfile):
 	melted_tool_similarity_dataframe.to_csv(outfile, sep='\t', index=False)
 
 #############################################
-########## 7. Upload Data
+########## 7. Upload Tool Data
 #############################################
 
-@follows(mkdir('07-upload_data'))
+@follows(mkdir('07-upload_tool_data'))
 
 # @files(
 		# [['03-articles/bioinformatics/bioinformatics_vol26_issue10_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue11_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue12_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue13_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue14_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue15_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue16_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue17_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue18_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue19_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue1_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue20_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue21_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue22_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue23_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue24_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue2_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue3_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue4_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue5_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue6_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue7_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue8_articles.txt', '03-articles/bioinformatics/bioinformatics_vol26_issue9_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue10_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue11_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue12_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue14_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue15_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue16_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue18_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue19_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue1_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue20_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue21_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue22_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue23_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue24_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue2_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue3_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue4_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue5_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue6_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue7_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue8_articles.txt', '03-articles/bioinformatics/bioinformatics_vol27_issue9_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue10_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue11_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue12_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue13_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue14_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue15_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue16_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue17_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue18_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue19_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue1_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue20_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue21_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue22_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue23_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue24_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue2_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue3_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue4_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue5_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue6_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue7_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue8_articles.txt', '03-articles/bioinformatics/bioinformatics_vol28_issue9_articles.txt', '03-articles/bioinformatics/bioinformatics_vol32_issue20_articles.txt', '03-articles/bioinformatics/bioinformatics_vol32_issue21_articles.txt', '03-articles/bioinformatics/bioinformatics_vol32_issue22_articles.txt', '03-articles/bioinformatics/bioinformatics_vol32_issue23_articles.txt', '03-articles/bioinformatics/bioinformatics_vol32_issue24_articles.txt', '03-articles/bioinformatics/bioinformatics_vol33_issue10_articles.txt', '03-articles/bioinformatics/bioinformatics_vol33_issue11_articles.txt', '03-articles/bioinformatics/bioinformatics_vol33_issue12_articles.txt', '03-articles/bioinformatics/bioinformatics_vol33_issue13_articles.txt', '03-articles/bioinformatics/bioinformatics_vol33_issue14_articles.txt', '03-articles/bioinformatics/bioinformatics_vol33_issue15_articles.txt', '03-articles/bioinformatics/bioinformatics_vol33_issue16_articles.txt', '03-articles/bioinformatics/bioinformatics_vol33_issue17_articles.txt', '03-articles/bioinformatics/bioinformatics_vol33_issue1_articles.txt', '03-articles/bioinformatics/bioinformatics_vol33_issue2_articles.txt', '03-articles/bioinformatics/bioinformatics_vol33_issue3_articles.txt', '03-articles/bioinformatics/bioinformatics_vol33_issue4_articles.txt', '03-articles/bioinformatics/bioinformatics_vol33_issue5_articles.txt', '03-articles/bioinformatics/bioinformatics_vol33_issue6_articles.txt', '03-articles/bioinformatics/bioinformatics_vol33_issue7_articles.txt', '03-articles/bioinformatics/bioinformatics_vol33_issue8_articles.txt', '03-articles/bioinformatics/bioinformatics_vol33_issue9_articles.txt', '03-articles/bmc-bioinformatics/bmc-bioinformatics_vol_10_articles.txt', '03-articles/bmc-bioinformatics/bmc-bioinformatics_vol_11_articles.txt', '03-articles/bmc-bioinformatics/bmc-bioinformatics_vol_12_articles.txt', '03-articles/bmc-bioinformatics/bmc-bioinformatics_vol_13_articles.txt', '03-articles/bmc-bioinformatics/bmc-bioinformatics_vol_14_articles.txt', '03-articles/bmc-bioinformatics/bmc-bioinformatics_vol_15_articles.txt', '03-articles/bmc-bioinformatics/bmc-bioinformatics_vol_16_articles.txt', '03-articles/bmc-bioinformatics/bmc-bioinformatics_vol_17_articles.txt', '03-articles/bmc-bioinformatics/bmc-bioinformatics_vol_18_articles.txt', '03-articles/database/database_vol0_articles.txt', '03-articles/database/database_vol2010_articles.txt', '03-articles/database/database_vol2011_articles.txt', '03-articles/database/database_vol2012_articles.txt', '03-articles/database/database_vol2013_articles.txt', '03-articles/database/database_vol2014_articles.txt', '03-articles/database/database_vol2015_articles.txt', '03-articles/database/database_vol2016_articles.txt', '03-articles/database/database_vol2017_articles.txt', '03-articles/nar/nar_vol41_issue10_articles.txt', '03-articles/nar/nar_vol41_issue11_articles.txt', '03-articles/nar/nar_vol41_issue12_articles.txt', '03-articles/nar/nar_vol41_issue13_articles.txt', '03-articles/nar/nar_vol41_issue14_articles.txt', '03-articles/nar/nar_vol41_issue15_articles.txt', '03-articles/nar/nar_vol41_issue16_articles.txt', '03-articles/nar/nar_vol41_issue17_articles.txt', '03-articles/nar/nar_vol41_issue18_articles.txt', '03-articles/nar/nar_vol41_issue19_articles.txt', '03-articles/nar/nar_vol41_issue1_articles.txt', '03-articles/nar/nar_vol41_issue20_articles.txt', '03-articles/nar/nar_vol41_issue21_articles.txt', '03-articles/nar/nar_vol41_issue22_articles.txt', '03-articles/nar/nar_vol41_issue2_articles.txt', '03-articles/nar/nar_vol41_issue3_articles.txt', '03-articles/nar/nar_vol41_issue4_articles.txt', '03-articles/nar/nar_vol41_issue5_articles.txt', '03-articles/nar/nar_vol41_issue6_articles.txt', '03-articles/nar/nar_vol41_issue7_articles.txt', '03-articles/nar/nar_vol41_issue8_articles.txt', '03-articles/nar/nar_vol41_issue9_articles.txt', '03-articles/nar/nar_vol41_issueD1_articles.txt', '03-articles/nar/nar_vol41_issueW1_articles.txt', '03-articles/nar/nar_vol42_issue10_articles.txt', '03-articles/nar/nar_vol42_issue11_articles.txt', '03-articles/nar/nar_vol42_issue12_articles.txt', '03-articles/nar/nar_vol42_issue13_articles.txt', '03-articles/nar/nar_vol42_issue14_articles.txt', '03-articles/nar/nar_vol42_issue15_articles.txt', '03-articles/nar/nar_vol42_issue16_articles.txt', '03-articles/nar/nar_vol42_issue17_articles.txt', '03-articles/nar/nar_vol42_issue18_articles.txt', '03-articles/nar/nar_vol42_issue19_articles.txt', '03-articles/nar/nar_vol42_issue1_articles.txt', '03-articles/nar/nar_vol42_issue20_articles.txt', '03-articles/nar/nar_vol42_issue21_articles.txt', '03-articles/nar/nar_vol42_issue22_articles.txt', '03-articles/nar/nar_vol42_issue2_articles.txt', '03-articles/nar/nar_vol42_issue3_articles.txt', '03-articles/nar/nar_vol42_issue4_articles.txt', '03-articles/nar/nar_vol42_issue5_articles.txt', '03-articles/nar/nar_vol42_issue6_articles.txt', '03-articles/nar/nar_vol42_issue7_articles.txt', '03-articles/nar/nar_vol42_issue8_articles.txt', '03-articles/nar/nar_vol42_issue9_articles.txt', '03-articles/nar/nar_vol42_issueD1_articles.txt', '03-articles/nar/nar_vol42_issueW1_articles.txt', '03-articles/nar/nar_vol43_issue10_articles.txt', '03-articles/nar/nar_vol43_issue11_articles.txt', '03-articles/nar/nar_vol43_issue13_articles.txt', '03-articles/nar/nar_vol43_issue15_articles.txt', '03-articles/nar/nar_vol43_issue16_articles.txt', '03-articles/nar/nar_vol43_issue17_articles.txt', '03-articles/nar/nar_vol43_issue18_articles.txt', '03-articles/nar/nar_vol43_issue19_articles.txt', '03-articles/nar/nar_vol43_issue1_articles.txt', '03-articles/nar/nar_vol43_issue20_articles.txt', '03-articles/nar/nar_vol43_issue21_articles.txt', '03-articles/nar/nar_vol43_issue22_articles.txt', '03-articles/nar/nar_vol43_issue3_articles.txt', '03-articles/nar/nar_vol43_issue4_articles.txt', '03-articles/nar/nar_vol43_issue6_articles.txt', '03-articles/nar/nar_vol43_issue8_articles.txt', '03-articles/nar/nar_vol43_issue9_articles.txt', '03-articles/nar/nar_vol44_issue10_articles.txt', '03-articles/nar/nar_vol44_issue11_articles.txt', '03-articles/nar/nar_vol44_issue12_articles.txt', '03-articles/nar/nar_vol44_issue13_articles.txt', '03-articles/nar/nar_vol44_issue14_articles.txt', '03-articles/nar/nar_vol44_issue15_articles.txt', '03-articles/nar/nar_vol44_issue16_articles.txt', '03-articles/nar/nar_vol44_issue17_articles.txt', '03-articles/nar/nar_vol44_issue18_articles.txt', '03-articles/nar/nar_vol44_issue19_articles.txt', '03-articles/nar/nar_vol44_issue1_articles.txt', '03-articles/nar/nar_vol44_issue20_articles.txt', '03-articles/nar/nar_vol44_issue21_articles.txt', '03-articles/nar/nar_vol44_issue22_articles.txt', '03-articles/nar/nar_vol44_issue2_articles.txt', '03-articles/nar/nar_vol44_issue3_articles.txt', '03-articles/nar/nar_vol44_issue4_articles.txt', '03-articles/nar/nar_vol44_issue5_articles.txt', '03-articles/nar/nar_vol44_issue6_articles.txt', '03-articles/nar/nar_vol44_issue7_articles.txt', '03-articles/nar/nar_vol44_issue8_articles.txt', '03-articles/nar/nar_vol44_issue9_articles.txt', '03-articles/nar/nar_vol44_issueD1_articles.txt', '03-articles/nar/nar_vol44_issueW1_articles.txt', '03-articles/nar/nar_vol45_issue10_articles.txt', '03-articles/nar/nar_vol45_issue11_articles.txt', '03-articles/nar/nar_vol45_issue12_articles.txt', '03-articles/nar/nar_vol45_issue13_articles.txt', '03-articles/nar/nar_vol45_issue14_articles.txt', '03-articles/nar/nar_vol45_issue1_articles.txt', '03-articles/nar/nar_vol45_issue2_articles.txt', '03-articles/nar/nar_vol45_issue3_articles.txt', '03-articles/nar/nar_vol45_issue4_articles.txt', '03-articles/nar/nar_vol45_issue5_articles.txt', '03-articles/nar/nar_vol45_issue6_articles.txt', '03-articles/nar/nar_vol45_issue7_articles.txt', '03-articles/nar/nar_vol45_issue8_articles.txt', '03-articles/nar/nar_vol45_issue9_articles.txt', '03-articles/nar/nar_vol45_issueD1_articles.txt', '03-articles/nar/nar_vol45_issueW1_articles.txt'], ['02-tools/bioinformatics/bioinformatics_vol26_issue10_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue11_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue12_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue13_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue14_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue15_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue16_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue17_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue18_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue19_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue1_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue20_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue21_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue22_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue23_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue24_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue2_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue3_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue4_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue5_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue6_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue7_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue8_tools.txt', '02-tools/bioinformatics/bioinformatics_vol26_issue9_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue10_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue11_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue12_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue14_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue15_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue16_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue18_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue19_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue1_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue20_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue21_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue22_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue23_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue24_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue2_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue3_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue4_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue5_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue6_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue7_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue8_tools.txt', '02-tools/bioinformatics/bioinformatics_vol27_issue9_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue10_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue11_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue12_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue13_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue14_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue15_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue16_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue17_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue18_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue19_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue1_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue20_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue21_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue22_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue23_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue24_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue2_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue3_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue4_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue5_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue6_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue7_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue8_tools.txt', '02-tools/bioinformatics/bioinformatics_vol28_issue9_tools.txt', '02-tools/bioinformatics/bioinformatics_vol32_issue20_tools.txt', '02-tools/bioinformatics/bioinformatics_vol32_issue21_tools.txt', '02-tools/bioinformatics/bioinformatics_vol32_issue22_tools.txt', '02-tools/bioinformatics/bioinformatics_vol32_issue23_tools.txt', '02-tools/bioinformatics/bioinformatics_vol32_issue24_tools.txt', '02-tools/bioinformatics/bioinformatics_vol33_issue10_tools.txt', '02-tools/bioinformatics/bioinformatics_vol33_issue11_tools.txt', '02-tools/bioinformatics/bioinformatics_vol33_issue12_tools.txt', '02-tools/bioinformatics/bioinformatics_vol33_issue13_tools.txt', '02-tools/bioinformatics/bioinformatics_vol33_issue14_tools.txt', '02-tools/bioinformatics/bioinformatics_vol33_issue15_tools.txt', '02-tools/bioinformatics/bioinformatics_vol33_issue16_tools.txt', '02-tools/bioinformatics/bioinformatics_vol33_issue17_tools.txt', '02-tools/bioinformatics/bioinformatics_vol33_issue1_tools.txt', '02-tools/bioinformatics/bioinformatics_vol33_issue2_tools.txt', '02-tools/bioinformatics/bioinformatics_vol33_issue3_tools.txt', '02-tools/bioinformatics/bioinformatics_vol33_issue4_tools.txt', '02-tools/bioinformatics/bioinformatics_vol33_issue5_tools.txt', '02-tools/bioinformatics/bioinformatics_vol33_issue6_tools.txt', '02-tools/bioinformatics/bioinformatics_vol33_issue7_tools.txt', '02-tools/bioinformatics/bioinformatics_vol33_issue8_tools.txt', '02-tools/bioinformatics/bioinformatics_vol33_issue9_tools.txt', '02-tools/bmc-bioinformatics/bmc-bioinformatics_vol_10_tools.txt', '02-tools/bmc-bioinformatics/bmc-bioinformatics_vol_11_tools.txt', '02-tools/bmc-bioinformatics/bmc-bioinformatics_vol_12_tools.txt', '02-tools/bmc-bioinformatics/bmc-bioinformatics_vol_13_tools.txt', '02-tools/bmc-bioinformatics/bmc-bioinformatics_vol_14_tools.txt', '02-tools/bmc-bioinformatics/bmc-bioinformatics_vol_15_tools.txt', '02-tools/bmc-bioinformatics/bmc-bioinformatics_vol_16_tools.txt', '02-tools/bmc-bioinformatics/bmc-bioinformatics_vol_17_tools.txt', '02-tools/bmc-bioinformatics/bmc-bioinformatics_vol_18_tools.txt', '02-tools/database/database_vol0_tools.txt', '02-tools/database/database_vol2010_tools.txt', '02-tools/database/database_vol2011_tools.txt', '02-tools/database/database_vol2012_tools.txt', '02-tools/database/database_vol2013_tools.txt', '02-tools/database/database_vol2014_tools.txt', '02-tools/database/database_vol2015_tools.txt', '02-tools/database/database_vol2016_tools.txt', '02-tools/database/database_vol2017_tools.txt', '02-tools/nar/nar_vol41_issue10_tools.txt', '02-tools/nar/nar_vol41_issue11_tools.txt', '02-tools/nar/nar_vol41_issue12_tools.txt', '02-tools/nar/nar_vol41_issue13_tools.txt', '02-tools/nar/nar_vol41_issue14_tools.txt', '02-tools/nar/nar_vol41_issue15_tools.txt', '02-tools/nar/nar_vol41_issue16_tools.txt', '02-tools/nar/nar_vol41_issue17_tools.txt', '02-tools/nar/nar_vol41_issue18_tools.txt', '02-tools/nar/nar_vol41_issue19_tools.txt', '02-tools/nar/nar_vol41_issue1_tools.txt', '02-tools/nar/nar_vol41_issue20_tools.txt', '02-tools/nar/nar_vol41_issue21_tools.txt', '02-tools/nar/nar_vol41_issue22_tools.txt', '02-tools/nar/nar_vol41_issue2_tools.txt', '02-tools/nar/nar_vol41_issue3_tools.txt', '02-tools/nar/nar_vol41_issue4_tools.txt', '02-tools/nar/nar_vol41_issue5_tools.txt', '02-tools/nar/nar_vol41_issue6_tools.txt', '02-tools/nar/nar_vol41_issue7_tools.txt', '02-tools/nar/nar_vol41_issue8_tools.txt', '02-tools/nar/nar_vol41_issue9_tools.txt', '02-tools/nar/nar_vol41_issueD1_tools.txt', '02-tools/nar/nar_vol41_issueW1_tools.txt', '02-tools/nar/nar_vol42_issue10_tools.txt', '02-tools/nar/nar_vol42_issue11_tools.txt', '02-tools/nar/nar_vol42_issue12_tools.txt', '02-tools/nar/nar_vol42_issue13_tools.txt', '02-tools/nar/nar_vol42_issue14_tools.txt', '02-tools/nar/nar_vol42_issue15_tools.txt', '02-tools/nar/nar_vol42_issue16_tools.txt', '02-tools/nar/nar_vol42_issue17_tools.txt', '02-tools/nar/nar_vol42_issue18_tools.txt', '02-tools/nar/nar_vol42_issue19_tools.txt', '02-tools/nar/nar_vol42_issue1_tools.txt', '02-tools/nar/nar_vol42_issue20_tools.txt', '02-tools/nar/nar_vol42_issue21_tools.txt', '02-tools/nar/nar_vol42_issue22_tools.txt', '02-tools/nar/nar_vol42_issue2_tools.txt', '02-tools/nar/nar_vol42_issue3_tools.txt', '02-tools/nar/nar_vol42_issue4_tools.txt', '02-tools/nar/nar_vol42_issue5_tools.txt', '02-tools/nar/nar_vol42_issue6_tools.txt', '02-tools/nar/nar_vol42_issue7_tools.txt', '02-tools/nar/nar_vol42_issue8_tools.txt', '02-tools/nar/nar_vol42_issue9_tools.txt', '02-tools/nar/nar_vol42_issueD1_tools.txt', '02-tools/nar/nar_vol42_issueW1_tools.txt', '02-tools/nar/nar_vol43_issue10_tools.txt', '02-tools/nar/nar_vol43_issue11_tools.txt', '02-tools/nar/nar_vol43_issue13_tools.txt', '02-tools/nar/nar_vol43_issue15_tools.txt', '02-tools/nar/nar_vol43_issue16_tools.txt', '02-tools/nar/nar_vol43_issue17_tools.txt', '02-tools/nar/nar_vol43_issue18_tools.txt', '02-tools/nar/nar_vol43_issue19_tools.txt', '02-tools/nar/nar_vol43_issue1_tools.txt', '02-tools/nar/nar_vol43_issue20_tools.txt', '02-tools/nar/nar_vol43_issue21_tools.txt', '02-tools/nar/nar_vol43_issue22_tools.txt', '02-tools/nar/nar_vol43_issue3_tools.txt', '02-tools/nar/nar_vol43_issue4_tools.txt', '02-tools/nar/nar_vol43_issue6_tools.txt', '02-tools/nar/nar_vol43_issue8_tools.txt', '02-tools/nar/nar_vol43_issue9_tools.txt', '02-tools/nar/nar_vol44_issue10_tools.txt', '02-tools/nar/nar_vol44_issue11_tools.txt', '02-tools/nar/nar_vol44_issue12_tools.txt', '02-tools/nar/nar_vol44_issue13_tools.txt', '02-tools/nar/nar_vol44_issue14_tools.txt', '02-tools/nar/nar_vol44_issue15_tools.txt', '02-tools/nar/nar_vol44_issue16_tools.txt', '02-tools/nar/nar_vol44_issue17_tools.txt', '02-tools/nar/nar_vol44_issue18_tools.txt', '02-tools/nar/nar_vol44_issue19_tools.txt', '02-tools/nar/nar_vol44_issue1_tools.txt', '02-tools/nar/nar_vol44_issue20_tools.txt', '02-tools/nar/nar_vol44_issue21_tools.txt', '02-tools/nar/nar_vol44_issue22_tools.txt', '02-tools/nar/nar_vol44_issue2_tools.txt', '02-tools/nar/nar_vol44_issue3_tools.txt', '02-tools/nar/nar_vol44_issue4_tools.txt', '02-tools/nar/nar_vol44_issue5_tools.txt', '02-tools/nar/nar_vol44_issue6_tools.txt', '02-tools/nar/nar_vol44_issue7_tools.txt', '02-tools/nar/nar_vol44_issue8_tools.txt', '02-tools/nar/nar_vol44_issue9_tools.txt', '02-tools/nar/nar_vol44_issueD1_tools.txt', '02-tools/nar/nar_vol44_issueW1_tools.txt', '02-tools/nar/nar_vol45_issue10_tools.txt', '02-tools/nar/nar_vol45_issue11_tools.txt', '02-tools/nar/nar_vol45_issue12_tools.txt', '02-tools/nar/nar_vol45_issue13_tools.txt', '02-tools/nar/nar_vol45_issue14_tools.txt', '02-tools/nar/nar_vol45_issue1_tools.txt', '02-tools/nar/nar_vol45_issue2_tools.txt', '02-tools/nar/nar_vol45_issue3_tools.txt', '02-tools/nar/nar_vol45_issue4_tools.txt', '02-tools/nar/nar_vol45_issue5_tools.txt', '02-tools/nar/nar_vol45_issue6_tools.txt', '02-tools/nar/nar_vol45_issue7_tools.txt', '02-tools/nar/nar_vol45_issue8_tools.txt', '02-tools/nar/nar_vol45_issue9_tools.txt', '02-tools/nar/nar_vol45_issueD1_tools.txt', '02-tools/nar/nar_vol45_issueW1_tools.txt'], '04-article_similarity/article_keywords.txt', '05-article_metrics/article_metrics.txt', '06-tool_similarity/tool_similarity.txt'],
 @files([[getArticles], [getTools], '04-article_similarity/article_keywords.txt', getArticleMetrics, getToolSimilarity],
-	   '07-upload_data/upload_data.txt')
+	   '07-upload_tool_data/upload_tool_data.txt')
 
-def uploadData(infiles, outfile):
+def uploadToolData(infiles, outfile):
 
 	# Split infiles
 	articleFiles, toolFiles, keywordFile, metricsFile, similarityFile = infiles
@@ -310,23 +316,132 @@ def uploadData(infiles, outfile):
 		# Upload
 		engine.execute(Table(table_name, MetaData(), autoload=True, autoload_with=engine).insert().prefix_with('IGNORE'), dataframe_ready_to_upload.to_dict(orient='records'))
 
-
-
 #################################################################
 #################################################################
-############### .  ########################################
+############### 2. Datasets #####################################
 #################################################################
 #################################################################
 
 #######################################################
 #######################################################
-########## S1. 
+########## S1. Annotation and Similarity
 #######################################################
 #######################################################
 
 #############################################
-########## 1. 
+########## 8. Annotate Datasets
 #############################################
+
+@follows(mkdir('08-annotated_datasets'))
+
+@originate('08-annotated_datasets/annotated_datasets.txt')
+
+def annotateDatasets(outfile):
+
+	# Create session
+	session = Session()
+
+	# Perform dataset query
+	unannotated_datasets_query = session.query(metadata.tables['dataset'].columns['dataset_accession']).filter(and_(or_(metadata.tables['dataset'].columns['dataset_accession'].like('GSE%'), metadata.tables['dataset'].columns['dataset_accession'].like('GDS%')), metadata.tables['dataset'].columns['dataset_title'] == None)).all()
+
+	# Loop through datasets
+	for unannotated_dataset in unannotated_datasets_query:
+		print unannotated_dataset
+		
+		# Get annotation
+		dataset_annotation = P.annotate_dataset(unannotated_dataset[0])
+		print dataset_annotation
+		
+		# Update
+		session.execute(metadata.tables['dataset'].update().values(dataset_annotation).where(metadata.tables['dataset'].columns['dataset_accession'] == unannotated_dataset[0]))
+
+	# Commit session
+	session.commit()
+
+#############################################
+########## 9. Dataset Similarity
+#############################################
+
+@follows(mkdir('09-dataset_similarity'))
+
+@originate('09-dataset_similarity/dataset_similarity.txt')
+
+def getDatasetSimilarity(outfile):
+
+	# Get session
+	session = Session()
+
+	# Perform dataset query
+	unannotated_datasets_query = session.query(metadata.tables['dataset']).all()
+
+	# Get dataset dataframe
+	dataset_dataframe = pd.DataFrame([x._asdict() for x in unannotated_datasets_query]).dropna()
+
+	# Get processed text
+	processed_texts = [P.process_text(x) for x in dataset_dataframe['dataset_title']+dataset_dataframe['dataset_description']]
+
+	# Get similarity and keywords
+	similarity_dataframe, keyword_dataframe = P.extract_text_similarity_and_keywords(processed_texts, labels=dataset_dataframe['dataset_accession'], identifier='dataset_accession')
+
+	# Fill diagonal
+	np.fill_diagonal(similarity_dataframe.values, np.nan)
+
+	# Melt tool similarity
+	similarity_dataframe = pd.melt(similarity_dataframe.reset_index('dataset_accession').rename(columns={'dataset_accession': 'source_dataset_accession'}), id_vars='source_dataset_accession', var_name='target_dataset_accession', value_name='similarity').dropna()
+
+	# Write
+	keyword_dataframe.to_csv(outfile.replace('similarity.txt', 'keywords.txt'), sep='\t', index=True)
+	similarity_dataframe.to_csv(outfile, sep='\t', index=True)
+
+#############################################
+########## 10. Upload Dataset Data
+#############################################
+
+@follows(mkdir('10-upload_dataset_data'))
+
+@files(glob.glob('09-dataset_similarity/*.txt'),
+	   '10-upload_dataset_data/upload_dataset_data.txt')
+
+def uploadDatasetData(infiles, outfile):
+
+	# Split infiles
+	keywordFile, similarityFile = infiles
+
+	# Read dataset similarity dataframe
+	dataset_similarity_dataframe = pd.read_table(similarityFile)
+
+	# Read similarity dataframe
+	related_dataset_dataframe = dataset_similarity_dataframe.groupby(['source_tool_name'])['target_tool_name','similarity'].apply(lambda x: x.nlargest(10, columns=['similarity'])).reset_index().drop('level_1', axis=1).merge(tool_id_dataframe, left_on='source_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'source_tool_fk'}).merge(tool_id_dataframe, left_on='target_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'target_tool_fk'})[['source_tool_fk', 'target_tool_fk', 'similarity']].dropna()
+
+	# # Get article dataframe
+	# article_dataframe =  P.fix_dates(pd.concat([pd.read_table(x) for x in articleFiles]))
+
+	# # Get tool dataframe
+	# tool_dataframe =  pd.concat([pd.read_table(x) for x in toolFiles])
+
+	# # Create session
+	# session = Session()
+
+	# # Upload and get IDs of tools 
+	# tool_id_dataframe = P.upload_and_get_ids(tool_dataframe, table_name='tool', engine=engine)
+
+	# # Commit
+	# session.commit()
+
+	# # Prepare dataframes ready to upload
+	# dataframes_ready_to_upload = {
+	# 	'article': article_dataframe.merge(tool_dataframe[['doi', 'tool_name']], on='doi', how='left').merge(tool_id_dataframe, on='tool_name', how='left').drop('tool_name', axis=1).dropna(),
+	# 	'related_tool': pd.read_table(similarityFile).groupby(['source_tool_name'])['target_tool_name','similarity'].apply(lambda x: x.nlargest(10, columns=['similarity'])).reset_index().drop('level_1', axis=1).merge(tool_id_dataframe, left_on='source_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'source_tool_fk'}).merge(tool_id_dataframe, left_on='target_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'target_tool_fk'})[['source_tool_fk', 'target_tool_fk', 'similarity']].dropna()
+	# }
+
+	# # Truncate similarity
+	# engine.execute('TRUNCATE TABLE related_tool;')
+
+	# # Loop through prepared dataframes
+	# for table_name, dataframe_ready_to_upload in dataframes_ready_to_upload.iteritems():
+
+	# 	# Upload
+		# engine.execute(Table(table_name, MetaData(), autoload=True, autoload_with=engine).insert().prefix_with('IGNORE'), dataframe_ready_to_upload.to_dict(orient='records'))
 
 
 ##################################################

@@ -13,10 +13,11 @@
 ##### 1. Python modules #####
 from ruffus import *
 import pandas as pd
-import nltk, re, sklearn, json, urllib2
+import nltk, re, sklearn, json, urllib
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sqlalchemy import Table, MetaData
 from datetime import datetime
+import xml.etree.ElementTree as ET
 
 ##### 2. Custom modules #####
 
@@ -32,7 +33,7 @@ stopwords.extend(['www','mail','edu','athttps', 'doi'])
 
 #################################################################
 #################################################################
-############### 1. Natural Language Processing ##################
+############### 1. Computational Tools ##########################
 #################################################################
 #################################################################
 
@@ -81,7 +82,7 @@ def process_text(text):
 #############################################
 
 # Get similarity and keywords
-def extract_text_similarity_and_keywords(processed_texts, labels, n_keywords=5):
+def extract_text_similarity_and_keywords(processed_texts, labels, n_keywords=5, identifier='doi'):
 
     # Get vectorized
     tfidf_vectorizer = TfidfVectorizer(min_df=0.00,max_df=1.0, ngram_range=(1, 1))
@@ -94,12 +95,12 @@ def extract_text_similarity_and_keywords(processed_texts, labels, n_keywords=5):
 
     # Feature dataframe
     feature_dataframe = pd.DataFrame(tfidf_matrix.todense(), index=labels, columns=tfidf_vectorizer.get_feature_names())
-
+    print feature_dataframe.head().reset_index()
     # Melt
-    feature_dataframe_melted = pd.melt(feature_dataframe.reset_index().rename(columns={'level_0': 'doi'}), id_vars='doi', var_name='word', value_name='importance')
+    feature_dataframe_melted = pd.melt(feature_dataframe.reset_index().rename(columns={'level_0': identifier}), id_vars=identifier, var_name='word', value_name='importance')
 
     # Get top keywords dataframe
-    keyword_dataframe = feature_dataframe_melted.groupby('doi')['word','importance'].apply(lambda x: x.nlargest(n_keywords, columns=['importance'])).reset_index().set_index('doi').drop_duplicates().drop(['level_1', 'importance'], axis=1)
+    keyword_dataframe = feature_dataframe_melted.groupby(identifier)['word','importance'].apply(lambda x: x.nlargest(n_keywords, columns=['importance'])).reset_index().set_index(identifier).drop_duplicates().drop(['level_1', 'importance'], axis=1)
 
     # Return
     return similarity_dataframe, keyword_dataframe
@@ -199,3 +200,49 @@ def upload_and_get_ids(dataframe_to_upload, table_name, engine, identifiers={'to
 
     # Return
     return id_dataframe
+
+
+#################################################################
+#################################################################
+############### 2. Datasets #####################################
+#################################################################
+#################################################################
+
+#######################################################
+#######################################################
+########## S1. Annotation
+#######################################################
+#######################################################
+
+#############################################
+########## 1. Annotate GEO Accession
+#############################################
+
+def annotate_dataset(dataset_accession, attributes = ['title', 'summary']):
+    
+    # Check if GEO
+    if dataset_accession[:3] in ['GDS', 'GSE']:
+        
+        print urllib.urlopen('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term={dataset_accession}%5BAccession%20ID%5D'.format(**locals()))
+        # Get GEO ID
+        geoId = ET.fromstring(urllib2.urlopen('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term={dataset_accession}%5BAccession%20ID%5D'.format(**locals())).read()).findall('IdList')[0][0].text
+        
+        # Get GEO Annotation
+        root = ET.fromstring(urllib2.urlopen('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gds&id={geoId}'.format(**locals())).read())
+        
+        # Convert to dictionary
+        annotated_dataset = {x.attrib['Name'].replace('title', 'dataset_title').replace('summary', 'dataset_description'): x.text.encode('ascii', 'ignore').replace('%', '%%').replace('"', "'") for x in root.find('DocSum') if 'Name' in x.attrib.keys() and x.attrib['Name'] in attributes}
+        
+        # Get landing URL
+        annotated_dataset['dataset_landing_url'] = 'https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc='+dataset_accession if dataset_accession[:3] == 'GDS' else 'https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc='+dataset_accession
+        
+        # Add repository FK
+        annotated_dataset['repository_fk'] = 1
+        
+    else:
+        
+        # Return empty
+        annotated_dataset = {'title': '', 'summary': '', 'repository_name': '', 'dataset_landing_url': ''}
+    
+    # Return data
+    return annotated_dataset
