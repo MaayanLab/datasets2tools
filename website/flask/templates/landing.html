@@ -306,7 +306,7 @@
 			$(evt.target).parents('.landing-search-form').submit();
 		});
 		$('#related-object-row').slick({
-			slidesToShow: 3,
+			slidesToShow: {{ 2 if object_type == 'dataset' else 3 }},
 			arrows: true,
 			dots: true
 		});

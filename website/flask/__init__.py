@@ -102,7 +102,9 @@ def index():
 def landing(object_type, object_identifier):
 	session = Session()
 	if object_type == 'dataset':
-		landing_data = {'dataset': datasets['search_results'][0],'canned_analyses': canned_analyses, 'tools': tools}
+		object_data = search_database({'dataset_accession': object_identifier}, object_type, session, metadata)
+		print object_data
+		landing_data = {'dataset': object_data,'canned_analyses': canned_analyses, 'tools': tools}
 	elif object_type == 'tool':
 		object_data = search_database({'tool_name': object_identifier}, object_type, session, metadata)
 		print object_data

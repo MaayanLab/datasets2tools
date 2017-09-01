@@ -11,7 +11,7 @@ def process_query(query_dict, object_type, session, metadata):
 
 		# By accession
 		if 'dataset_accession' in query_dict.keys():
-			query = session.query(metadata.tables[object_type].columns['id']).filter(metadata.tables[object_type].columns['tool_name']==query_dict['dataset_accession'])
+			query = session.query(metadata.tables[object_type].columns['id']).filter(metadata.tables[object_type].columns['dataset_accession']==query_dict['dataset_accession'])
 
 	# Tool
 	elif object_type == 'tool':
@@ -31,12 +31,19 @@ def get_object_data(object_id, object_type, session, metadata, get_related=True)
 
 	# Dataset
 	if object_type == 'dataset':
-		pass
+		
+		# Perform dataset query
+		dataset_query = session.query(metadata.tables['dataset'], metadata.tables['repository']).join(metadata.tables['repository']).filter(metadata.tables['dataset'].columns['id'] == object_id).all()
+
+		# Get tool data
+		object_data = [x._asdict() for x in dataset_query][0]
+		print object_data
+
 
 	elif object_type == 'tool':
 		
 		# Perform tool query
-		tool_query = session.query(metadata.tables[object_type]).filter(metadata.tables[object_type].columns['id'] == object_id)
+		tool_query = session.query(metadata.tables['tool']).filter(metadata.tables['tool'].columns['id'] == object_id)
 
 		# Get tool data
 		object_data = {key: value for key, value in zip(metadata.tables[object_type].columns.keys(), tool_query.all()[0])}

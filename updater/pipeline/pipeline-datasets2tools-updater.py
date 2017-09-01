@@ -12,7 +12,7 @@
 #############################################
 ##### 1. Python modules #####
 from ruffus import *
-import sys, os, glob, json, urllib2
+import sys, os, glob, json
 import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -24,6 +24,7 @@ from sqlalchemy import Table, MetaData
 # Pipeline running
 sys.path.append('pipeline')
 import PipelineDatasets2ToolsUpdater as P
+from dataset_annotation import *
 
 #############################################
 ########## 2. General Setup
@@ -356,11 +357,9 @@ def annotateDatasets(outfile):
 
 	# Loop through datasets
 	for unannotated_dataset in unannotated_datasets_query:
-		print unannotated_dataset
 		
 		# Get annotation
-		dataset_annotation = P.annotate_dataset(unannotated_dataset[0])
-		print dataset_annotation
+		dataset_annotation = json.loads(os.popen('python pipeline/annotate_dataset.py '+unannotated_dataset[0]).read())
 		
 		# Update
 		session.execute(metadata.tables['dataset'].update().values(dataset_annotation).where(metadata.tables['dataset'].columns['dataset_accession'] == unannotated_dataset[0]))
@@ -378,14 +377,8 @@ def annotateDatasets(outfile):
 
 def getDatasetSimilarity(outfile):
 
-	# Get session
-	session = Session()
-
-	# Perform dataset query
-	unannotated_datasets_query = session.query(metadata.tables['dataset']).all()
-
 	# Get dataset dataframe
-	dataset_dataframe = pd.DataFrame([x._asdict() for x in unannotated_datasets_query]).dropna()
+	dataset_dataframe = pd.read_sql_query('SELECT * FROM dataset WHERE dataset_title IS NOT NULL', engine)
 
 	# Get processed text
 	processed_texts = [P.process_text(x) for x in dataset_dataframe['dataset_title']+dataset_dataframe['dataset_description']]
@@ -400,14 +393,16 @@ def getDatasetSimilarity(outfile):
 	similarity_dataframe = pd.melt(similarity_dataframe.reset_index('dataset_accession').rename(columns={'dataset_accession': 'source_dataset_accession'}), id_vars='source_dataset_accession', var_name='target_dataset_accession', value_name='similarity').dropna()
 
 	# Write
-	keyword_dataframe.to_csv(outfile.replace('similarity.txt', 'keywords.txt'), sep='\t', index=True)
-	similarity_dataframe.to_csv(outfile, sep='\t', index=True)
+	keyword_dataframe.to_csv(outfile.replace('similarity.txt', 'keywords.txt'), sep='\t')
+	similarity_dataframe.to_csv(outfile, sep='\t', index=False)
 
 #############################################
 ########## 10. Upload Dataset Data
 #############################################
 
 @follows(mkdir('10-upload_dataset_data'))
+
+@follows(getDatasetSimilarity)
 
 @files(glob.glob('09-dataset_similarity/*.txt'),
 	   '10-upload_dataset_data/upload_dataset_data.txt')
@@ -420,38 +415,25 @@ def uploadDatasetData(infiles, outfile):
 	# Read dataset similarity dataframe
 	dataset_similarity_dataframe = pd.read_table(similarityFile)
 
-	# Read similarity dataframe
-	related_dataset_dataframe = dataset_similarity_dataframe.groupby(['source_tool_name'])['target_tool_name','similarity'].apply(lambda x: x.nlargest(10, columns=['similarity'])).reset_index().drop('level_1', axis=1).merge(tool_id_dataframe, left_on='source_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'source_tool_fk'}).merge(tool_id_dataframe, left_on='target_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'target_tool_fk'})[['source_tool_fk', 'target_tool_fk', 'similarity']].dropna()
+	# Get dataset ID dataframe
+	dataset_id_dataframe = pd.read_sql_query('SELECT id AS dataset_fk, dataset_accession FROM dataset', engine)
 
-	# # Get article dataframe
-	# article_dataframe =  P.fix_dates(pd.concat([pd.read_table(x) for x in articleFiles]))
+	# Truncate similarity
+	engine.execute('TRUNCATE TABLE related_dataset;')
 
-	# # Get tool dataframe
-	# tool_dataframe =  pd.concat([pd.read_table(x) for x in toolFiles])
+	# Prepare dataframes ready to upload
+	dataframes_ready_to_upload = {
+		'related_dataset': dataset_similarity_dataframe.groupby(['source_dataset_accession'])['target_dataset_accession','similarity'].apply(lambda x: x.nlargest(10, columns=['similarity'])).reset_index().drop('level_1', axis=1).merge(dataset_id_dataframe, left_on='source_dataset_accession', right_on='dataset_accession', how='left').rename(columns={'dataset_fk': 'source_dataset_fk'}).merge(dataset_id_dataframe, left_on='target_dataset_accession', right_on='dataset_accession', how='left').rename(columns={'dataset_fk': 'target_dataset_fk'})[['source_dataset_fk', 'target_dataset_fk', 'similarity']].dropna(),
+		'keyword': pd.read_table(keywordFile).merge(dataset_id_dataframe, on='dataset_accession', how='left')[['dataset_fk', 'keyword']].dropna()
+	}
 
-	# # Create session
-	# session = Session()
+	# Loop through prepared dataframes
+	for table_name, dataframe_ready_to_upload in dataframes_ready_to_upload.iteritems():
 
-	# # Upload and get IDs of tools 
-	# tool_id_dataframe = P.upload_and_get_ids(tool_dataframe, table_name='tool', engine=engine)
+		# Upload
+		engine.execute('SET GLOBAL max_allowed_packet=1073741824;')
+		engine.execute(Table(table_name, MetaData(), autoload=True, autoload_with=engine).insert().prefix_with('IGNORE'), dataframe_ready_to_upload.to_dict(orient='records'))
 
-	# # Commit
-	# session.commit()
-
-	# # Prepare dataframes ready to upload
-	# dataframes_ready_to_upload = {
-	# 	'article': article_dataframe.merge(tool_dataframe[['doi', 'tool_name']], on='doi', how='left').merge(tool_id_dataframe, on='tool_name', how='left').drop('tool_name', axis=1).dropna(),
-	# 	'related_tool': pd.read_table(similarityFile).groupby(['source_tool_name'])['target_tool_name','similarity'].apply(lambda x: x.nlargest(10, columns=['similarity'])).reset_index().drop('level_1', axis=1).merge(tool_id_dataframe, left_on='source_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'source_tool_fk'}).merge(tool_id_dataframe, left_on='target_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'target_tool_fk'})[['source_tool_fk', 'target_tool_fk', 'similarity']].dropna()
-	# }
-
-	# # Truncate similarity
-	# engine.execute('TRUNCATE TABLE related_tool;')
-
-	# # Loop through prepared dataframes
-	# for table_name, dataframe_ready_to_upload in dataframes_ready_to_upload.iteritems():
-
-	# 	# Upload
-		# engine.execute(Table(table_name, MetaData(), autoload=True, autoload_with=engine).insert().prefix_with('IGNORE'), dataframe_ready_to_upload.to_dict(orient='records'))
 
 
 ##################################################

@@ -13,7 +13,7 @@
 ##### 1. Python modules #####
 from ruffus import *
 import pandas as pd
-import nltk, re, sklearn, json, urllib
+import nltk, re, sklearn, json, urllib, urllib2, requests, time
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sqlalchemy import Table, MetaData
 from datetime import datetime
@@ -222,11 +222,15 @@ def annotate_dataset(dataset_accession, attributes = ['title', 'summary']):
     
     # Check if GEO
     if dataset_accession[:3] in ['GDS', 'GSE']:
+
+        url = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term={dataset_accession}%5BAccession%20ID%5D'.format(**locals())
+        print url
+
+        print 'opening...'
         
-        print urllib.urlopen('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term={dataset_accession}%5BAccession%20ID%5D'.format(**locals()))
         # Get GEO ID
         geoId = ET.fromstring(urllib2.urlopen('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term={dataset_accession}%5BAccession%20ID%5D'.format(**locals())).read()).findall('IdList')[0][0].text
-        
+
         # Get GEO Annotation
         root = ET.fromstring(urllib2.urlopen('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gds&id={geoId}'.format(**locals())).read())
         
