@@ -380,6 +380,25 @@
 					font-weight: 300;
 				}
 
+				.no-search-results {
+					text-align: center;
+					font-size: 10pt;
+					font-weight: 300;
+					padding: 50px 0px;
+				}
+
+					.contribute-button {
+					    margin: 15px 0px;
+					    background-color: #255FA7;
+					    color: white;
+					    font-weight: 600;
+					    cursor: pointer;
+					    font-size: 10pt;
+					    border: none;
+					    padding: 7px 15px;
+					    border-radius: 3px;
+					}
+
 		#fairness {
 
 		}
@@ -685,6 +704,13 @@
 		border-radius: 1px;
 		background-color: white;
 	}
+
+		#no-search-results {
+			padding: 100px 15px;
+			text-align: center;
+			font-size: 12pt;
+			font-weight: 300;
+		}
 
 		#search-filters-row {
 			margin-top: 10px;

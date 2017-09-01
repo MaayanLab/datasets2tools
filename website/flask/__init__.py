@@ -113,7 +113,6 @@ def landing(object_type, object_identifier):
 			'canned_analyses': {'search_filters': canned_analyses['search_filters'], 'count': 1, 'search_results': search_database({'tool_name': object_identifier}, 'canned_analysis', session, metadata)},
 			'tool': search_database({'tool_name': object_identifier}, object_type, session, metadata, get_related=True)[0]
 		}
-		print landing_data['datasets']['search_results']
 	elif object_type == 'canned_analysis':
 		landing_data = {
 			'datasets': {'search_filters': datasets['search_filters'], 'count': 1, 'search_results': search_database({'canned_analysis_fk': 1}, 'dataset', session, metadata)},
@@ -131,17 +130,24 @@ def landing(object_type, object_identifier):
 
 @app.route(entry_point+'/search')
 def search():
+	session=Session()
 	object_type = request.args.get('object_type', default='canned_analysis', type=str)
-	offset = request.args.get('offset', default=1, type=int)
-	page_size = request.args.get('page_size', default=10, type=int)
-	sort_by = request.args.get('sort_by', default='relevance', type=str)
+	query_dict = request.args.to_dict()
+	[query_dict.pop(x) for x in ['object_type', 'sort_by', 'offset', 'page_size'] if x in query_dict.keys()]
+	# search_parameters = {
+	# 	# 'offset': request.args.get('offset', default=1, type=int)
+	# 	# 'page_size': request.args.get('page_size', default=10, type=int)
+	# 	# 'sort_by': request.args.get('sort_by', default='relevance', type=str)
+	# }
 	if object_type=='canned_analysis':
 		search_data=canned_analyses
 	elif object_type=='dataset':
 		search_data=datasets
 	elif object_type=='tool':
 		search_data=tools
-	return render_template('search.html', search_data=search_data, object_type=object_type, offset=offset, page_size=page_size, sort_by=sort_by)
+	search_data['search_results'] = search_database(query_dict, object_type, session, metadata, get_related=False)
+	session.close()
+	return render_template('search.html', search_data=search_data, object_type=object_type, offset=1, page_size=10, sort_by='relevance')
 
 @app.route(entry_point+'/contribute')
 def contribute():

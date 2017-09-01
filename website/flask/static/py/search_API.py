@@ -129,7 +129,7 @@ def process_query(query_dict, object_type, session, metadata):
 	return ids
 
 
-def get_object_data(object_id, object_type, session, metadata, get_related=False):
+def get_object_data(object_id, object_type, session, metadata, get_related):
 
 	# Dataset
 	if object_type == 'dataset':
@@ -209,13 +209,13 @@ def get_object_data(object_id, object_type, session, metadata, get_related=False
 	# Return
 	return object_data
 
-def search_database(query, object_type, session, metadata, get_related=True):
+def search_database(query, object_type, session, metadata, get_related=False):
 
 	# Get IDs
 	ids = process_query(query, object_type, session, metadata)
 
 	# Get object data
-	search_results = [get_object_data(x, object_type, session, metadata) for x in ids]
+	search_results = [get_object_data(x, object_type, session, metadata, get_related) for x in ids]
 
 	# Return
 	return search_results
