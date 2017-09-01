@@ -245,7 +245,7 @@
 							border: none;
 							background-color: #fcfcfc;
 							padding-top: 5px;
-							padding-left: 3px;
+							padding-left: 15px;
 						}
 
 							.info-card-tabs .nav-link {
@@ -722,6 +722,31 @@
 		margin-bottom: 0px;
 	}
 
+	#contribute-instructions-row {
+		margin-top: 15px;
+	}
+
+		#contribute-instructions-list {
+			font-size: 11pt;
+			font-weight: 300;
+		}
+
+			#contribute-instructions-list li {
+				margin-bottom: 20px;
+				padding-left: 5px;
+			}
+
+				#download-form-button {
+					background-color: #255FA7;
+					border-radius: 3px;
+					border: 1px solid #255FA7;
+					color: white;
+					font-weight: 300;
+					padding: 5px 10px;
+					margin-right: 5px;
+					font-size: 12pt;
+					cursor: pointer;
+				}
+
 	#dropzone-row {
-		margin-top: 20px;
 	}

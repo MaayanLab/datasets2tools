@@ -10,7 +10,8 @@ from flask_dropzone import Dropzone
 from StringIO import StringIO
 from flask_sqlalchemy import SQLAlchemy
 sys.path.append('static/py')
-import API
+from upload_API import *
+from search_API import *
 from sqlalchemy.orm import sessionmaker
 
 # Configure
@@ -25,6 +26,8 @@ entry_point = '/datasets2tools'
 dropzone = Dropzone(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:MyNewPass@localhost/datasets2tools'
 engine = SQLAlchemy(app).engine
+metadata = MetaData()
+metadata.reflect(bind=engine)
 Session = sessionmaker(bind=engine)
 
 # Lists
@@ -100,6 +103,9 @@ def landing(object_type, object_identifier):
 	if object_type == 'dataset':
 		landing_data = {'dataset': datasets['search_results'][0], 'canned_analyses': canned_analyses, 'tools': tools}
 	elif object_type == 'tool':
+		table = Table('tool', MetaData(), autoload=True, autoload_with=engine)
+		tool_data = engine.execute(table.select().where(table.columns['tool_name'] == object_identifier)).fetchall()
+		print tool_data
 		landing_data = {'datasets': datasets, 'canned_analyses': canned_analyses, 'tool': tools['search_results'][0]}
 	elif object_type == 'canned_analysis':
 		landing_data = {'datasets': datasets, 'canned_analysis': canned_analyses['search_results'][0], 'tools': tools}
@@ -134,7 +140,7 @@ def upload_analysis_api():
 	print 'uploading...'
 	canned_analysis_dataframe = pd.read_table(StringIO(request.files['file'].read()))
 	session = Session()
-	upload_results = API.upload_analyses(canned_analysis_dataframe, engine, session)
+	upload_results = upload_analyses(canned_analysis_dataframe, engine, session)
 	session.commit()
 	return upload_results
 

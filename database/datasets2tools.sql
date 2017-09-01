@@ -6,7 +6,7 @@ USE `datasets2tools`;
 
 CREATE TABLE repository (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
-	`repository_name` VARCHAR(50) UNIQUE,
+	`repository_name` VARCHAR(50) UNIQUE NOT NULL,
 	`repository_homepage_url` TEXT,
 	`repository_icon_url` TEXT
 );
@@ -20,7 +20,7 @@ CREATE TABLE dataset_type (
 CREATE TABLE dataset (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`repository_fk` INT,
-	`dataset_accession` VARCHAR(30) UNIQUE,
+	`dataset_accession` VARCHAR(30) UNIQUE NOT NULL,
 	`dataset_title` VARCHAR(255),
 	`dataset_description` TEXT,
 	`dataset_type_fk` INT,
@@ -41,7 +41,7 @@ CREATE TABLE related_dataset (
 
 CREATE TABLE tool (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
-	`tool_name` VARCHAR(100) UNIQUE,
+	`tool_name` VARCHAR(100) UNIQUE NOT NULL,
 	`tool_description` TEXT,
 	`tool_homepage_url` TEXT,
 	`tool_icon_url` TEXT
@@ -60,7 +60,7 @@ CREATE TABLE related_tool (
 
 CREATE TABLE journal (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
-	`journal_name` VARCHAR(50) UNIQUE,
+	`journal_name` VARCHAR(50) UNIQUE NOT NULL,
 	`journal_description` TEXT,
 	`journal_homepage_url` TEXT
 );
@@ -73,7 +73,7 @@ CREATE TABLE article (
 	`abstract` TEXT,
 	`authors` TEXT,
 	`date` DATE,
-	`doi` VARCHAR(255) UNIQUE,
+	`doi` VARCHAR(255) UNIQUE NOT NULL,
 	FOREIGN KEY (journal_fk) REFERENCES journal(id),
 	FOREIGN KEY (tool_fk) REFERENCES tool(id)
 );
@@ -84,7 +84,7 @@ CREATE TABLE canned_analysis (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`canned_analysis_title` VARCHAR(255),
 	`canned_analysis_description` TEXT,
-	`canned_analysis_url` VARCHAR(255) UNIQUE,
+	`canned_analysis_url` VARCHAR(255) UNIQUE NOT NULL,
 	`canned_analysis_preview_url` TEXT
 );
 
@@ -115,7 +115,7 @@ CREATE TABLE analysis_to_tool (
 
 CREATE TABLE term (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
-	`term_name` VARCHAR(50) UNIQUE,
+	`term_name` VARCHAR(50) UNIQUE NOT NULL,
 	`term_description` TEXT
 );
 
@@ -145,8 +145,8 @@ CREATE TABLE keywords (
 
 CREATE TABLE user (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
-	`username` VARCHAR(50) UNIQUE,
-	`email` VARCHAR(50) UNIQUE,
+	`username` VARCHAR(50) UNIQUE NOT NULL,
+	`email` VARCHAR(50) UNIQUE NOT NULL,
 	`password` VARCHAR(80)
 );
 

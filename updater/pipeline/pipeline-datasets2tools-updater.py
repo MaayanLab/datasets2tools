@@ -214,8 +214,6 @@ def getArticleSimilarity(infiles, outfile):
 ########## 5. Get article metrics
 #############################################
 
-# @follows(getArticleSimilarity)
-
 @follows(mkdir('05-article_metrics'))
 
 @merge(getArticles,
@@ -237,8 +235,6 @@ def getArticleMetrics(infiles, outfile):
 #############################################
 ########## 6. Tool Similarity
 #############################################
-
-# @follows(getArticleSimilarity)
 
 @follows(mkdir('06-tool_similarity'))
 
@@ -271,8 +267,6 @@ def getToolSimilarity(infiles, outfile):
 #############################################
 ########## 7. Upload Data
 #############################################
-
-# @follows(getToolSimilarity)
 
 @follows(mkdir('07-upload_data'))
 
