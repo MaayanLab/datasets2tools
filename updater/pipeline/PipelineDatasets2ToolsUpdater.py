@@ -69,7 +69,7 @@ def process_text(text):
 #    processed_text = [(word.lower(), penn_to_wn_tags(pos_tag)) for word, pos_tag in tag(" ".join(processed_text))]        
     
     # Check if exists
-    processed_text = [x for x in processed_text if nltk.corpus.wordnet.synsets(x)]
+    # processed_text = [x for x in processed_text if nltk.corpus.wordnet.synsets(x)]
     
     # Join
     processed_text = " ".join(processed_text)
@@ -95,12 +95,12 @@ def extract_text_similarity_and_keywords(processed_texts, labels, n_keywords=5, 
 
     # Feature dataframe
     feature_dataframe = pd.DataFrame(tfidf_matrix.todense(), index=labels, columns=tfidf_vectorizer.get_feature_names())
-    print feature_dataframe.head().reset_index()
+    
     # Melt
-    feature_dataframe_melted = pd.melt(feature_dataframe.reset_index().rename(columns={'level_0': identifier}), id_vars=identifier, var_name='word', value_name='importance')
+    feature_dataframe_melted = pd.melt(feature_dataframe.reset_index().rename(columns={'level_0': identifier}), id_vars=identifier, var_name='keyword', value_name='importance')
 
-    # Get top keywords dataframe
-    keyword_dataframe = feature_dataframe_melted.groupby(identifier)['word','importance'].apply(lambda x: x.nlargest(n_keywords, columns=['importance'])).reset_index().set_index(identifier).drop_duplicates().drop(['level_1', 'importance'], axis=1)
+    # Get keywords dataframe .loc[[nltk.corpus.wordnet.synsets(x) for x in feature_dataframe_melted['keyword']]]
+    keyword_dataframe = feature_dataframe_melted.dropna().groupby(identifier)['keyword','importance'].apply(lambda x: x.nlargest(n_keywords, columns=['importance'])).reset_index().set_index(identifier).drop_duplicates().drop(['level_1', 'importance'], axis=1)
 
     # Return
     return similarity_dataframe, keyword_dataframe

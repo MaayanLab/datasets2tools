@@ -43,6 +43,7 @@ def get_object_data(object_id, object_type, session, metadata, get_related=True)
 
 		# Perform article query
 		article_query = session.query(metadata.tables['article'], metadata.tables['journal']).join(metadata.tables['journal']).filter(metadata.tables['article'].columns['tool_fk'] == object_id).all()
+		print article_query
 
 		# Get article data
 		object_data['articles'] = [x._asdict() for x in article_query]
@@ -57,7 +58,7 @@ def get_object_data(object_id, object_type, session, metadata, get_related=True)
 		pass
 
 	# Perform keyword query
-	keyword_query = session.query(metadata.tables['keywords'].columns['keyword']).filter(metadata.tables['article'].columns[object_type+'_fk'] == object_id).all()
+	keyword_query = session.query(metadata.tables['keyword'].columns['keyword']).filter(metadata.tables['keyword'].columns[object_type+'_fk'] == object_id).all()
 	
 	# Get keyword data
 	object_data['keywords'] = [x[0] for x in keyword_query]

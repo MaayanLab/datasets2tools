@@ -230,6 +230,7 @@
 
 						.keyword:hover, .keyword:focus {
 							color: white;
+							text-decoration: none;
 						}
 
 				#general-info {
@@ -303,20 +304,15 @@
 									.info-card-publication-abstract-section-text {
 									}
 
-							.info-card-publication-keywords {
-								font-size: 9pt;
-								padding-top: 9px;
-								padding-bottom: 9px;
-								font-style: italic;
-							}
-
 							.info-card-publication-doi {
 								font-size: 9pt;
 								font-style: italic;
+								font-weight: 600;
 							}
 
 								.info-card-publication-doi a {
 									font-style: normal;
+									font-weight: 400;
 								}
 
 				#related-object-info {
@@ -354,7 +350,7 @@
 							}
 							
 								#related-object-row .slick-dots li button:before {
-									font-size: 9pt;
+									/*font-size: 9pt;*/
 								}
 
 		#datasets {

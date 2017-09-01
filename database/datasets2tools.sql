@@ -19,7 +19,7 @@ CREATE TABLE dataset_type (
 
 CREATE TABLE dataset (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
-	`repository_fk` INT,
+	`repository_fk` INT DEFAULT 3,
 	`dataset_type_fk` INT,
 	`dataset_accession` VARCHAR(30) UNIQUE NOT NULL,
 	`dataset_title` VARCHAR(255),
@@ -131,7 +131,7 @@ CREATE TABLE canned_analysis_metadata (
 
 ### Keywords
 
-CREATE TABLE keywords (
+CREATE TABLE keyword (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`dataset_fk` INT DEFAULT NULL,
 	`tool_fk` INT DEFAULT NULL,
@@ -150,4 +150,19 @@ CREATE TABLE user (
 	`email` VARCHAR(50) UNIQUE NOT NULL,
 	`password` VARCHAR(80)
 );
+
+### Add Data
+
+# Repositories
+INSERT INTO repository (repository_name, repository_homepage_url, repository_icon_url) VALUES
+	('Gene Expression Omnibus', 'https://www.ncbi.nlm.nih.gov/geo/', 'https://www.ncbi.nlm.nih.gov/geo/img/geo_main.gif'),
+	('LINCS Data Portal', 'http://lincsportal.ccs.miami.edu/dcic-portal/', 'http://lincsportal.ccs.miami.edu/dcic-portal/images/ldp_logo.png'),
+	('Unspecified', '#', '#');
+
+# Journals
+INSERT INTO journal (journal_name) VALUES
+	('Bioinformatics'),
+	('Database'),
+	('Nucleic Acids Research'),
+	('BMC Bioinformatics');
 

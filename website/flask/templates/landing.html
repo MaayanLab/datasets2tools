@@ -122,7 +122,7 @@
 							<tr>
 						{% elif object_type == 'tool' %}
 							<tr><td>Description</td><td>{{ landing_data[object_type]['tool_description'] }}</td></tr>
-							<tr><td>Homepage</td><td><a href="tool_homepage_url">{{ landing_data[object_type]['tool_homepage_url'] }}</a></td></tr>
+							<tr><td>Homepage</td><td><a href="{{ landing_data[object_type]['tool_homepage_url'] }}">{{ landing_data[object_type]['tool_homepage_url'] }}</a></td></tr>
 						{% elif object_type == 'canned_analysis' %}
 							<tr><td>Title</td><td>{{ landing_data[object_type]['canned_analysis_title'] }}</td></tr>
 							<tr><td>Description</td><td>{{ landing_data[object_type]['canned_analysis_description'] }}</td></tr>
@@ -156,14 +156,13 @@
 										<div class="info-card-publication-abstract">
 											{% for section_title, section_text in publication['abstract']['abstract'] %}
 												<div class="info-card-publication-abstract-section">
-													{% if section_title != '' %}
+													{% if section_title and section_title != '' %}
 														<span class="info-card-publication-abstract-section-title">{{ section_title }}</span>
 													{% endif %}
 													<span class="info-card-publication-abstract-section-text">{{ section_text }}</span>
 												</div>
 											{% endfor %}
 										</div>
-										<div class="info-card-publication-keywords">Keywords: {% for keyword in publication['keywords'] %}<span class="keyword">{{keyword}}</span>{% endfor %}</div>
 										<div class="info-card-publication-doi">DOI: <a href="{{ publication['doi'] }}">{{ publication['doi'] }}</a></div>
 									</div>
 								</div>
