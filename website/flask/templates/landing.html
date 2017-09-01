@@ -13,12 +13,13 @@
 		<div id="object-overview" class="row">
 			<div id="object-icon-col" class="{{ 'col-2' if object_type == 'tool' else 'col-3' }}">
 				{% if object_type == 'dataset' %}
-					<img id="object-icon" src="{{ url_for('static', filename='icons/gene.png') }}">
+					{% set image_url = url_for('static', filename='icons/gene.png') %}
 				{% elif object_type == 'tool' %}
-					<img id="object-icon" class='tool' src="{{ landing_data.tool.tool_icon_url }}">
+					{% set image_url = landing_data.tool.tool_icon_url if landing_data.tool.tool_icon_url else url_for('static', filename='icons/tool.png') %}
 				{% elif object_type == 'canned_analysis' %}
-					<img id="object-icon" src="{{ landing_data.canned_analysis.canned_analysis_preview_url }}">
+					{% set image_url = landing_data.canned_analysis.canned_analysis_preview_url if landing_data.canned_analysis.canned_analysis_preview_url else url_for('static', filename='icons/analysis.png') %}
 				{% endif %}
+				<img id="object-icon" class="{{ object_type }}-icon" src="{{ image_url }}">
 			</div>
 			<div id="object-info-col" class="{{ 'col-6' if object_type == 'tool' else 'col-5' }}">
 				<div class="row">

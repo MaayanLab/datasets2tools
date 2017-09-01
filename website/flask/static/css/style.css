@@ -24,11 +24,14 @@
 			#object-icon {
 				width: 100%;
 				margin: auto;
-				padding: 20px;
 			}
 
-				#object-icon.tool {
-					padding: 5px;
+				#object-icon.tool-icon {
+					padding: 0px;
+				}
+
+				#object-icon.dataset-icon {
+					padding: 20px;
 				}
 
 		#object-info-col {

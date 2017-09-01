@@ -21,68 +21,79 @@
 		    border-radius: .2rem;
 		}
 
-			.card-icon-col {
-				padding: 0.5rem 0.7rem;
-				text-align: center;
-				margin: auto;
+			.card-wrapper-row {
+				height: 100%;
 			}
 
-				.card-icon {
-					width: 100%;
+				.card-icon-col {
+					padding: 0.5rem 0.7rem;
+					text-align: center;
 					margin: auto;
 				}
 
-			.card-info-col {
-				padding: 0.5rem 0.2rem 0.5rem 0.1rem;
-			}
-
-				.card-title {
-					font-size: 9pt;
-					color: darkblue;
-					font-weight: 600;
-					display: block;
-					margin-bottom: 0px;
-				}
-
-					.card-title:hover {
-						color: darkblue;
+					.card-icon {
+						width: 100%;
+						margin: auto;
 					}
 
-				.card-source {
-					font-size: 7pt;
-					margin-top: 3px;
-					margin-bottom: 5px;
-					color: darkblue;
-					display: block
+				.card-info-col {
+					padding: 0.3rem 0.2rem 0.3rem 0.1rem;
 				}
 
-				.tool-metrics {
-					font-size: 7pt;
-					font-style: italic;
-					margin-top: 1px;
-					margin-bottom: 5px;
-					color: #757575;
-				}
+					.card-title {
+						font-size: 9pt;
+						color: darkblue;
+						font-weight: 600;
+						display: block;
+						margin-bottom: 0px;
+					}
 
-				.card-description {
-					font-size: 7pt;
-					margin-bottom: 3px;
-					color: black;
-					font-weight: 400;
-				}
+						.card-title:hover {
+							color: darkblue;
+						}
 
-				.card-description-tooltip {
-					font-size: 8pt;
-					padding: 7px 15px;
-					text-align: justify;
-					max-width: 300px;
-				}
+					.card-source {
+						font-size: 7pt;
+						margin-top: 3px;
+						margin-bottom: 5px;
+						color: darkblue;
+						display: block
+					}
 
-				.card-info-icon {
-					color: #757575;
-					position: absolute;
-					right: 0.5rem;
-					bottom: 0rem;
-					font-size: 10pt;
-				}
+					.tool-metrics {
+						font-size: 7pt;
+						font-style: italic;
+						margin-top: 1px;
+						margin-bottom: 5px;
+						color: #757575;
+					}
 
+					.card-description {
+						font-size: 7pt;
+						margin-bottom: 3px;
+						color: black;
+						font-weight: 400;
+					}
+
+					.card-description-tooltip {
+						font-size: 8pt;
+						padding: 7px 15px;
+						text-align: justify;
+						max-width: 300px;
+					}
+
+					.card-info-icon {
+						color: #757575;
+						position: absolute;
+						right: 0.5rem;
+						bottom: 0rem;
+						font-size: 10pt;
+					}
+
+/*************************/
+/** SPECIFIC CARDs
+/*************************/
+
+.tool-card {
+	height: 130px;
+}
