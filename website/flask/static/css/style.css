@@ -292,7 +292,6 @@
 							}
 
 								.info-card-publication-abstract-section {
-									font-size: 9pt;
 									margin-bottom: 5px;
 								}
 	
@@ -302,7 +301,6 @@
 									}
 
 									.info-card-publication-abstract-section-text {
-										font-size: 9pt;
 									}
 
 							.info-card-publication-keywords {
@@ -328,6 +326,36 @@
 					#related-object-row {
 						padding: 10px 25px;
 					}
+
+						#related-object-row .slick-arrow::before {
+						    color: black;
+						    font-family: "FontAwesome";
+						}
+
+						#related-object-row .slick-prev {
+							    left: 15px;
+						}
+
+							#related-object-row .slick-prev::before {
+								content: "\f104";
+							}
+
+						#related-object-row .slick-next {
+						    right: 17px;
+						}
+						
+							#related-object-row .slick-next::before {
+								content: "\f105";
+							}
+
+							#related-object-row .slick-dots {
+								margin-left: -25px;
+								bottom: -15px;
+							}
+							
+								#related-object-row .slick-dots li button:before {
+									font-size: 9pt;
+								}
 
 		#datasets {
 

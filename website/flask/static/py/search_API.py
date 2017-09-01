@@ -42,10 +42,16 @@ def get_object_data(object_id, object_type, session, metadata):
 		object_data = {key: value for key, value in zip(metadata.tables[object_type].columns.keys(), tool_query.all()[0])}
 
 		# Perform article query
-		article_query = session.query(metadata.tables['article']).filter(metadata.tables['article'].columns['tool_fk'] == object_id)
+		article_query = session.query(metadata.tables['article'], metadata.tables['journal']).join(metadata.tables['journal']).filter(metadata.tables['article'].columns['tool_fk'] == object_id).all()
 
 		# Get article data
-		object_data['articles'] = [{key: value if key != 'abstract' else json.loads(value) for key, value in zip(metadata.tables['article'].columns.keys(), query_result)} for query_result in article_query.all()]
+		object_data['articles'] = [x._asdict() for x in article_query]
+
+		# Loop through articles
+		for i in range(len(object_data['articles'])):
+
+			# Convert to dict
+			object_data['articles'][i]['abstract'] = json.loads(object_data['articles'][i]['abstract'])
 
 	elif object_type == 'canned_analysis':
 		pass
@@ -74,7 +80,6 @@ def get_related_objects(object_id, object_type, session, metadata):
 	related_object_query = session.query(metadata.tables['related_'+object_type].columns['_'.join(['target', object_type,'fk'])]).filter(metadata.tables['related_'+object_type].columns['_'.join(['source', object_type,'fk'])] == object_id)
 
 	# Get ids
-	print related_object_query.all()
 	related_object_data = [get_object_data(x[0], object_type, session, metadata) for x in related_object_query.all()]
 
 	# Return

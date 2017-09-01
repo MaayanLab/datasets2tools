@@ -4,6 +4,8 @@
 {% block head %}
 
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/chosen.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/slick.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/slick-theme.css') }}">
 
 {% endblock %}
 
@@ -262,6 +264,7 @@
 
 
 {% block footer %}
+    <script src="{{ url_for('static', filename='js/slick.js') }}"></script>
     <script src="{{ url_for('static', filename='js/chosen.jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/chosen.proto.min.js') }}"></script>
 	<script src="https://d3js.org/d3.v4.min.js"></script>
@@ -302,6 +305,11 @@
 		});
 		$('.landing-search-form').change(function(evt){
 			$(evt.target).parents('.landing-search-form').submit();
+		});
+		$('#related-object-row').slick({
+			slidesToShow: 3,
+			arrows: true,
+			dots: true
 		});
 	</script>
 
