@@ -105,7 +105,6 @@ def landing(object_type, object_identifier):
 		landing_data = {'dataset': datasets['search_results'][0],'canned_analyses': canned_analyses, 'tools': tools}
 	elif object_type == 'tool':
 		object_data = search_database({'tool_name': object_identifier}, object_type, session, metadata)
-		object_data['related_objects'] = get_related_objects(object_data['id'], object_type, session, metadata)
 		landing_data = {'datasets': datasets, 'canned_analyses': canned_analyses, 'tool': object_data}
 	elif object_type == 'canned_analysis':
 		landing_data = {'datasets': datasets, 'canned_analysis': canned_analyses['search_results'][0], 'tools': tools}

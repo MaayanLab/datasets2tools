@@ -27,7 +27,7 @@ def process_query(query_dict, object_type, session, metadata):
 	return ids
 
 
-def get_object_data(object_id, object_type, session, metadata):
+def get_object_data(object_id, object_type, session, metadata, get_related=True):
 
 	# Dataset
 	if object_type == 'dataset':
@@ -56,9 +56,23 @@ def get_object_data(object_id, object_type, session, metadata):
 	elif object_type == 'canned_analysis':
 		pass
 
+	# Perform keyword query
+	keyword_query = session.query(metadata.tables['keywords'].columns['keyword']).filter(metadata.tables['article'].columns[object_type+'_fk'] == object_id).all()
+	
+	# Get keyword data
+	object_data['keywords'] = [x[0] for x in keyword_query]
+
+	# Get related objects
+	if get_related:
+
+		# Perform related object query
+		related_object_query = session.query(metadata.tables['related_'+object_type].columns['_'.join(['target', object_type,'fk'])]).filter(metadata.tables['related_'+object_type].columns['_'.join(['source', object_type,'fk'])] == object_id)
+
+		# Get ids
+		object_data['related_objects'] = [get_object_data(x[0], object_type, session, metadata, get_related=False) for x in related_object_query.all()]
+
 	# Return
 	return object_data
-
 
 def search_database(query, object_type, session, metadata):
 
@@ -73,15 +87,3 @@ def search_database(query, object_type, session, metadata):
 
 	# Return
 	return search_results
-
-def get_related_objects(object_id, object_type, session, metadata):
-
-	# Perform related object query
-	related_object_query = session.query(metadata.tables['related_'+object_type].columns['_'.join(['target', object_type,'fk'])]).filter(metadata.tables['related_'+object_type].columns['_'.join(['source', object_type,'fk'])] == object_id)
-
-	# Get ids
-	related_object_data = [get_object_data(x[0], object_type, session, metadata) for x in related_object_query.all()]
-
-	# Return
-	return related_object_data
-
