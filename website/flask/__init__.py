@@ -102,15 +102,24 @@ def index():
 def landing(object_type, object_identifier):
 	session = Session()
 	if object_type == 'dataset':
-		object_data = search_database({'dataset_accession': object_identifier}, object_type, session, metadata)
-		print object_data
-		landing_data = {'dataset': object_data,'canned_analyses': canned_analyses, 'tools': tools}
+		landing_data = {
+			'dataset': search_database({'dataset_accession': object_identifier}, object_type, session, metadata, get_related=True)[0],
+			'canned_analyses': {'search_filters': canned_analyses['search_filters'], 'count': 1, 'search_results': search_database({'dataset_accession': object_identifier}, 'canned_analysis', session, metadata)},
+			'tools': {'search_filters': tools['search_filters'], 'count': 1, 'search_results': search_database({'dataset_accession': object_identifier}, 'tool', session, metadata)}
+		}
 	elif object_type == 'tool':
-		object_data = search_database({'tool_name': object_identifier}, object_type, session, metadata)
-		print object_data
-		landing_data = {'datasets': datasets, 'canned_analyses': canned_analyses, 'tool': object_data}
+		landing_data = {
+			'datasets': {'search_filters': tools['search_filters'], 'count': 1, 'search_results': search_database({'tool_name': object_identifier}, 'dataset', session, metadata)},
+			'canned_analyses': {'search_filters': canned_analyses['search_filters'], 'count': 1, 'search_results': search_database({'tool_name': object_identifier}, 'canned_analysis', session, metadata)},
+			'tool': search_database({'tool_name': object_identifier}, object_type, session, metadata, get_related=True)[0]
+		}
+		print landing_data['datasets']['search_results']
 	elif object_type == 'canned_analysis':
-		landing_data = {'datasets': datasets, 'canned_analysis': canned_analyses['search_results'][0], 'tools': tools}
+		landing_data = {
+			'datasets': {'search_filters': datasets['search_filters'], 'count': 1, 'search_results': search_database({'canned_analysis_fk': 1}, 'dataset', session, metadata)},
+			'canned_analysis': search_database({'id': 1}, object_type, session, metadata, get_related=True)[0],
+			'tools': {'search_filters': tools['search_filters'], 'count': 1, 'search_results': search_database({'canned_analysis_fk': 1}, 'tool', session, metadata)}
+		}
 	else:
 		abort(404)
 	offset = request.args.get('offset', default=1, type=int)

@@ -49,7 +49,7 @@ def upload_analyses(canned_analysis_dataframe, engine, session):
 	for object_type in ['dataset', 'tool']:
 		
 		# Get table object
-		table = Table(object_type, MetaData(), autoload=True, autoload_with=engine)
+		table = Table('analysis_to_'+object_type, MetaData(), autoload=True, autoload_with=engine)
 		
 		# Upload
 		engine.execute(table.insert().prefix_with('IGNORE'), fk_conversion_dataframe[['canned_analysis_fk', object_type+'_fk']].to_dict(orient='records'))

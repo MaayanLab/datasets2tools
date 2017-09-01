@@ -118,7 +118,6 @@
 							<tr><td>Description</td><td>{{ landing_data[object_type]['dataset_description'] }}</td></tr>
 							<tr><td>Landing Page</td><td><a href="{{ landing_data[object_type]['dataset_landing_url'] }}">{{ landing_data[object_type]['dataset_landing_url'] }}</a></td></tr>
 							<tr><td>Repository</td><td><a href="{{ landing_data[object_type]['repository_homepage_url'] }}">{{ landing_data[object_type]['repository_name'] }}</a></td></tr>
-							<tr><td>Upload Date</td><td>{{ landing_data[object_type]['date'] }}</td></tr>
 							<tr>
 						{% elif object_type == 'tool' %}
 							<tr><td>Description</td><td>{{ landing_data[object_type]['tool_description'] }}</td></tr>
@@ -306,7 +305,7 @@
 			$(evt.target).parents('.landing-search-form').submit();
 		});
 		$('#related-object-row').slick({
-			slidesToShow: {{ 2 if object_type == 'dataset' else 3 }},
+			slidesToShow: {{ 3 if object_type == 'tool' else 2 }},
 			arrows: true,
 			dots: true
 		});
