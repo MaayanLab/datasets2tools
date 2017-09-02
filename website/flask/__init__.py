@@ -99,23 +99,24 @@ def index():
 @app.route(entry_point+'/landing/<object_type>/<object_identifier>')
 def landing(object_type, object_identifier):
 	session = Session()
+	search_options_dict = {'object_type': object_type}
 	if object_type == 'dataset':
 		landing_data = {
-			'dataset': search_database({'dataset_accession': object_identifier}, object_type, session, metadata, get_related=True)[0],
-			'canned_analyses': {'search_filters': canned_analyses['search_filters'], 'count': 1, 'search_results': search_database({'dataset_accession': object_identifier}, 'canned_analysis', session, metadata)},
-			'tools': {'search_filters': tools['search_filters'], 'count': 1, 'search_results': search_database({'dataset_accession': object_identifier}, 'tool', session, metadata)}
+			'dataset': search_database({'dataset_accession': object_identifier}, {'object_type': 'dataset'}, session, metadata, get_related=True)[0],
+			'canned_analyses': {'search_filters': canned_analyses['search_filters'], 'count': 1, 'search_results': search_database({'dataset_accession': object_identifier}, {'object_type': 'canned_analysis'}, session, metadata)},
+			'tools': {'search_filters': tools['search_filters'], 'count': 1, 'search_results': search_database({'dataset_accession': object_identifier}, {'object_type': 'tool'}, session, metadata)}
 		}
 	elif object_type == 'tool':
 		landing_data = {
-			'datasets': {'search_filters': tools['search_filters'], 'count': 1, 'search_results': search_database({'tool_name': object_identifier}, 'dataset', session, metadata)},
-			'canned_analyses': {'search_filters': canned_analyses['search_filters'], 'count': 1, 'search_results': search_database({'tool_name': object_identifier}, 'canned_analysis', session, metadata)},
-			'tool': search_database({'tool_name': object_identifier}, object_type, session, metadata, get_related=True)[0]
+			'datasets': {'search_filters': tools['search_filters'], 'count': 1, 'search_results': search_database({'tool_name': object_identifier}, {'object_type': 'dataset'}, session, metadata)},
+			'canned_analyses': {'search_filters': canned_analyses['search_filters'], 'count': 1, 'search_results': search_database({'tool_name': object_identifier}, {'object_type': 'canned_analysis'}, session, metadata)},
+			'tool': search_database({'tool_name': object_identifier}, {'object_type': 'tool'}, session, metadata, get_related=True)[0]
 		}
 	elif object_type == 'canned_analysis':
 		landing_data = {
-			'datasets': {'search_filters': datasets['search_filters'], 'count': 1, 'search_results': search_database({'canned_analysis_fk': 1}, 'dataset', session, metadata)},
-			'canned_analysis': search_database({'id': 1}, object_type, session, metadata, get_related=True)[0],
-			'tools': {'search_filters': tools['search_filters'], 'count': 1, 'search_results': search_database({'canned_analysis_fk': 1}, 'tool', session, metadata)}
+			'datasets': {'search_filters': datasets['search_filters'], 'count': 1, 'search_results': search_database({'canned_analysis_fk': 1}, {'object_type': 'dataset'}, session, metadata)},
+			'canned_analysis': search_database({'id': 1}, {'object_type': 'canned_analysis'}, session, metadata, get_related=True)[0],
+			'tools': {'search_filters': tools['search_filters'], 'count': 1, 'search_results': search_database({'canned_analysis_fk': 1}, {'object_type': 'tool'}, session, metadata)}
 		}
 	else:
 		abort(404)
