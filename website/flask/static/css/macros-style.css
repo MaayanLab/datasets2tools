@@ -46,7 +46,7 @@
 						font-weight: 600;
 						display: block;
 						margin-bottom: 0px;
-						word-break: break-all;
+						/*word-break: break-all;*/
 					}
 
 						.card-title:hover {

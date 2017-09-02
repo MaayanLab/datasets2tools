@@ -16,7 +16,7 @@ from sqlalchemy.orm import sessionmaker
 
 # Configure
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:MyNewPass@localhost/datasets2tools'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:MyNewPass@localhost/datasets2tools?charset=utf8'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'Thisissupposedtobesecret!'
 app.config['DROPZONE_MAX_FILE_SIZE'] = 10
@@ -24,8 +24,6 @@ db = SQLAlchemy(app)
 engine = db.engine
 entry_point = '/datasets2tools'
 dropzone = Dropzone(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:MyNewPass@localhost/datasets2tools'
-engine = SQLAlchemy(app).engine
 metadata = MetaData()
 metadata.reflect(bind=engine)
 Session = sessionmaker(bind=engine)
@@ -131,23 +129,22 @@ def landing(object_type, object_identifier):
 @app.route(entry_point+'/search')
 def search():
 	session=Session()
-	object_type = request.args.get('object_type', default='canned_analysis', type=str)
-	query_dict = request.args.to_dict()
-	[query_dict.pop(x) for x in ['object_type', 'sort_by', 'offset', 'page_size'] if x in query_dict.keys()]
-	# search_parameters = {
-	# 	# 'offset': request.args.get('offset', default=1, type=int)
-	# 	# 'page_size': request.args.get('page_size', default=10, type=int)
-	# 	# 'sort_by': request.args.get('sort_by', default='relevance', type=str)
-	# }
-	if object_type=='canned_analysis':
+	search_options_dict = {
+		'offset': request.args.get('offset', default=1, type=int),
+		'page_size': request.args.get('page_size', default=10, type=int),
+		'sort_by': request.args.get('sort_by', default='relevance', type=str),
+		'object_type': request.args.get('object_type', default='canned_analysis', type=str)
+	}
+	query_dict = {key:value for key, value in request.args.to_dict().iteritems() if key not in search_options_dict.keys()}
+	if search_options_dict['object_type']=='canned_analysis':
 		search_data=canned_analyses
-	elif object_type=='dataset':
+	elif search_options_dict['object_type']=='dataset':
 		search_data=datasets
-	elif object_type=='tool':
+	elif search_options_dict['object_type']=='tool':
 		search_data=tools
-	search_data['search_results'] = search_database(query_dict, object_type, session, metadata, get_related=False)
+	search_data['search_results'] = search_database(query_dict, search_options_dict, session, metadata, get_related=False)
 	session.close()
-	return render_template('search.html', search_data=search_data, object_type=object_type, offset=1, page_size=10, sort_by='relevance')
+	return render_template('search.html', search_data=search_data, object_type=search_options_dict['object_type'], search_options_dict=search_options_dict, offset=1, page_size=10, sort_by='relevance')
 
 @app.route(entry_point+'/contribute')
 def contribute():
@@ -165,7 +162,7 @@ def testsearch():
 @app.route(entry_point+'/api/upload/analysis', methods=['POST'])
 def upload_analysis_api():
 	print 'uploading...'
-	canned_analysis_dataframe = pd.read_table(StringIO(request.files['file'].read()))
+	canned_analysis_dataframe = pd.read_table(StringIO(request.files['file'].read())).dropna()
 	session = Session()
 	upload_results = upload_analyses(canned_analysis_dataframe, engine, session)
 	session.commit()

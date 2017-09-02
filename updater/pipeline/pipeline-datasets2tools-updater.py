@@ -249,12 +249,12 @@ def getArticleMetrics(infiles, outfile):
 ########## 6. Tool Similarity
 #############################################
 
-@follows(mkdir('06-tool_similarity'))
+@follows(mkdir('06-related_tools'))
 
 @merge([getTools, getArticleSimilarity],
-	   '06-tool_similarity/tool_similarity.txt')
+	   '06-related_tools/related_tools.txt')
 
-def getToolSimilarity(infiles, outfile):
+def getRelatedTools(infiles, outfile):
 
 	# Get similarity infile
 	similarityInfile = infiles.pop()
@@ -276,9 +276,12 @@ def getToolSimilarity(infiles, outfile):
 
 	# Remove 0
 	# melted_tool_similarity_dataframe = melted_tool_similarity_dataframe.loc[[x > 0 for x in melted_tool_similarity_dataframe['similarity']]]
+	
+	# Get related tools
+	related_tool_dataframe = melted_tool_similarity_dataframe.groupby(['source_tool_name'])['target_tool_name','similarity'].apply(lambda x: x.nlargest(10, columns=['similarity'])).reset_index().drop('level_1', axis=1)
 
 	# Write
-	melted_tool_similarity_dataframe.to_csv(outfile, sep='\t', index=False)
+	related_tool_dataframe.to_csv(outfile, sep='\t', index=False)
 
 #############################################
 ########## 7. Upload Tool Data
@@ -290,7 +293,7 @@ def getToolSimilarity(infiles, outfile):
 		'''
 
 @follows(mkdir('07-upload_tool_data'))
-@files([[getArticles], [getTools], '04-article_similarity/article_keywords.txt', getArticleMetrics, getToolSimilarity],
+@files([[getArticles], [getTools], '04-article_similarity/article_keywords.txt', getArticleMetrics, getRelatedTools],
 	   '07-upload_tool_data/upload_tool_data.txt')
 
 def uploadToolData(infiles, outfile):
@@ -304,24 +307,21 @@ def uploadToolData(infiles, outfile):
 	# Get tool dataframe
 	tool_dataframe =  pd.concat([pd.read_table(x) for x in toolFiles])
 
-	# Create session
-	session = Session()
-
 	# Upload and get IDs of tools 
 	tool_id_dataframe = P.upload_and_get_ids(tool_dataframe, table_name='tool', engine=engine)
 
-	# Commit
-	session.commit()
-
 	# Prepare dataframes ready to upload
+	print 'Preparing dataframes...'
 	dataframes_ready_to_upload = {
 		'article': article_dataframe.merge(tool_dataframe[['doi', 'tool_name']], on='doi', how='left').merge(tool_id_dataframe, on='tool_name', how='left').drop('tool_name', axis=1).dropna(),
-		'related_tool': pd.read_table(similarityFile).groupby(['source_tool_name'])['target_tool_name','similarity'].apply(lambda x: x.nlargest(10, columns=['similarity'])).reset_index().drop('level_1', axis=1).merge(tool_id_dataframe, left_on='source_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'source_tool_fk'}).merge(tool_id_dataframe, left_on='target_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'target_tool_fk'})[['source_tool_fk', 'target_tool_fk', 'similarity']].dropna(),
+		# 'related_tool': pd.read_table(similarityFile).merge(tool_id_dataframe, left_on='source_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'source_tool_fk'}).merge(tool_id_dataframe, left_on='target_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'target_tool_fk'})[['source_tool_fk', 'target_tool_fk', 'similarity']].dropna(),
+		# 'related_tool': pd.read_table(similarityFile).groupby(['source_tool_name'])['target_tool_name','similarity'].apply(lambda x: x.nlargest(10, columns=['similarity'])).reset_index().drop('level_1', axis=1).merge(tool_id_dataframe, left_on='source_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'source_tool_fk'}).merge(tool_id_dataframe, left_on='target_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'target_tool_fk'})[['source_tool_fk', 'target_tool_fk', 'similarity']].dropna(),
 		'keyword': pd.read_table(keywordFile).merge(article_dataframe, on='doi', how='left').merge(tool_dataframe, on='doi', how='left').merge(tool_id_dataframe, on='tool_name', how='left')[['tool_fk', 'keyword']].dropna()
 	}
 
 	# Loop through prepared dataframes
 	for table_name, dataframe_ready_to_upload in dataframes_ready_to_upload.iteritems():
+		print 'Uploading '+table_name+'...'
 
 		# Upload
 		engine.execute('SET GLOBAL max_allowed_packet=1073741824;')
@@ -357,7 +357,7 @@ def annotateDatasets(outfile):
 
 	# Loop through datasets
 	for unannotated_dataset in unannotated_datasets_query:
-		
+		print unannotated_dataset
 		# Get annotation
 		dataset_annotation = json.loads(os.popen('python pipeline/annotate_dataset.py '+unannotated_dataset[0]).read())
 		

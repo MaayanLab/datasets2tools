@@ -388,7 +388,8 @@
 				}
 
 					.contribute-button {
-					    margin: 15px 0px;
+					    margin-top: 25px;
+					    margin-bottom: 10px;
 					    background-color: #255FA7;
 					    color: white;
 					    font-weight: 600;

@@ -58,13 +58,13 @@
 						<div id="search-number-card-row" class="row">
 							<div class="col-6 text-left">
 								{% for offset_option in [1,2,3] %}
-									<input type="radio" name="offset" id="{{object_type}}-offset-{{offset_option}}" value="{{offset_option}}"{{ ' checked' if offset_option == offset }}>
+									<input type="radio" name="offset" id="{{object_type}}-offset-{{offset_option}}" value="{{offset_option}}"{{ ' checked' if offset_option == search_options_dict.offset }}>
 									<label for="{{object_type}}-offset-{{offset_option}}" class="search-filter-number-card">{{offset_option}}</label>
 								{% endfor %}
 							</div>
 							<div class="col-6 text-right">
 								{% for page_size_option in [10,20,30] %}
-									<input type="radio" name="page_size" id="{{object_type}}-page-size-{{page_size_option}}" value="{{page_size_option}}"{{ ' checked' if page_size_option == page_size }}>
+									<input type="radio" name="page_size" id="{{object_type}}-page-size-{{page_size_option}}" value="{{page_size_option}}"{{ ' checked' if page_size_option == search_options_dict.page_size }}>
 									<label for="{{object_type}}-page-size-{{page_size_option}}" class="search-filter-number-card">{{page_size_option}}</label>
 								{% endfor %}
 								<span class="search-filter-number-label"> per page </span>
