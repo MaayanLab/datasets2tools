@@ -24,7 +24,6 @@ from sqlalchemy import Table, MetaData
 # Pipeline running
 sys.path.append('pipeline')
 import PipelineDatasets2ToolsUpdater as P
-from dataset_annotation import *
 
 #############################################
 ########## 2. General Setup
@@ -275,7 +274,7 @@ def getRelatedTools(infiles, outfile):
 	melted_tool_similarity_dataframe = pd.melt(tool_similarity_dataframe.reset_index('doi').rename(columns={'doi': 'source_tool_name'}), id_vars='source_tool_name', var_name='target_tool_name', value_name='similarity').dropna()
 
 	# Remove 0
-	# melted_tool_similarity_dataframe = melted_tool_similarity_dataframe.loc[[x > 0 for x in melted_tool_similarity_dataframe['similarity']]]
+	melted_tool_similarity_dataframe = melted_tool_similarity_dataframe.loc[[x > 0 for x in melted_tool_similarity_dataframe['similarity']]]
 	
 	# Get related tools
 	related_tool_dataframe = melted_tool_similarity_dataframe.groupby(['source_tool_name'])['target_tool_name','similarity'].apply(lambda x: x.nlargest(10, columns=['similarity'])).reset_index().drop('level_1', axis=1)
@@ -314,7 +313,7 @@ def uploadToolData(infiles, outfile):
 	print 'Preparing dataframes...'
 	dataframes_ready_to_upload = {
 		'article': article_dataframe.merge(tool_dataframe[['doi', 'tool_name']], on='doi', how='left').merge(tool_id_dataframe, on='tool_name', how='left').drop('tool_name', axis=1).dropna(),
-		# 'related_tool': pd.read_table(similarityFile).merge(tool_id_dataframe, left_on='source_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'source_tool_fk'}).merge(tool_id_dataframe, left_on='target_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'target_tool_fk'})[['source_tool_fk', 'target_tool_fk', 'similarity']].dropna(),
+		'related_tool': pd.read_table(similarityFile).merge(tool_id_dataframe, left_on='source_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'source_tool_fk'}).merge(tool_id_dataframe, left_on='target_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'target_tool_fk'})[['source_tool_fk', 'target_tool_fk', 'similarity']].dropna(),
 		# 'related_tool': pd.read_table(similarityFile).groupby(['source_tool_name'])['target_tool_name','similarity'].apply(lambda x: x.nlargest(10, columns=['similarity'])).reset_index().drop('level_1', axis=1).merge(tool_id_dataframe, left_on='source_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'source_tool_fk'}).merge(tool_id_dataframe, left_on='target_tool_name', right_on='tool_name', how='left').rename(columns={'tool_fk': 'target_tool_fk'})[['source_tool_fk', 'target_tool_fk', 'similarity']].dropna(),
 		'keyword': pd.read_table(keywordFile).merge(article_dataframe, on='doi', how='left').merge(tool_dataframe, on='doi', how='left').merge(tool_id_dataframe, on='tool_name', how='left')[['tool_fk', 'keyword']].dropna()
 	}

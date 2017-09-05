@@ -25,6 +25,7 @@
 
           <div class="collapse navbar-collapse" id="navbar-links">
               <form id="search-form" class="form-inline" action="{{ url_for('search') }}">
+                  <input type="hidden" name="object_type" value="canned_analysis">
                   <input class="form-control" type="text" name="q" placeholder="Search Datasets2Tools">
                   <button class="btn" type="button">
                     <i class="fa fa-search"></i>

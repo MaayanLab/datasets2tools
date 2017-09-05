@@ -19,6 +19,7 @@
 		    border-bottom-color: rgb(208, 209, 213);
 		    border-left-color: rgb(223, 224, 228);
 		    border-radius: .2rem;
+		    height: 100%;
 		}
 
 			.card-wrapper-row {

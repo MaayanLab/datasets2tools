@@ -34,7 +34,7 @@
 					{% if search_data.search_results|length > 0 %}
 						<div id="search-filters-row" class="row">
 							<div id="search-results-number" class="col-6 text-left">
-								250 search results
+								{{ search_data.display_options.count }} search result{{ 's' if search_data.display_options.count > 1 else '' }}
 							</div>
 							<div class="col-6 text-right">
 								<a class="filter-button">Filters&nbsp&nbsp</a>
@@ -43,7 +43,7 @@
 						<div id="search-options-wrapper">
 							<hr width="95%">
 							<div id="search-options-row" class="row">
-								{{ macros.display_filter_options(search_data.search_filters, object_type) }}
+								{{ macros.display_search_options(search_data.search_options) }}
 							</div>
 						</div> <!-- #search-options-wrapper -->
 						<hr width="95%">
@@ -56,15 +56,15 @@
 							<br>
 						</div> <!-- #search-results-row -->
 						<div id="search-number-card-row" class="row">
-							<div class="col-6 text-left">
-								{% for offset_option in [1,2,3] %}
-									<input type="radio" name="offset" id="{{object_type}}-offset-{{offset_option}}" value="{{offset_option}}"{{ ' checked' if offset_option == search_options_dict.offset }}>
+							<div class="col-6 text-left offset-col">
+								{% for offset_option in search_data.display_options.offset['values'] %}
+									<input type="radio" name="offset" id="{{object_type}}-offset-{{offset_option}}" value="{{offset_option}}"{{ ' checked' if offset_option == search_data.display_options.offset.selected }}>
 									<label for="{{object_type}}-offset-{{offset_option}}" class="search-filter-number-card">{{offset_option}}</label>
 								{% endfor %}
 							</div>
-							<div class="col-6 text-right">
-								{% for page_size_option in [10,20,30] %}
-									<input type="radio" name="page_size" id="{{object_type}}-page-size-{{page_size_option}}" value="{{page_size_option}}"{{ ' checked' if page_size_option == search_options_dict.page_size }}>
+							<div class="col-6 text-right page-size-col">
+								{% for page_size_option in search_data.display_options.page_size['values'] %}
+									<input type="radio" name="page_size" id="{{object_type}}-page-size-{{page_size_option}}" value="{{page_size_option}}"{{ ' checked' if page_size_option == search_data.display_options.page_size.selected }}>
 									<label for="{{object_type}}-page-size-{{page_size_option}}" class="search-filter-number-card">{{page_size_option}}</label>
 								{% endfor %}
 								<span class="search-filter-number-label"> per page </span>
@@ -101,11 +101,16 @@
 		    }).prop('disabled', true);
 		});
 		$('#object-search-form').change(function(evt){
-			if ( $(evt.target).parent().hasClass('search-tab-col') ) {
+			if ( $(evt.target).parent().is('.search-tab-col, .form-inline') ) {
 			    $(':input', this).filter(function() {
 			        return !['q', 'object_type'].includes(this.name);
 			    }).prop('disabled', true);
+			} else if ( $(evt.target).parent().is('.page-size-col') ) {
+			    $(':input', this).filter(function() {
+			        return ['offset'].includes(this.name);
+			    }).prop('disabled', true);
 			}
+			console.log($(evt.target));
 			$(evt.target).parents('#object-search-form').submit();
 		});
 	</script>

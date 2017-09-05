@@ -88,17 +88,17 @@
 				</li>
 				{% if object_type != 'dataset' %}
 					<li class="nav-item">
-						<a class="nav-link" data-toggle="tab" href="#datasets" role="tab">Datasets ({{ landing_data.datasets.count }})</a>
+						<a class="nav-link" data-toggle="tab" href="#datasets" role="tab">Datasets ({{ landing_data.datasets.display_options.count }})</a>
 					</li>
 				{% endif %}
 				{% if object_type != 'tool' %}
 					<li class="nav-item">
-						<a class="nav-link" data-toggle="tab" href="#tools" role="tab">Tools ({{ landing_data.tools.count }})</a>
+						<a class="nav-link" data-toggle="tab" href="#tools" role="tab">Tools ({{ landing_data.tools.display_options.count }})</a>
 					</li>
 				{% endif %}
 				{% if object_type != 'canned_analysis' %}
 					<li class="nav-item">
-						<a class="nav-link" data-toggle="tab" href="#canned_analyses" role="tab">Analyses ({{ landing_data.canned_analyses.count }})</a>
+						<a class="nav-link" data-toggle="tab" href="#canned_analyses" role="tab">Analyses ({{ landing_data.canned_analyses.display_options.count }})</a>
 					</li>
 				{% endif %}
 				<li class="nav-item">
@@ -259,6 +259,9 @@
 										<br>
 										<a href="{{ url_for('contribute') }}"><button class="contribute-button">Contribute</button></a>
 								{% else %}
+										There are no indexed analyses by this tool at this moment.
+										<br>
+										<a href="{{ url_for('contribute') }}"><button class="contribute-button">Contribute</button></a>
 								{% endif %}
 							</div>
 						{% endif %}

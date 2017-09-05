@@ -151,6 +151,26 @@ CREATE TABLE user (
 	`password` VARCHAR(80)
 );
 
+### Evaluations
+
+CREATE TABLE question (
+	`id` INT AUTO_INCREMENT PRIMARY KEY,
+	`question_number` INT NOT NULL,
+	`question` TEXT NOT NULL,
+	`object_type` ENUM('dataset', 'tool', 'canned_analysis')
+);
+
+CREATE TABLE evaluation (
+	`id` INT AUTO_INCREMENT PRIMARY KEY,
+	`question_fk` INT NOT NULL,
+	`user_fk` INT NOT NULL,
+	`score` INT,
+	`comment` TEXT,
+	FOREIGN KEY (question_fk) REFERENCES question(id),
+	FOREIGN KEY (user_fk) REFERENCES user(id)
+);
+
+
 ### Add Data
 
 # Repositories

@@ -73,6 +73,7 @@ def upload_analyses(canned_analysis_dataframe, engine, session):
 	canned_analysis_metadata = Table('canned_analysis_metadata', MetaData(), autoload=True, autoload_with=engine)
 
 	# Upload
+	engine.execute('SET GLOBAL max_allowed_packet=1073741824;')
 	engine.execute(canned_analysis_metadata.insert().prefix_with('IGNORE'), metadata_dataframe_ready_to_upload.to_dict(orient='records'))
 
 	# Return
