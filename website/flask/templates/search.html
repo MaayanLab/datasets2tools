@@ -57,17 +57,21 @@
 						</div> <!-- #search-results-row -->
 						<div id="search-number-card-row" class="row">
 							<div class="col-6 text-left offset-col">
-								{% for offset_option in search_data.display_options.offset['values'] %}
-									<input type="radio" name="offset" id="{{object_type}}-offset-{{offset_option}}" value="{{offset_option}}"{{ ' checked' if offset_option == search_data.display_options.offset.selected }}>
-									<label for="{{object_type}}-offset-{{offset_option}}" class="search-filter-number-card">{{offset_option}}</label>
-								{% endfor %}
+								{% if search_data.display_options.offset['values']|length > 1 %}
+									{% for offset_option in search_data.display_options.offset['values'] %}
+										<input type="radio" name="offset" id="{{object_type}}-offset-{{offset_option}}" value="{{offset_option}}"{{ ' checked' if offset_option == search_data.display_options.offset.selected }}>
+										<label for="{{object_type}}-offset-{{offset_option}}" class="search-filter-number-card">{{offset_option}}</label>
+									{% endfor %}
+								{% endif %}
 							</div>
 							<div class="col-6 text-right page-size-col">
-								{% for page_size_option in search_data.display_options.page_size['values'] %}
-									<input type="radio" name="page_size" id="{{object_type}}-page-size-{{page_size_option}}" value="{{page_size_option}}"{{ ' checked' if page_size_option == search_data.display_options.page_size.selected }}>
-									<label for="{{object_type}}-page-size-{{page_size_option}}" class="search-filter-number-card">{{page_size_option}}</label>
-								{% endfor %}
-								<span class="search-filter-number-label"> per page </span>
+								{% if search_data.display_options.page_size['values']|length > 0 %}
+									{% for page_size in search_data.display_options.page_size['values'] %}
+										<input type="radio" name="page_size" id="{{object_type}}-page-size-{{page_size}}" value="{{page_size}}"{{ ' checked' if page_size == search_data.display_options.page_size.selected }}>
+										<label for="{{object_type}}-page-size-{{page_size}}" class="search-filter-number-card">{{page_size}}</label>
+									{% endfor %}
+									<span class="search-filter-number-label"> per page </span>
+								{% endif %}
 							</div>
 						</div> <!-- #search-offsets-row -->
 					{% else %}

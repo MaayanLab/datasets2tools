@@ -153,8 +153,6 @@ def process_query(input_search_options, object_type, session, tables):
 									 			 .join(tables['term']) \
 									 			 .filter(and_(tables['term'].columns['term_name'] == term_name, tables['canned_analysis_metadata'].columns['value'] == value)) \
 									 			 .subquery()))
-					# and_(tables['term'].columns['term_name'] == term_name,
-										  # tables['canned_analysis_metadata'].columns['value'] == value))
 
 	# Keyword
 	if keyword:
@@ -283,13 +281,13 @@ def get_and_apply_display_options(ids, input_display_options, object_type, sessi
 	sorted_ids_subset = sorted_ids[(input_display_options['offset']-1)*input_display_options['page_size']: (input_display_options['offset'])*input_display_options['page_size']]
 
 	# Get offsets
-	offsets = range(1, len(ids)/input_display_options['page_size']+1)
+	offsets = range(1, len(ids)/input_display_options['page_size']+2)
 
 	# Display options
 	output_display_options = {
 		'count': len(ids),
 		'offset': {'values': offsets, 'selected': input_display_options['offset']},
-		'page_size': {'values': [5,10,30], 'selected': input_display_options['page_size']},
+		'page_size': {'values': [x for x in [5,10,30]], 'selected': input_display_options['page_size']},
 		'sort_by': {'values': ['relevance','fairness','date'], 'selected': input_display_options['sort_by']}
 	}
 

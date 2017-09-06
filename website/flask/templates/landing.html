@@ -201,7 +201,7 @@
 						<div class="row">
 						</div>
 						{% if landing_data.datasets.search_results|length > 0  %}
-							{{ macros.display_search_results(landing_data.datasets.search_filters, landing_data.datasets.search_results, object_type='dataset') }}
+							{{ macros.display_search_results(landing_data.datasets, object_type='dataset') }}
 						{% else %}
 							<div class="no-search-results">
 								{% if object_type == 'tool' %}
@@ -226,7 +226,7 @@
 						<div class="row">
 						</div>
 						{% if landing_data.tools.search_results|length > 0  %}
-							{{ macros.display_search_results(landing_data.tools.search_filters, landing_data.tools.search_results, object_type='tool') }}
+							{{ macros.display_search_results(landing_data.tools, object_type='tool') }}
 						{% else %}
 							<div class="no-search-results">
 								{% if object_type == 'dataset' %}
@@ -251,7 +251,7 @@
 						<div class="row">
 						</div>
 						{% if landing_data.canned_analyses.search_results|length > 0  %}
-							{{ macros.display_search_results(landing_data.canned_analyses.search_filters, landing_data.canned_analyses.search_results, object_type='canned_analysis') }}
+							{{ macros.display_search_results(landing_data.canned_analyses, object_type='canned_analysis') }}
 						{% else %}
 							<div class="no-search-results">
 								{% if object_type == 'tool' %}

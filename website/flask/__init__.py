@@ -73,6 +73,16 @@ class User(UserMixin, db.Model):
 # Lists
 fairness = [{"fairness_question": "The tool is hosted in one or more well-used repositories, if relevant repositories exist.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Source code is shared on a public repository.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Code is written in an open-source, free programming language.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "The tool inputs standard data format(s) consistent with community practice.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "All previous versions of the tool are made available.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Web-based version is available (in addition to desktop version).", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Source code is documented.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Pipelines that use the tool have been standardized and provide detailed usage guidelines.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "A tutorial page is provided for the tool.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Example datasets are provided.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Licensing information is provided on the tool's landing page.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Information is provided describing how to cite the tool.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Version information is provided for the tool.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "A paper about the tool has been published.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Video tutorials for the tool are available.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Contact information is provided for the originator(s) of the tool.", "fairness_score": random.uniform(-1, 1)}]
 
+#############################################
+########## 3. General Setup
+#############################################
+##### 1. Variables #####
+# Default display options
+default_display_options = {'offset': 1, 'page_size': 15, 'sort_by': 'relevance'}
+
+# Object identifiers
+object_identifier_columns = {'dataset': 'dataset_accession', 'tool': 'tool_name', 'canned_analysis': 'canned_analysis_accession'}
+
 #################################################################
 #################################################################
 ############### 1. App Configuration ############################
@@ -91,7 +101,7 @@ fairness = [{"fairness_question": "The tool is hosted in one or more well-used r
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+	return User.query.get(int(user_id))
 
 #############################################
 ########## 2. Login
@@ -198,66 +208,35 @@ def landing(object_type, object_identifier):
 
 	# Get search query
 	search_options = {key:value for key, value in request.args.to_dict().iteritems() if key not in display_options.keys()}
+	search_options[object_identifier_columns[object_type]] = object_identifier
 
-	# Get object type
-	# tab = search_options.pop('tab')
+	# Get selected object type
+	selected_object_type = search_options.pop('object_type') if 'object_type' in search_options.keys() else None
 
-	# Database session
-	session = Session()
-
-	# Define landing data
-	landing_data = {}
-
+	# Get selected object type filters
+	associated_object_data = {x: {'search_options': search_options, 'display_options': display_options} if selected_object_type == x else {'search_options': {object_identifier_columns[object_type]: object_identifier}, 'display_options': default_display_options} for x in object_identifier_columns.keys()}
+	
 	# Get object data
-	landing_data[object_type] = get_landing_data(object_identifier, object_type, session, tables)
+	landing_data = {object_type: get_landing_data(object_identifier, object_type, Session(), tables)}
 
 	# Get datasets
-	if object_type == 'dataset':
+	if object_type != 'dataset':
 
 		# Add data
-		landing_data['tools'] = search_database({'dataset_accession': object_identifier}, display_options, 'tool', session, tables)
-		landing_data['canned_analyses'] = search_database({'dataset_accession': object_identifier}, display_options, 'canned_analysis', session, tables)
+		landing_data['datasets'] = search_database(associated_object_data['dataset']['search_options'], associated_object_data['dataset']['display_options'], 'dataset', Session(), tables)
 
-	elif object_type == 'tool':
-
-		# Add data
-		landing_data['datasets'] = search_database({'tool_name': object_identifier}, display_options, 'dataset', session, tables)
-		landing_data['canned_analyses'] = search_database({'tool_name': object_identifier}, display_options, 'canned_analysis', session, tables)
-
-	elif object_type == 'canned_analysis':
+	# Get tools
+	if object_type != 'tool':
 
 		# Add data
-		landing_data['datasets'] = search_database({'canned_analysis_accession': object_identifier}, display_options, 'dataset', session, tables)
-		landing_data['tools'] = search_database({'canned_analysis_accession': object_identifier}, display_options, 'tool', session, tables)
+		landing_data['tools'] = search_database(associated_object_data['tool']['search_options'], associated_object_data['tool']['display_options'], 'tool', Session(), tables)
 
+	# Get canned analyses
+	if object_type != 'canned_analysis':
 
+		# Add data
+		landing_data['canned_analyses'] = search_database(associated_object_data['canned_analysis']['search_options'], associated_object_data['canned_analysis']['display_options'], 'canned_analysis', Session(), tables)
 
-
-	# if object_type == 'dataset':
-	# 	landing_data = {
-	# 		'dataset': get_landing_data(object_identifier, 'dataset', session, metadata),
-	# 		'canned_analyses':  search_database({'dataset_accession': object_identifier}, {'object_type': 'tool'}, session, metadata, landing_page=True),
-	# 		'tools': {'search_filters': tools['search_filters'], 'count': 1, 'search_results': []}
-	# 	}
-	# elif object_type == 'tool':
-	# 	landing_data = {
-	# 		'datasets': {'search_filters': tools['search_filters'], 'count': 1, 'search_results': search_database({'tool_name': object_identifier}, {'object_type': 'dataset'}, session, metadata)},
-	# 		'canned_analyses': {'search_filters': canned_analyses['search_filters'], 'count': 1, 'search_results': search_database({'tool_name': object_identifier}, {'object_type': 'canned_analysis'}, session, metadata)},
-	# 		'tool': search_database({'tool_name': object_identifier}, {'object_type': 'tool'}, session, metadata, landing_page=True)[0]
-	# 	}
-	# elif object_type == 'canned_analysis':
-	# 	landing_data = {
-	# 		'datasets': {'search_filters': datasets['search_filters'], 'count': 1, 'search_results': search_database({'canned_analysis_fk': 1}, {'object_type': 'dataset'}, session, metadata)},
-	# 		'canned_analysis': search_database({'id': 1}, {'object_type': 'canned_analysis'}, session, metadata, landing_page=True)[0],
-	# 		'tools': {'search_filters': tools['search_filters'], 'count': 1, 'search_results': search_database({'canned_analysis_fk': 1}, {'object_type': 'tool'}, session, metadata)}
-	# 	}
-	# else:
-	# 	abort(404)
-	# offset = request.args.get('offset', default=1, type=int)
-	# page_size = request.args.get('page_size', default=10, type=int)
-	# sort_by = request.args.get('sort_by', default='relevance', type=str)
-	# q = request.args.get('q', default='', type=str)
-	session.close()
 	return render_template('landing.html', landing_data=landing_data, object_type=object_type)
 
 #############################################
@@ -319,4 +298,6 @@ def static_files(path):
 ########## 1. Run
 #############################################
 if __name__ == "__main__":
+	app.jinja_env.auto_reload = True
+	app.config['TEMPLATES_AUTO_RELOAD'] = True
 	app.run(debug=True, host='0.0.0.0')

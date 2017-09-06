@@ -79,7 +79,7 @@
 {% endmacro %}
 
 <!-- Search Results -->
-{% macro display_search_results(search_filters, object_list, object_type) %}
+{% macro display_search_results(search_data, object_type) %}
 
 	<div class="row search-results-wrapper">
 		<form class="landing-search-form">
@@ -103,31 +103,34 @@
 						<div class="search-options-wrapper">
 							<hr width="100%">
 							<div class="row search-options-row">
-								<div class="col-12">
-								</div>
+								{{ display_search_options(search_data.search_options, search_data.display_options.sort_by, object_type) }}
 							</div>
 						</div>
 					</div>
 				</div>
 				<hr width="100%" class="my-1">
 				<div class="row object-card-row">
-					{% for object_data in object_list %}
+					{% for object_data in search_data.search_results %}
 						{{ display_object_card(object_data, object_type) }}
 					{% endfor %}
 				</div>
 				<div class="row search-number-card-row">
 					<div class="col-6 text-left">
-						{% for offset in [1,2,3] %}
-							<input type="radio" name="offset" id="{{object_type}}-offset-{{offset}}" value="{{offset}}"{{ ' checked' if request.args.get('offset', default=1)|int == offset }}>
-							<label for="{{object_type}}-offset-{{offset}}" class="search-filter-number-card">{{offset}}</label>
-						{% endfor %}
+						{% if search_data.display_options.offset['values']|length > 1 %}
+							{% for offset in search_data.display_options.offset['values'] %}
+								<input type="radio" name="offset" id="{{object_type}}-offset-{{offset}}" value="{{offset}}"{{ ' checked' if offset == search_data.display_options.offset['selected'] }}>
+								<label for="{{object_type}}-offset-{{offset}}" class="search-filter-number-card">{{offset}}</label>
+							{% endfor %}
+						{% endif %}
 					</div>
 					<div class="col-6 text-right">
-						{% for page_size in [10,20,30] %}
-							<input type="radio" name="page_size" id="{{object_type}}-page-size-{{page_size}}" value="{{page_size}}"{{ ' checked' if request.args.get('page_size', default=10)|int == page_size }}>
-							<label for="{{object_type}}-page-size-{{page_size}}" class="search-filter-number-card">{{page_size}}</label>
-						{% endfor %}
-						<span class="search-filter-number-label"> per page </span>
+						{% if search_data.display_options.page_size['values']|length > 0 %}
+							{% for page_size in search_data.display_options.page_size['values'] %}
+								<input type="radio" name="page_size" id="{{object_type}}-page-size-{{page_size}}" value="{{page_size}}"{{ ' checked' if page_size == search_data.display_options.page_size['selected'] }}>
+								<label for="{{object_type}}-page-size-{{page_size}}" class="search-filter-number-card">{{page_size}}</label>
+							{% endfor %}
+							<span class="search-filter-number-label"> per page </span>
+						{% endif %}
 					</div>
 				</div>
 			</div>
