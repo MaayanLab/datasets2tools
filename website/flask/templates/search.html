@@ -43,7 +43,7 @@
 						<div id="search-options-wrapper">
 							<hr width="95%">
 							<div id="search-options-row" class="row">
-								{{ macros.display_search_options(search_data.search_options) }}
+								{{ macros.display_search_options(search_data.search_options, search_data.display_options.sort_by) }}
 							</div>
 						</div> <!-- #search-options-wrapper -->
 						<hr width="95%">
@@ -114,6 +114,7 @@
 			$(evt.target).parents('#object-search-form').submit();
 		});
 	</script>
-	{% if 'sort_by' in request.args.keys() %}<script type="text/javascript">$('.filter-button').click();</script>{% endif %}
-
+{% if 'sort_by' in request.args.keys() %}<script type="text/javascript">$('.filter-button').click();</script>{% endif %}
 {% endblock %}
+
+

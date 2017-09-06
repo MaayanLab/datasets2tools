@@ -50,21 +50,38 @@
 
 {% endmacro %}
 
-<!-- Search Results -->
-{% macro display_search_options(search_options) %}
+<!-- Search Options -->
+{% macro display_search_options(search_options, sort_by_dict, object_type) %}
+	{% set colsize = 'col-3' if object_type == 'canned_analysis' else 'col-4' %}
+	<div class="{{ colsize }}">
+		<div class="search-option-label">Sort by</div>
+		<select data-placeholder="Select..." name="sort_by" class="search-sort-dropdown">
+			<option></option>
+			{% for value in sort_by_dict['values'] %}
+				<option value="{{ value }}"{{ ' selected' if value == sort_by_dict['selected'] else '' }}>{{ value.title().replace('Fair', 'FAIR') }}</option>
+			{% endfor %}
+		</select>
+	</div>
 	{% for options_dict in search_options %}
 		{% for option, option_data in options_dict.iteritems() %}
-			<div class="col-4">
-				<div class="search-option-label">{{ option.title().replace('_', ' ') }}</div>
-				<select data-placeholder="Select..." class="search-option-dropdown" name="{{ option }}">
-					<option></option>
-					{% for value in option_data['values'] %}
-						<option value="{{ value }}"{{ ' selected' if request.args.get('object_type') == object_type and value == option_data['selected'] else '' }}>{{ value }}</option>
-					{% endfor %}
-				</select>
-			</div>
+			{% if option_data['values']|length > 0 %}
+				<div class="{{ colsize }}">
+					<div class="search-option-label">{{ option.title().replace('_', ' ') }}</div>
+					<select data-placeholder="Select..." class="search-option-dropdown" name="{{ option }}">
+						<option></option>
+						{% for value in option_data['values'] %}
+							<option value="{{ value }}"{{ ' selected' if value == option_data['selected'] else '' }}>{{ value }}</option>
+						{% endfor %}
+					</select>
+				</div>
+			{% endif %}
 		{% endfor %}
 	{% endfor %}
+{% endmacro %}
+
+<!-- Search Filters -->
+{% macro display_search_filters(sort_by_dict) %}
+
 {% endmacro %}
 
 <!-- Search Results -->

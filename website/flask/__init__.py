@@ -53,6 +53,7 @@ entry_point = '/datasets2tools'
 dropzone = Dropzone(app)
 metadata = MetaData()
 metadata.reflect(bind=engine)
+tables = metadata.tables
 Session = sessionmaker(bind=engine)
 
 ##### 3. Login manager #####
@@ -183,7 +184,7 @@ def search():
 	object_type = search_options.pop('object_type')
 
 	# Search database
-	search_data = search_database(search_options, display_options, object_type, Session(), metadata)
+	search_data = search_database(search_options, display_options, object_type, Session(), tables)
 
 	# Return template
 	return render_template('search.html', object_type=object_type, search_data=search_data)
@@ -211,26 +212,26 @@ def landing(object_type, object_identifier):
 	landing_data = {}
 
 	# Get object data
-	landing_data[object_type] = get_landing_data(object_identifier, 'dataset', session, metadata)
+	landing_data[object_type] = get_landing_data(object_identifier, 'dataset', session, tables)
 
 	# Get datasets
 	if object_type == 'dataset':
 
 		# Add data
-		landing_data['tools'] = search_database({'dataset_accession': object_identifier}, display_options, 'tool', session, metadata)
-		landing_data['canned_analyses'] = search_database({'dataset_accession': object_identifier}, display_options, 'canned_analysis', session, metadata)
+		landing_data['tools'] = search_database({'dataset_accession': object_identifier}, display_options, 'tool', session, tables)
+		landing_data['canned_analyses'] = search_database({'dataset_accession': object_identifier}, display_options, 'canned_analysis', session, tables)
 
 	elif object_type == 'tool':
 
 		# Add data
-		landing_data['datasets'] = search_database({'tool_name': object_identifier}, display_options, 'dataset', session, metadata)
-		landing_data['canned_analyses'] = search_database({'tool_name': object_identifier}, display_options, 'canned_analysis', session, metadata)
+		landing_data['datasets'] = search_database({'tool_name': object_identifier}, display_options, 'dataset', session, tables)
+		landing_data['canned_analyses'] = search_database({'tool_name': object_identifier}, display_options, 'canned_analysis', session, tables)
 
 	elif object_type == 'canned_analysis':
 
 		# Add data
-		landing_data['datasets'] = search_database({'canned_analysis_accession': object_identifier}, display_options, 'dataset', session, metadata)
-		landing_data['tools'] = search_database({'canned_analysis_accession': object_identifier}, display_options, 'tool', session, metadata)
+		landing_data['datasets'] = search_database({'canned_analysis_accession': object_identifier}, display_options, 'dataset', session, tables)
+		landing_data['tools'] = search_database({'canned_analysis_accession': object_identifier}, display_options, 'tool', session, tables)
 
 
 
