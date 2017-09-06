@@ -83,6 +83,7 @@ CREATE TABLE article (
 
 CREATE TABLE canned_analysis (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
+	`canned_analysis_accession` CHAR(11) GENERATED ALWAYS AS(CONCAT('DCA', LPAD(id, 8, 0))),
 	`canned_analysis_title` VARCHAR(255),
 	`canned_analysis_description` TEXT,
 	`canned_analysis_url` VARCHAR(255) UNIQUE NOT NULL,

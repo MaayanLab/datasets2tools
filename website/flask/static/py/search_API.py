@@ -53,6 +53,12 @@ def process_query(input_search_options, object_type, session, tables):
 					 .join(tables['analysis_to_'+other_object_type]) \
 					 .join(tables[other_object_type])
 
+		# Canned analysis
+		if 'canned_analysis_accession' in input_search_options.keys():
+
+			# Filter canned analysis
+			query = query.filter(tables['canned_analysis'].columns['canned_analysis_accession'] == input_search_options.pop('canned_analysis_accession'))
+
 		# Dataset cases
 		if object_type == 'dataset':
 
@@ -103,6 +109,12 @@ def process_query(input_search_options, object_type, session, tables):
 					 .join(tables['dataset']) \
 					 .join(tables['repository']) \
 					 .join(tables['tool'])
+
+		# Check if dataset has been specified
+		if 'canned_analysis_accession' in input_search_options.keys():
+
+			# Filter by dataset
+			query = query.filter(tables['canned_analysis'].columns['canned_analysis_accession'] == input_search_options.pop('canned_analysis_accession'))
 
 		# Check if dataset has been specified
 		if 'dataset_accession' in input_search_options.keys():
@@ -341,8 +353,6 @@ def get_search_options(ids, object_type, input_search_options, session, tables):
 							     .filter(tables['canned_analysis_metadata'].columns['canned_analysis_fk'].in_(ids)) \
 							     .distinct() \
 							     .all()
-
-		print pd.DataFrame(metadata_query)
 
 		# Try
 		try:

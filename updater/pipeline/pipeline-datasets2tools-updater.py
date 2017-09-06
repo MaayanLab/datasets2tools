@@ -33,7 +33,10 @@ import PipelineDatasets2ToolsUpdater as P
 spiders = ['oxford', 'bmc_bioinformatics']
 
 # Database engine
-engine = create_engine('mysql://root:MyNewPass@localhost/datasets2tools')
+dbFile = '../db.txt'
+if os.path.exists(dbFile):
+	with open(dbFile) as openfile: database_uri = openfile.readlines()[0]
+engine = create_engine(database_uri)
 
 # Session maker
 Session = sessionmaker(bind=engine)

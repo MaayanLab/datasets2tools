@@ -52,8 +52,7 @@
 
 <!-- Search Options -->
 {% macro display_search_options(search_options, sort_by_dict, object_type) %}
-	{% set colsize = 'col-3' if object_type == 'canned_analysis' else 'col-4' %}
-	<div class="{{ colsize }}">
+	<div class="col-4">
 		<div class="search-option-label">Sort by</div>
 		<select data-placeholder="Select..." name="sort_by" class="search-sort-dropdown">
 			<option></option>
@@ -65,7 +64,7 @@
 	{% for options_dict in search_options %}
 		{% for option, option_data in options_dict.iteritems() %}
 			{% if option_data['values']|length > 0 %}
-				<div class="{{ colsize }}">
+				<div class="col-4">
 					<div class="search-option-label">{{ option.title().replace('_', ' ') }}</div>
 					<select data-placeholder="Select..." class="search-option-dropdown" name="{{ option }}">
 						<option></option>
@@ -77,11 +76,6 @@
 			{% endif %}
 		{% endfor %}
 	{% endfor %}
-{% endmacro %}
-
-<!-- Search Filters -->
-{% macro display_search_filters(sort_by_dict) %}
-
 {% endmacro %}
 
 <!-- Search Results -->

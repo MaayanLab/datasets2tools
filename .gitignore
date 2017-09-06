@@ -4,3 +4,4 @@ updater/0*
 *.pyc
 *.sqlite
 *-checkpoint.ipynb
+db.txt
