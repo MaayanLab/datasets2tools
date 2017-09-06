@@ -73,11 +73,11 @@
 				<div id="fairness-label">FAIR Metrics</div>
 				<svg height="95px" width="95px">
 					{% set w = 23 %}
-					{% for fairness_data in landing_data[object_type]['fairness'] %}
-						 <rect x="{{ ((loop.index-1) % 4)*w }}" y="{{ (((loop.index)/4)|round(0, 'ceil')-1)*w }}" width="{{w-2}}px" height="{{w-2}}px" fill="grey" data-value="{{fairness_data.fairness_score}}" data-toggle="tooltip" data-placement="bottom" data-animation="false" data-html="true" title="<div class='fairness-tooltip'><div class='fairness-score'><b>Score:</b> {{fairness_data.fairness_score|round(2, 'floor')}}</div><div class='fairness-question'><b>{{loop.index}}.</b> {{fairness_data.fairness_question}}</div></div>"/>
+					{% for index, fairness_data in landing_data[object_type]['fairness']['scores'].iterrows() %}
+						 <rect x="{{ ((loop.index-1) % 4)*w }}" y="{{ (((loop.index)/4)|round(0, 'ceil')-1)*w }}" width="{{w-2}}px" height="{{w-2}}px" fill="grey" data-value="{{fairness_data.fairness_score}}" data-toggle="tooltip" data-placement="bottom" data-animation="false" data-html="true" title="<div class='fairness-tooltip'><div class='fairness-question'>{% if fairness_data.fairness_score >= -1 %}<b>Score:</b> {{fairness_data.fairness_score|round(2)}}</div>{% endif %}<b>{{fairness_data.question_number}}.</b> {{fairness_data.question}}</div></div>"/>
 					{% endfor %}
 				</svg>
-				<div id="fairness-evaluation-number">{{ 3 }} evaluations</div>
+				<div id="fairness-evaluation-number">{{ landing_data[object_type]['fairness']['nr_evaluations'] }} evaluations</div>
 			</div>
 		</div> <!-- #object-overview -->
 
@@ -273,11 +273,17 @@
 				<div id="fairness-info" class="info-card">
 					<div class="info-card-title">FAIR Evaluation</div>
 						{% if current_user.is_authenticated %}
-							<form id="fairness-form" action="{{url_for('index')}}">
+							<form id="fairness-form" action="javascript:submitFairness();" method="post">
+								<input type="hidden" name="object_type" value="{{object_type}}">
+								<input type="hidden" name="object_id" value="{{landing_data[object_type].id}}">
 								<table id="fairness-table">
 									<tr><th>Question</th><th>Yes</th><th>No</th><th>Yes, but:</th><th>Comments</th></tr>
-									{% for fairness_data in landing_data[object_type]['fairness']%}
-										<tr><td>{{loop.index}}. {{fairness_data.fairness_question}}</td><td><input type="radio" name="fairness-question-{{loop.index}}" value="yes" required></td><td><input type="radio" name="fairness-question-{{loop.index}}" value="no"></td><td><input type="radio" name="fairness-question-{{loop.index}}" value="yes-but"></td><td><input type="text" class="yes-but-comment" name="fairness-question-{{loop.index}}-comment"></td></tr>
+									{% for index, fairness_data in landing_data[object_type]['fairness']['scores'].iterrows() %}
+										<tr><td><b>{{fairness_data.question_number}}.</b> {{fairness_data.question}}</td>
+										<td><input type="radio" name="fairness-question-{{fairness_data.id}}" value=1 {{'checked' if landing_data[object_type].fairness.user_scores[fairness_data.id].score == 1}}></td>
+										<td><input type="radio" name="fairness-question-{{fairness_data.id}}" value=-1 {{'checked' if landing_data[object_type].fairness.user_scores[fairness_data.id].score == -1}}></td>
+										<td><input type="radio" name="fairness-question-{{fairness_data.id}}" value=0 {{'checked' if landing_data[object_type].fairness.user_scores[fairness_data.id].score == 0}}></td>
+										<td><input type="text" class="yes-but-comment" name="fairness-question-{{fairness_data.id}}-comment" value="{{landing_data[object_type].fairness.user_scores[fairness_data.id].comment}}"></td></tr>
 									{% endfor %}
 								</table>
 								<button id="fairness-button" class="btn" type="submit">Submit</button>
@@ -320,15 +326,20 @@
 		};
 		color = d3.scaleLinear().domain([-1, 1]).interpolate(d3.interpolateRgb).range([d3.rgb(255,0,0), d3.rgb(0,0,255)]);
 		$('#object-fairness-col rect').each(function(i, elem) {
-			$(elem).attr('fill', color($(elem).attr('data-value')));
+			if ($(elem).attr('data-value') === 'nan') {
+				$(elem).attr('fill', 'grey');
+			} else {
+				$(elem).attr('fill', color($(elem).attr('data-value')));
+			}
 		});
-		$('#fairness-table input[type="radio"]').change(function(evt) {
-			if ($(evt.target).val() === 'yes-but') {
+		$('#fairness-table input[type="radio"]').click(function(evt) {
+			if ($(evt.target).val() === "0") {
 				$(evt.target).parents('tr').find('.yes-but-comment').css('visibility', 'visible');
 			} else {
 				$(evt.target).parents('tr').find('.yes-but-comment').css('visibility', 'hidden');
 			}
 		});
+		$('#fairness-table input[type="radio"][value="0"]:checked').click();
 		$('#evaluate-button').click(function(evt) {
 			$('a[href="#fairness"]').click();
 		});	
@@ -337,7 +348,7 @@
 		        return this.value.length == 0;
 		    }).prop('disabled', true);
 		});
-		$('.landing-search-form').change(function(evt){
+		$('.landing-search-form').change(function(evt) {
 			$(evt.target).parents('.landing-search-form').submit();
 		});
 		$('#related-object-row').slick({
@@ -345,6 +356,16 @@
 			arrows: true,
 			dots: true
 		});
+		function submitFairness() {
+		    $.ajax({
+		        url: '{{ url_for("upload_evaluation_api") }}',
+		        type: 'post',
+		        data: $('#fairness-form').serialize(),
+		        success: function() {
+		            location.reload();
+		        }
+		    });
+		};
 	</script>
 
 	{% if 'object_type' in request.args.keys() %}

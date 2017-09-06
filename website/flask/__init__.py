@@ -215,9 +215,9 @@ def landing(object_type, object_identifier):
 
 	# Get selected object type filters
 	associated_object_data = {x: {'search_options': search_options, 'display_options': display_options} if selected_object_type == x else {'search_options': {object_identifier_columns[object_type]: object_identifier}, 'display_options': default_display_options} for x in object_identifier_columns.keys()}
-	
+
 	# Get object data
-	landing_data = {object_type: get_landing_data(object_identifier, object_type, Session(), tables)}
+	landing_data = {object_type: get_landing_data(object_identifier, object_type, Session(), tables, current_user.get_id())}
 
 	# Get datasets
 	if object_type != 'dataset':
@@ -254,17 +254,61 @@ def contribute():
 #######################################################
 
 #############################################
-########## 1. Test
+########## 1. FAIRness Submission
 #############################################
 
-@app.route(entry_point+'/testsearch')
-def testsearch():
-	session = Session()
-	query_dict = request.args.to_dict()
-	object_type = query_dict.pop('object_type')
-	results = json.dumps(search_database(query_dict, object_type, session, metadata))
-	session.close()
-	return results
+@app.route(entry_point+'/api/upload/fairness_evaluation', methods=['POST'])
+def upload_evaluation_api():
+
+	# Check if user is authenticated
+	if current_user.is_authenticated:
+
+		# Get evaluation data
+		evaluation_dict = request.form.to_dict()
+
+		# Get object data
+		object_info = {x: evaluation_dict.pop(x) for x in ['object_type', 'object_id']}
+
+		# Get results dict
+		melted_evaluation_dataframe = pd.Series(evaluation_dict).rename('score').to_frame()
+
+		# Add columns
+		melted_evaluation_dataframe['question_fk'] = [x.split('-')[2] for x in melted_evaluation_dataframe.index]
+
+		# Add comment
+		melted_evaluation_dataframe['column_type'] = ['comment' if 'comment' in x else 'score' for x in melted_evaluation_dataframe.index]
+
+		# Cast
+		evaluation_dataframe = pd.pivot_table(melted_evaluation_dataframe, index='question_fk', columns='column_type', values='score', aggfunc='first').reset_index()
+
+		# Add user ID
+		evaluation_dataframe['user_fk'] = current_user.get_id()
+		
+		# Add object FK
+		evaluation_dataframe[object_info['object_type']+'_fk'] = object_info['object_id']
+
+		print evaluation_dataframe
+
+		# Create session
+		# session = Session()
+
+		# Try
+		# try:
+
+			# Upload evaluation
+		engine.execute(tables['evaluation'].insert(), evaluation_dataframe.to_dict(orient='records'))
+
+
+			# Commit
+		# 	session.commit()
+
+		# except:
+
+		# 	# Rollback
+		# 	session.rollback()
+
+	# Get 
+	return ''
 
 #############################################
 ########## 2. Upload Analysis

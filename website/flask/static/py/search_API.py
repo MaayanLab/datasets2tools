@@ -19,9 +19,10 @@
 ##### 1. Python modules #####
 import json
 import pandas as pd
+import numpy as np
 
 ##### 2. Database modules #####
-from sqlalchemy import or_, and_
+from sqlalchemy import or_, and_, asc, func
 
 #################################################################
 #################################################################
@@ -174,7 +175,7 @@ def process_query(input_search_options, object_type, session, tables):
 ########## 2. Get Object Data
 #############################################
 
-def get_object_data(object_id, object_type, session, tables, landing_page):
+def get_object_data(object_id, object_type, session, tables, landing_page, user_id=None):
 
 	# Dataset
 	if object_type == 'dataset':
@@ -252,6 +253,44 @@ def get_object_data(object_id, object_type, session, tables, landing_page):
 		object_data['related_objects'] = [get_object_data(x[0], object_type, session, metadata, landing_page=False) for x in related_object_query.all()]
 
 		# Get FAIRness
+		fairness_query = session.query(tables['question'].columns['id'], tables['question'].columns['question_number'], tables['question'].columns['question'], func.avg(tables['evaluation'].columns['score'])) \
+								.join(tables['evaluation']) \
+								.filter(tables['evaluation'].columns[object_type+'_fk'] == object_id) \
+								.group_by(tables['question'].columns['id'], tables['question'].columns['question_number'], tables['question'].columns['question']) \
+								.order_by(asc(tables['question'].columns['question_number'])) \
+								.all()
+
+		# Get dataframe
+		fairness_dataframe = pd.DataFrame([[x[0], x[1], x[2], float(x[3])] for x in fairness_query], columns=['id', 'question_number', 'question', 'fairness_score'])
+
+		# Get nr evaluations
+		print fairness_dataframe
+		nr_evaluations = len(fairness_dataframe.index)/16
+
+		# If no length
+		if nr_evaluations == 0:
+
+			# Get questions
+			fairness_query = session.query(tables['question'].columns['id'], tables['question'].columns['question_number'], tables['question'].columns['question']) \
+									.filter(tables['question'].columns['object_type'] == object_type) \
+									.all()
+
+			# Get dataframe
+			fairness_dataframe = pd.DataFrame(fairness_query)
+
+			# Add score
+			fairness_dataframe['fairness_score'] = np.nan
+
+		# Get user evaluation
+		user_fairness_query = session.query(tables['question'].columns['id'], tables['evaluation'].columns['score'], tables['evaluation'].columns['comment']) \
+									 .join(tables['evaluation']) \
+									 .filter(and_(tables['evaluation'].columns['user_fk'] == user_id,
+									 			  tables['evaluation'].columns[object_type+'_fk'] == object_id)) \
+									 .all()
+			
+		# Add
+		object_data['fairness'] = {'nr_evaluations': nr_evaluations, 'scores': fairness_dataframe, 'user_scores': pd.DataFrame(user_fairness_query).set_index('id').to_dict(orient='index')}
+		print object_data['fairness']
 
 	# Return
 	return object_data
@@ -414,7 +453,7 @@ def search_database(input_search_options, input_display_options, object_type, se
 ########## 2. Get Landing Data
 #############################################
 
-def get_landing_data(object_identifier, object_type, session, tables):
+def get_landing_data(object_identifier, object_type, session, tables, user_id):
 
 	# Get identifier column
 	if object_type == 'dataset':
@@ -431,7 +470,7 @@ def get_landing_data(object_identifier, object_type, session, tables):
 	object_id = process_query(input_search_options, object_type, session, tables)[0]
 
 	# Get object data
-	object_data = get_object_data(object_id, object_type, session, tables, landing_page = True)
+	object_data = get_object_data(object_id, object_type, session, tables, landing_page=True, user_id=user_id)
 
 	# Close session
 	session.close()

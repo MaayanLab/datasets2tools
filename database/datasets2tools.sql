@@ -163,13 +163,31 @@ CREATE TABLE question (
 
 CREATE TABLE evaluation (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
-	`question_fk` INT NOT NULL,
 	`user_fk` INT NOT NULL,
+	`question_fk` INT NOT NULL,
 	`score` INT,
 	`comment` TEXT,
+	`dataset_fk` INT DEFAULT NULL,
+	`tool_fk` INT DEFAULT NULL,
+	`canned_analysis_fk` INT DEFAULT NULL,
+	FOREIGN KEY (dataset_fk) REFERENCES dataset(id),
+	FOREIGN KEY (tool_fk) REFERENCES tool(id),
+	FOREIGN KEY (canned_analysis_fk) REFERENCES canned_analysis(id),
 	FOREIGN KEY (question_fk) REFERENCES question(id),
-	FOREIGN KEY (user_fk) REFERENCES user(id)
+	FOREIGN KEY (user_fk) REFERENCES user(id),
+	UNIQUE KEY (user_fk, question_fk, dataset_fk, tool_fk, canned_analysis_fk)
 );
+
+-- CREATE TABLE question_answer (
+-- 	`id` INT AUTO_INCREMENT PRIMARY KEY,
+-- 	`question_fk` INT NOT NULL,
+-- 	`evaluation_fk` INT NOT NULL,
+-- 	`score` INT,
+-- 	`comment` TEXT,
+-- 	FOREIGN KEY (question_fk) REFERENCES question(id),
+-- 	FOREIGN KEY (evaluation_fk) REFERENCES evaluation(id),
+-- 	UNIQUE KEY (question_fk, evaluation_fk)
+-- );
 
 
 ### Add Data
@@ -186,4 +204,55 @@ INSERT INTO journal (journal_name) VALUES
 	('Database'),
 	('Nucleic Acids Research'),
 	('BMC Bioinformatics');
+
+# Questions
+INSERT INTO question (question_number, question, object_type) VALUES
+	(1, "The tool is hosted in one or more well-used repositories, if relevant repositories exist.", "tool"),
+	(2, "Source code is shared on a public repository.", "tool"),
+	(3, "Code is written in an open-source, free programming language.", "tool"),
+	(4, "The tool inputs standard data format(s) consistent with community practice.", "tool"),
+	(5, "All previous versions of the tool are made available.", "tool"),
+	(6, "Web-based version is available (in addition to desktop version).", "tool"),
+	(7, "Source code is documented.", "tool"),
+	(8, "Pipelines that use the tool have been standardized and provide detailed usage guidelines.", "tool"),
+	(9, "A tutorial page is provided for the tool.", "tool"),
+	(10, "Example datasets are provided.", "tool"),
+	(11, "Licensing information is provided on the tool's landing page.", "tool"),
+	(12, "Information is provided describing how to cite the tool.", "tool"),
+	(13, "Version information is provided for the tool.", "tool"),
+	(14, "A paper about the tool has been published.", "tool"),
+	(15, "Video tutorials for the tool are available.", "tool"),
+	(16, "Contact information is provided for the originator(s) of the tool.", "tool"),
+	(1, "Standardized IDs are used to identify dataset.", "dataset"),
+	(2, "The dataset can be located on the host platform via free-text search and menu-driven decision tree search.", "dataset"),
+	(3, "The dataset is hosted in one or more well-used repositories, if relevant repositories exist.", "dataset"),
+	(4, "(Meta)data are assigned a globally unique and eternally persistent identifier.", "dataset"),
+	(5, "The dataset is retrievable by a standardized protocol.", "dataset"),
+	(6, "The dataset is available in a human-readable format.", "dataset"),
+	(7, "The dataset is available in a standard machine-accessible format (that is interoperable with popular analysis tools).", "dataset"),
+	(8, "The meta(data) are sufficiently complete to permit effective reuse.", "dataset"),
+	(9, "Metadata are linked to other relevant datasets, vocabularies and ontologies.", "dataset"),
+	(10, "A tutorial page is provided for the dataset to describe the format of the dataset.", "dataset"),
+	(11, "Information is provided describing how to cite the dataset.", "dataset"),
+	(12, "A description of the methods used to acquire the data is provided.", "dataset"),
+	(13, "Licensing information is provided on the dataset's landing page.", "dataset"),
+	(14, "Version information is provided on the dataset's landing page.", "dataset"),
+	(15, "Tools that can be used to analyze the dataset are listed on the dataset's landing page.", "dataset"),
+	(16, "Contact information is provided for the originator(s) of the dataset.", "dataset"),
+	(1, "The structure of the repository permits efficient discovery of data and metadata by end users.", "canned_analysis"),
+	(2, "The repository is available online.", "canned_analysis"),
+	(3, "The repository uses a standardized protocol to permit access by users.", "canned_analysis"),
+	(4, "The repository provides a tutorial that describes detailed usage guidelines.", "canned_analysis"),
+	(5, "The repository provides a Frequently Asked Questions (FAQ) page and/or user forum as a resource for users.", "canned_analysis"),
+	(6, "The repository provides contact information for staff to enable users with questions or suggestions to interact with repository experts.", "canned_analysis"),
+	(7, "The repository is established on standard core infrastructure components including hardware, operating systems, and supporting software.", "canned_analysis"),
+	(8, "Tools that can be used to analyze each dataset are listed on the corresponding dataset pages.", "canned_analysis"),
+	(9, "The repository maintains licenses to manage data access and use.", "canned_analysis"),
+	(10, "The repository hosts data and metadata according to a set of defined criteria to ensure that the resources provided are consistent with the intent of the repository.", "canned_analysis"),
+	(11, "The repository provides sufficient detail about its data and metadata so that users are able to evaluate the quality of these resources.", "canned_analysis"),
+	(12, "Metadata are linked to other relevant datasets, vocabularies and ontologies.", "canned_analysis"),
+	(13, "The repository provides documentation for each resource to permit its complete and accurate citation.", "canned_analysis"),
+	(14, "Sufficient metadata are provided for each dataset to permit accurate and useful employment of the dataset.", "canned_analysis"),
+	(15, "A description of the methods used to acquire the data is provided.", "canned_analysis"),
+	(16, "Version information is provided for each resource, where available.", "canned_analysis");
 
