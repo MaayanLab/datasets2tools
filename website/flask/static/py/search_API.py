@@ -287,9 +287,15 @@ def get_object_data(object_id, object_type, session, tables, landing_page, user_
 									 .filter(and_(tables['evaluation'].columns['user_fk'] == user_id,
 									 			  tables['evaluation'].columns[object_type+'_fk'] == object_id)) \
 									 .all()
+
+		if len(user_fairness_query) > 0:
+
+			user_scores = pd.DataFrame(user_fairness_query).set_index('id').to_dict(orient='index')
+		else:
+			user_scores = pd.DataFrame()
 			
 		# Add
-		object_data['fairness'] = {'nr_evaluations': nr_evaluations, 'scores': fairness_dataframe, 'user_scores': pd.DataFrame(user_fairness_query).set_index('id').to_dict(orient='index')}
+		object_data['fairness'] = {'nr_evaluations': nr_evaluations, 'scores': fairness_dataframe, 'user_scores': user_scores}
 		print object_data['fairness']
 
 	# Return

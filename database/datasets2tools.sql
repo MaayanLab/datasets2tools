@@ -175,8 +175,9 @@ CREATE TABLE evaluation (
 	FOREIGN KEY (canned_analysis_fk) REFERENCES canned_analysis(id),
 	FOREIGN KEY (question_fk) REFERENCES question(id),
 	FOREIGN KEY (user_fk) REFERENCES user(id),
-	UNIQUE KEY (user_fk, question_fk, dataset_fk, tool_fk, canned_analysis_fk)
+	ADD INDEX `unique_evaluation` (user_fk, question_fk, dataset_fk, tool_fk, canned_analysis_fk)
 );
+
 
 -- CREATE TABLE question_answer (
 -- 	`id` INT AUTO_INCREMENT PRIMARY KEY,

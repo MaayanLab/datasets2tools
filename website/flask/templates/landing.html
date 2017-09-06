@@ -280,10 +280,10 @@
 									<tr><th>Question</th><th>Yes</th><th>No</th><th>Yes, but:</th><th>Comments</th></tr>
 									{% for index, fairness_data in landing_data[object_type]['fairness']['scores'].iterrows() %}
 										<tr><td><b>{{fairness_data.question_number}}.</b> {{fairness_data.question}}</td>
-										<td><input type="radio" name="fairness-question-{{fairness_data.id}}" value=1 {{'checked' if landing_data[object_type].fairness.user_scores[fairness_data.id].score == 1}}></td>
-										<td><input type="radio" name="fairness-question-{{fairness_data.id}}" value=-1 {{'checked' if landing_data[object_type].fairness.user_scores[fairness_data.id].score == -1}}></td>
-										<td><input type="radio" name="fairness-question-{{fairness_data.id}}" value=0 {{'checked' if landing_data[object_type].fairness.user_scores[fairness_data.id].score == 0}}></td>
-										<td><input type="text" class="yes-but-comment" name="fairness-question-{{fairness_data.id}}-comment" value="{{landing_data[object_type].fairness.user_scores[fairness_data.id].comment}}"></td></tr>
+										<td><input type="radio" name="fairness-question-{{fairness_data.id}}" value=1 {{'checked' if fairness_data.id in landing_data[object_type].fairness.user_scores.keys() and landing_data[object_type].fairness.user_scores[fairness_data.id].score == 1}}></td>
+										<td><input type="radio" name="fairness-question-{{fairness_data.id}}" value=-1 {{'checked' if fairness_data.id in landing_data[object_type].fairness.user_scores.keys() and landing_data[object_type].fairness.user_scores[fairness_data.id].score == -1}}></td>
+										<td><input type="radio" name="fairness-question-{{fairness_data.id}}" value=0 {{'checked' if fairness_data.id in landing_data[object_type].fairness.user_scores.keys() and landing_data[object_type].fairness.user_scores[fairness_data.id].score == 0}}></td>
+										<td><input type="text" class="yes-but-comment" name="fairness-question-{{fairness_data.id}}-comment" value="{{landing_data[object_type].fairness.user_scores[fairness_data.id].comment if fairness_data.id in landing_data[object_type].fairness.user_scores.keys() else '' }}"></td></tr>
 									{% endfor %}
 								</table>
 								<button id="fairness-button" class="btn" type="submit">Submit</button>
