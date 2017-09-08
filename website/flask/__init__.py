@@ -41,21 +41,22 @@ from search_API import *
 #############################################
 ##### 1. Flask App #####
 app = Flask(__name__)
+entry_point = '/datasets2tools'
 dbFile = '../../db.txt'
 if os.path.exists(dbFile):
-	with open(dbFile) as openfile: app.config['SQLALCHEMY_DATABASE_URI'], app.config['SECRET_KEY'] = openfile.readlines()
+	with open(dbFile) as openfile: os.environ['SQLALCHEMY_DATABASE_URI'], os.environ['SECRET_KEY'] = openfile.readlines()
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = os.environ['SQLALCHEMY_TRACK_MODIFICATIONS']
+app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DROPZONE_MAX_FILE_SIZE'] = 10
 
 ##### 2. Database connection #####
 db = SQLAlchemy(app)
 engine = db.engine
-entry_point = '/datasets2tools'
 dropzone = Dropzone(app)
 metadata = MetaData()
 metadata.reflect(bind=engine)
 tables = metadata.tables
-Session = sessionmaker(bind=engine)
 
 ##### 3. Login manager #####
 # Login manager definition
