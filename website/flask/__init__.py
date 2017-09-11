@@ -189,10 +189,8 @@ def index():
 @app.route(entry_point+'/search')
 def search():
 
-	# Get request dict
+	# Get search dictionaries
 	search_filters = request.args.to_dict()
-
-	# Get non-search options
 	search_options = {x: search_filters.pop(x, default_search_options[x]) for x in default_search_options.keys()}
 
 	# Search database
@@ -208,41 +206,29 @@ def search():
 @app.route(entry_point+'/landing/<object_type>/<object_identifier>')
 def landing(object_type, object_identifier):
 
-	# Get display options
-	display_options = {'offset': request.args.get('offset', default=1, type=int), 'page_size': request.args.get('page_size', default=10, type=int), 'sort_by': request.args.get('sort_by', default='relevance', type=str)}
-
-	# Get search query
-	search_options = {key:value for key, value in request.args.to_dict().iteritems() if key not in display_options.keys()}
-	search_options[object_identifier_columns[object_type]] = object_identifier
-
-	# Get selected object type
-	selected_object_type = search_options.pop('object_type') if 'object_type' in search_options.keys() else None
-
-	# Get selected object type filters
-	associated_object_data = {x: {'search_options': search_options, 'display_options': display_options} if selected_object_type == x else {'search_options': {object_identifier_columns[object_type]: object_identifier}, 'display_options': default_display_options} for x in object_identifier_columns.keys()}
+	# Get search dicts
+	landing_search_filters = {object_identifier_columns[object_type]: object_identifier}
+	landing_search_options = default_search_options.copy()
+	landing_search_options.update({'object_type': object_type})
 
 	# Get object data
-	landing_data = {object_type: get_landing_data(object_identifier, object_type, Session(), tables, current_user.get_id())}
+	object_data = Datasets2Tools.search(search_filters = landing_search_filters, search_options = landing_search_options, get_related_objects=True, get_fairness=True).search_results[0]
 
-	# Get datasets
-	if object_type != 'dataset':
+	# Get associated objects
+	associated_objects = {}
+	for associated_object_type in ['dataset', 'tool', 'canned_analysis']:
+		if associated_object_type != object_type:
+			associated_search_filters, associated_search_options = landing_search_filters.copy(), default_search_options.copy()
+			associated_search_options.update({'object_type': associated_object_type})
+			if request.args.get('object_type') == associated_object_type:
+				parameters = request.args.to_dict()
+				associated_search_options.update({x: parameters.pop(x, default_search_options[x]) for x in associated_search_options.keys()})
+				associated_search_filters.update(parameters)
+			associated_objects[associated_object_type] = Datasets2Tools.search(search_filters = associated_search_filters, search_options = associated_search_options, get_related_objects=False, get_fairness=False)
 
-		# Add data
-		landing_data['datasets'] = search_database(associated_object_data['dataset']['search_options'], associated_object_data['dataset']['display_options'], 'dataset', Session(), tables)
- 
-	# Get tools
-	if object_type != 'tool':
-
-		# Add data
-		landing_data['tools'] = search_database(associated_object_data['tool']['search_options'], associated_object_data['tool']['display_options'], 'tool', Session(), tables)
-
-	# Get canned analyses
-	if object_type != 'canned_analysis':
-
-		# Add data
-		landing_data['canned_analyses'] = search_database(associated_object_data['canned_analysis']['search_options'], associated_object_data['canned_analysis']['display_options'], 'canned_analysis', Session(), tables)
-
-	return render_template('landing.html', landing_data=landing_data, object_type=object_type)
+	print associated_objects
+	# Return template
+	return render_template('landing.html', object_data=object_data, object_type=object_type, associated_objects=associated_objects)
 
 #############################################
 ########## 4. Contribute Page
@@ -292,7 +278,6 @@ def upload_evaluation_api():
 		# Add object FK
 		evaluation_dataframe[object_info['object_type']+'_fk'] = object_info['object_id']
 
-		print evaluation_dataframe
 
 		# Create session
 		# session = Session()

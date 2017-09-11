@@ -94,17 +94,17 @@ class Search:
 	def __init__(self, engine, session, tables, search_filters, search_options, get_related_objects, get_fairness, user_id):
 
 		# Save query data
-		self.engine, self.session, self.tables, self.object_type, sort_by, offset, page_size = engine, session, tables, search_options['object_type'], search_options['sort_by'], search_options['offset'], search_options['page_size']
+		self.engine, self.session, self.tables, self.object_type, sort_by, offset, page_size = engine, session, tables, search_options['object_type'], search_options['sort_by'], int(search_options['offset']), int(search_options['page_size'] )
 
 		# Get IDs
-		object_ids = self.get_ids(search_filters = search_filters, sort_by = sort_by)
+		object_ids = self.get_ids(search_filters = search_filters.copy(), sort_by = sort_by)
 
 		# Filter IDs
-		filtered_ids = object_ids[(offset-1)*page_size:offset*page_size]
+		filtered_ids = object_ids[(offset-1)*page_size:offset*page_size] if page_size and offset else object_ids
 
 		# Get search results
 		self.search_results = [self.get_object_data(object_id = object_id, get_related_objects = get_related_objects, get_fairness = get_fairness, user_id = user_id) for object_id in filtered_ids]
-		self.search_filters = self.get_search_filters(object_ids = object_ids)
+		self.search_filters = self.get_search_filters(object_ids = object_ids, used_filters = search_filters.keys())
 		self.search_options = self.get_search_options(count = len(object_ids), sort_by = sort_by, offset = offset, page_size = page_size)
 
 #############################################
@@ -157,7 +157,7 @@ class Search:
 		# Metadata search
 		if self.object_type == 'canned_analysis' and len(search_filters.keys()) > 0:
 			for term_name, value in search_filters.iteritems():
-				query = query.filter(tables['canned_analysis'].columns['id'].in_(session.query(tables['canned_analysis_metadata'].columns['canned_analysis_fk']).distinct() .join(tables['term']).filter(and_(tables['term'].columns['term_name'] == term_name, tables['canned_analysis_metadata'].columns['value'] == value)).subquery()))
+				query = query.filter(self.tables['canned_analysis'].columns['id'].in_(self.session.query(self.tables['canned_analysis_metadata'].columns['canned_analysis_fk']).distinct() .join(self.tables['term']).filter(and_(self.tables['term'].columns['term_name'] == term_name, self.tables['canned_analysis_metadata'].columns['value'] == value)).subquery()))
 			
 		# Sort by relevance
 		if sort_by == 'relevance':
@@ -170,7 +170,8 @@ class Search:
 			
 		# Sort by date
 		if sort_by == 'date':
-			query = query.order_by(tables['object_type'].columns['date'].desc())
+			pass
+			# query = query.order_by(self.tables['object_type'].columns['date'].desc())
 							
 		# Sort by FAIRness
 		if sort_by == 'fairness':
@@ -259,6 +260,10 @@ class Search:
 			all_comments_query = self.session.query(self.tables[self.object_type+'_evaluation'].columns['question_fk'], self.tables[self.object_type+'_evaluation'].columns['comment']).filter(self.tables[self.object_type+'_evaluation'].columns[self.object_type+'_fk'] == object_id).filter(self.tables[self.object_type+'_evaluation'].columns['comment'] != None).all()
 			comment_dataframe = pd.DataFrame([x._asdict() for x in all_comments_query]).set_index('question_fk') if len(all_comments_query) > 0 else {}
 
+			# Get number of evaluations
+			evaluation_number_query = self.session.query(func.count(self.tables[self.object_type+'_evaluation'].columns['user_fk'])).all()
+			object_data['fairness']['evaluations'] = [int(x[0]) for x in evaluation_number_query][0]
+
 			# Add comments and
 			if len(comment_dataframe) > 0:
 				for question_fk in comment_dataframe.index:
@@ -271,7 +276,7 @@ class Search:
 ########## 4. Get Search Filters
 #############################################
 
-	def get_search_filters(self, object_ids):
+	def get_search_filters(self, object_ids, used_filters):
 
 		# Define object identifiers
 		object_identifiers = {'dataset': 'dataset_accession', 'tool': 'tool_name'}
@@ -289,8 +294,8 @@ class Search:
 		if self.object_type == 'dataset' or self.object_type == 'tool':
 			other_object_type = 'dataset' if self.object_type == 'tool' else 'tool'
 			search_filters.append({
-				'label': other_object_type,
-				'values': self.session.query(self.tables[other_object_type].columns[object_identifiers[self.object_type]]).join(self.tables['analysis_to_'+other_object_type]).join(self.tables['canned_analysis']).join(self.tables['analysis_to_'+self.object_type]).join(self.tables[self.object_type]).filter(self.tables[self.object_type].columns['id'].in_(ids)).distinct().all()
+				'label': object_identifiers[other_object_type],
+				'values': [x[0] for x in self.session.query(self.tables[other_object_type].columns[object_identifiers[other_object_type]]).join(self.tables['analysis_to_'+other_object_type]).join(self.tables['canned_analysis']).join(self.tables['analysis_to_'+self.object_type]).join(self.tables[self.object_type]).filter(self.tables[self.object_type].columns['id'].in_(object_ids)).distinct().all()]
 			})
 
 		# Get canned analysis data
@@ -299,23 +304,25 @@ class Search:
 			# Get datasets and tools
 			for associated_object_type in ['dataset', 'tool']:
 				search_filters.append({
-					'label': associated_object_type,
+					'label': object_identifiers[associated_object_type],
 					'values': [x[0] for x in self.session.query(self.tables[associated_object_type].columns[object_identifiers[associated_object_type]]).join(self.tables['analysis_to_'+associated_object_type]).join(self.tables['canned_analysis']).distinct().all()]
 				})
 
 			# Perform metadata query
 			metadata_query = self.session.query(self.tables['term'].columns['term_name'], self.tables['canned_analysis_metadata'].columns['value']).join(self.tables['canned_analysis_metadata']).filter(self.tables['canned_analysis_metadata'].columns['canned_analysis_fk'].in_(object_ids)).distinct().all()
-			metadata_dataframe = pd.DataFrame(metadata_query).set_index('term_name')
+			
 
 			# Add metadata
-			for term_name in metadata_dataframe.index.unique():
-				search_filters.append({
-					'label': term_name,
-					'values': metadata_dataframe.loc[term_name, 'value'].tolist() if isinstance(metadata_dataframe.loc[term_name, 'value'], pd.Series) else [metadata_dataframe.loc[term_name, 'value']]
-				})
+			if len(metadata_query) > 0:
+				metadata_dataframe = pd.DataFrame(metadata_query).set_index('term_name')
+				for term_name in metadata_dataframe.index.unique():
+					search_filters.append({
+						'label': term_name,
+						'values': metadata_dataframe.loc[term_name, 'value'].tolist() if isinstance(metadata_dataframe.loc[term_name, 'value'], pd.Series) else [metadata_dataframe.loc[term_name, 'value']]
+					})
 
 		# Filter filters (so meta)
-		search_filters = [x for x in search_filters if len(x['values']) > 1]
+		search_filters = [x for x in search_filters if len(x['values']) > 1 or x['label'] in used_filters]
 
 		# Return
 		return search_filters
@@ -327,27 +334,31 @@ class Search:
 	def get_search_options(self, count, sort_by, offset, page_size):
 
 		# Define search options
-		search_options = {}
+		search_options = {'count': count}
 
 		# Get max pages
-		max_pages = count/page_size
+		max_pages = -(-count//page_size)
 
 		# Get offset options
 		offset_options = [offset-1, offset, offset+1, max_pages]
 
 		# Get offsets
-		search_options['offset'] = [x for x in set(offset_options) if x > 0 and x <= max_pages]
+		search_options['offset'] = {'values': [x for x in set(offset_options) if x > 0 and x <= max_pages], 'selected': offset}
+
+		# Default options
+		search_options['sort_by'] = {'values': [{'label': 'Relevance', 'value': 'relevance'}, {'label': 'Date (newest)', 'value': 'newest'}], 'selected': sort_by}
 
 		# Get sort by
 		if self.object_type == 'dataset':
-			search_options['sort_by'] = ['relevance', 'date']
+			search_options['sort_by']['values'].append([])
 		elif self.object_type == 'tool':
-			search_options['sort_by'] = ['relevance', 'date']
+			search_options['sort_by']['values'].append([])
 		elif self.object_type == 'canned_analysis':
-			search_options['sort_by'] = ['relevance', 'date']
+			search_options['sort_by']['values'].append([])
 
 		# Get page sizes
-		search_options['page_size'] = [10, 20, 30]
+		page_sizes = [(x+1)*10 for x in range(min(count/10, 3)+1)] if count > 10 else []
+		search_options['page_size'] = {'values': page_sizes, 'selected': page_size}
 		
 		# Return
 		return search_options

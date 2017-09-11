@@ -16,8 +16,8 @@
 		{% set card_description = object_data.tool_description %}
 		{% set card_icon_url = object_data.tool_icon_url if object_data.tool_icon_url else url_for('static', filename='icons/tool.png') %}
 		{% set card_landing_url = url_for('landing', object_type=object_type, object_identifier=object_data.tool_name) %}
-		{% set card_colsize = 'col-4' %}
-		{% set image_colsize = 5 %}
+		{% set card_colsize = 'col-6' %}
+		{% set image_colsize = 4 %}
 		{% set max_description_length = 100 %}
 	{% elif object_type == 'canned_analysis' %}
 		{% set card_title = object_data.canned_analysis_title %}
@@ -50,160 +50,50 @@
 
 {% endmacro %}
 
-<!-- Search Options -->
-{% macro display_search_options(search_options, sort_by_dict, object_type) %}
-	<div class="col-4">
-		<div class="search-option-label">Sort by</div>
-		<select data-placeholder="Select..." name="sort_by" class="search-sort-dropdown">
-			<option></option>
-			{% for value in sort_by_dict['values'] %}
-				<option value="{{ value }}"{{ ' selected' if value == sort_by_dict['selected'] else '' }}>{{ value.title().replace('Fair', 'FAIR') }}</option>
-			{% endfor %}
-		</select>
-	</div>
-	{% for options_dict in search_options %}
-		{% for option, option_data in options_dict.iteritems() %}
-			{% if option_data['values']|length > 0 %}
-				<div class="col-4">
-					<div class="search-option-label">{{ option.title().replace('_', ' ') }}</div>
-					<select data-placeholder="Select..." class="search-option-dropdown" name="{{ option }}">
-						<option></option>
-						{% for value in option_data['values'] %}
-							<option value="{{ value }}"{{ ' selected' if value == option_data['selected'] else '' }}>{{ value }}</option>
-						{% endfor %}
-					</select>
-				</div>
-			{% endif %}
-		{% endfor %}
-	{% endfor %}
-{% endmacro %}
-
-<!-- Search Results -->
-{% macro display_search_results(search_data, object_type) %}
-
-	<div class="row search-results-wrapper">
-		<form class="landing-search-form">
-			<input type="hidden" name="object_type" value="{{ object_type }}">
-			<div class="col-12">
-				<div class="row search-filters-row">
-					<div class="col-12">
-						<div class="row search-row">
-							<div class="col-6 text-left">
-								<div class="form-inline">
-									<input class="form-control" type="text" placeholder="Search..." name="q"{{ ' value='+request.args.get('q') if request.args.get('q', default='') != ''}}>
-									<button class="btn" type="button">
-										<i class="fa fa-search"></i>
-									</button>
-								</div>
-							</div>
-							<div class="col-6 text-right">
-								<a class="filter-button">Filters&nbsp&nbsp</a>
-							</div>
-						</div>
-						<div class="search-options-wrapper">
-							<hr width="100%">
-							<div class="row search-options-row">
-								{{ display_search_options(search_data.search_options, search_data.display_options.sort_by, object_type) }}
-							</div>
-						</div>
-					</div>
-				</div>
-				<hr width="100%" class="my-1">
-				<div class="row object-card-row">
-					{% for object_data in search_data.search_results %}
-						{{ display_object_card(object_data, object_type) }}
-					{% endfor %}
-				</div>
-				<div class="row search-number-card-row">
-					<div class="col-6 text-left">
-						{% if search_data.display_options.offset['values']|length > 1 %}
-							{% for offset in search_data.display_options.offset['values'] %}
-								<input type="radio" name="offset" id="{{object_type}}-offset-{{offset}}" value="{{offset}}"{{ ' checked' if offset == search_data.display_options.offset['selected'] }}>
-								<label for="{{object_type}}-offset-{{offset}}" class="search-filter-number-card">{{offset}}</label>
-							{% endfor %}
-						{% endif %}
-					</div>
-					<div class="col-6 text-right">
-						{% if search_data.display_options.page_size['values']|length > 0 %}
-							{% for page_size in search_data.display_options.page_size['values'] %}
-								<input type="radio" name="page_size" id="{{object_type}}-page-size-{{page_size}}" value="{{page_size}}"{{ ' checked' if page_size == search_data.display_options.page_size['selected'] }}>
-								<label for="{{object_type}}-page-size-{{page_size}}" class="search-filter-number-card">{{page_size}}</label>
-							{% endfor %}
-							<span class="search-filter-number-label"> per page </span>
-						{% endif %}
-					</div>
-				</div>
-			</div>
-		</form>
-	</div>
-{% endmacro %}
-
 <!-- Filters -->
-{% macro display_filters(search_filters, sort_by, object_type) %}
+{% macro display_filters(search_filters, sort_by) %}
 	<div class="col-4">
 		<div class="search-option-label">Sort by</div>
 		<select data-placeholder="Select..." name="sort_by" class="search-sort-dropdown">
 			<option></option>
-			{% for value in sort_by_dict['values'] %}
-				<option value="{{ value }}"{{ ' selected' if value == sort_by_dict['selected'] else '' }}>{{ value.title().replace('Fair', 'FAIR') }}</option>
+			{% for value in sort_by['values'] %}
+				<option value="{{ value.value }}"{{ ' selected' if value.value == sort_by['selected'] else '' }}>{{ value.label }}</option>
 			{% endfor %}
 		</select>
 	</div>
-	{% for options_dict in search_options %}
-		{% for option, option_data in options_dict.iteritems() %}
-			{% if option_data['values']|length > 0 %}
-				<div class="col-4">
-					<div class="search-option-label">{{ option.title().replace('_', ' ') }}</div>
-					<select data-placeholder="Select..." class="search-option-dropdown" name="{{ option }}">
-						<option></option>
-						{% for value in option_data['values'] %}
-							<option value="{{ value }}"{{ ' selected' if value == option_data['selected'] else '' }}>{{ value }}</option>
-						{% endfor %}
-					</select>
-				</div>
-			{% endif %}
-		{% endfor %}
+	{% for filters in search_filters %}
+		<div class="col-4">
+			<div class="search-option-label">{{ filters.label.title().replace('_', ' ') }}</div>
+			<select data-placeholder="Select..." class="search-option-dropdown" name="{{ filters.label }}">
+				<option></option>
+				{% for value in filters['values'] %}
+					<option value="{{ value }}"{{ ' selected' if value == request.args.get(filters.label) else '' }}>{{ value }}</option>
+				{% endfor %}
+			</select>
+		</div>
 	{% endfor %}
 {% endmacro %}
-<!-- Search Results -->
-{% macro display_search_results2(search_data, object_type, page_type) %}
 
-	<div class="container search-container {{page_type}}-search">
-		<form class="object-search-form" action="{{ url_for('search') if page_type == 'search' else url_for('landing_search') }}">
-			<!-- Display Search Bar -->
-			{% if page_type== 'search' %}
-				<div id="search-label">Search</div>
-				<div id="search-row" class="row">
-					<div class="col-12">
-						<div class="form-inline">
-							<input class="form-control" type="text" value="{{ request.args.get('q', default='') }}" name="q">
-							<button class="btn" type="button">
-								<i class="fa fa-search"></i>
-							</button>
-						</div>
-					</div>
-				</div> <!-- #search-row -->
-				<div id="search-tab-row" class="row">
-					<div class="col-12 search-tab-col">
-						<input id="canned_analyses" type="radio" name="object_type" value="canned_analysis"{{' checked' if object_type == 'canned_analysis' }}><label class="search-tab" for="canned_analyses">Analyses</label>
-						<input id="datasets" type="radio" name="object_type" value="dataset"{{' checked' if object_type == 'dataset' }}><label class="search-tab" for="datasets">Datasets</label>
-						<input id="tools" type="radio" name="object_type" value="tool"{{' checked' if object_type == 'tool' }}><label class="search-tab" for="tools">Tools</label>
-					</div>
-				</div> <!-- #search-tab-row -->
-			{% else %}
-			asd
+<!-- Navigation -->
+{% macro display_navigation(search_options) %}
+		<div class="col-6 text-left offset-col">
+			{% if search_options.offset['values']|length > 1 %}
+				{% for offset in search_options.offset['values'] %}
+					<input type="radio" class="search-navigation-radio" name="offset" id="{{object_type}}-offset-{{offset}}" value="{{offset}}"{{ ' checked' if offset == search_options.offset.selected }}>
+					<label for="{{object_type}}-offset-{{offset}}" class="search-navigation-number">{{offset}}</label>
+				{% endfor %}
 			{% endif %}
-			<div class="search-results-wrapper-row row">
-				<div class="col-12">
-					{% if search_data.search_results|length > 0 %}
-					{% else %}
-						{% if page_type == 'search' %}
-							<div id="no-search-results"> No results found.</div>
-						{% elif page_type == 'landing' %}
-						{% endif %}
-					{% endif %}
-				</div>
-			</div>
-		</form>
-	</div>
+		</div>
+		<div class="col-6 text-right page-size-col">
+			{% if search_options.page_size['values']|length > 0 %}
+				{% for page_size in search_options.page_size['values'] %}
+					<input type="radio" class="search-navigation-radio" name="page_size" id="{{object_type}}-page-size-{{page_size}}" value="{{page_size}}"{{ ' checked' if page_size == search_options.page_size.selected }}>
+					<label for="{{object_type}}-page-size-{{page_size}}" class="search-navigation-number">{{page_size}}</label>
+				{% endfor %}
+				<span class="search-filter-number-label"> per page </span>
+			{% endif %}
+		</div>
 {% endmacro %}
+
+<!-- Search Results -->
+

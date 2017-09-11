@@ -12,14 +12,15 @@
 {% block content %}
 
 	<div id="landing-container" class="container">
+
 		<div id="object-overview" class="row">
 			<div id="object-icon-col" class="{{ 'col-2' if object_type == 'tool' else 'col-3' }}">
 				{% if object_type == 'dataset' %}
 					{% set image_url = url_for('static', filename='icons/gene.png') %}
 				{% elif object_type == 'tool' %}
-					{% set image_url = landing_data.tool.tool_icon_url if landing_data.tool.tool_icon_url else url_for('static', filename='icons/tool.png') %}
+					{% set image_url = object_data.tool_icon_url if object_data.tool_icon_url else url_for('static', filename='icons/tool.png') %}
 				{% elif object_type == 'canned_analysis' %}
-					{% set image_url = landing_data.canned_analysis.canned_analysis_preview_url if landing_data.canned_analysis.canned_analysis_preview_url else url_for('static', filename='icons/analysis.png') %}
+					{% set image_url = object_data.canned_analysis_preview_url if object_data.canned_analysis_preview_url else url_for('static', filename='icons/analysis.png') %}
 				{% endif %}
 				<img id="object-icon" class="{{ object_type }}-icon" src="{{ image_url }}">
 			</div>
@@ -27,18 +28,18 @@
 				<div class="row">
 					<div id="object-main-title" class="col-12 {{ 'tool' if object_type == 'tool' }}">
 						{% if object_type == 'dataset' %}
-							{{ landing_data.dataset.dataset_title }}
+							{{ object_data.dataset_title }}
 						{% elif object_type == 'tool' %}
-							{{ landing_data.tool.tool_name }}
+							{{ object_data.tool_name }}
 						{% elif object_type == 'canned_analysis' %}
-							{{ landing_data.canned_analysis.canned_analysis_title }}
+							{{ object_data.canned_analysis_title }}
 						{% endif %}
 					</div>
 				</div>
 				<div class="row">
 					<div id="object-subtype" class="col-12">
 						{% if object_type == 'dataset' %}
-							{{ landing_data.dataset.dataset_type }} Dataset
+							Dataset
 						{% elif object_type == 'tool' %}
 							Computational Tool
 						{% elif object_type == 'canned_analysis' %}
@@ -51,15 +52,15 @@
 				<div class="row">
 					<div class="col-12">
 						{% if object_type == 'dataset' %}
-							<a href="{{ landing_data.dataset.dataset_landing_url }}">
+							<a href="{{ object_data.dataset_landing_url }}">
 								<button class="btn">View</button>
 							</a>
 						{% elif object_type == 'tool' %}
-							<a href="{{ landing_data.tool.tool_homepage_url }}">
+							<a href="{{ object_data.tool_homepage_url }}">
 								<button class="btn">View</button>
 							</a>
 						{% elif object_type == 'canned_analysis' %}
-							<a href="{{ landing_data.canned_analysis.canned_analysis_url }}">
+							<a href="{{ object_data.canned_analysis_url }}">
 								<button class="btn">View</button>
 							</a>
 						{% endif %}
@@ -73,11 +74,11 @@
 				<div id="fairness-label">FAIR Metrics</div>
 				<svg height="95px" width="95px">
 					{% set w = 23 %}
-					{% for index, fairness_data in landing_data[object_type]['fairness']['scores'].iterrows() %}
-						 <rect x="{{ ((loop.index-1) % 4)*w }}" y="{{ (((loop.index)/4)|round(0, 'ceil')-1)*w }}" width="{{w-2}}px" height="{{w-2}}px" fill="grey" data-value="{{fairness_data.fairness_score}}" data-toggle="tooltip" data-placement="bottom" data-animation="false" data-html="true" title="<div class='fairness-tooltip'><div class='fairness-question'>{% if fairness_data.fairness_score >= -1 %}<b>Score:</b> {{fairness_data.fairness_score|round(2)}}</div>{% endif %}<b>{{fairness_data.question_number}}.</b> {{fairness_data.question}}</div></div>"/>
+					{% for question in object_data['fairness']['questions'] %}
+						 <rect x="{{ ((loop.index-1) % 4)*w }}" y="{{ (((loop.index)/4)|round(0, 'ceil')-1)*w }}" width="{{w-2}}px" height="{{w-2}}px" fill="grey" data-value="{{object_data['fairness']['user_scores'].get(question['id'])}}" data-toggle="tooltip" data-placement="bottom" data-animation="false" data-html="true" title="<div class='fairness-tooltip'><div class='fairness-question'>{% if object_data['fairness']['user_scores'].get(question['id']) >= -1 %}<b>Score:</b> {{object_data['fairness']['user_scores'].get(question['id'])}}</div>{% endif %}<b>{{question.question_number}}.</b> {{question.question}}</div></div>"/>
 					{% endfor %}
 				</svg>
-				<div id="fairness-evaluation-number">{{ landing_data[object_type]['fairness']['nr_evaluations'] }} evaluations</div>
+				<div id="fairness-evaluation-number">{{ object_data['fairness']['evaluations'] }} evaluations</div>
 			</div>
 		</div> <!-- #object-overview -->
 
@@ -88,17 +89,17 @@
 				</li>
 				{% if object_type != 'dataset' %}
 					<li class="nav-item">
-						<a class="nav-link" data-toggle="tab" href="#datasets" role="tab">Datasets ({{ landing_data.datasets.display_options.count }})</a>
+						<a class="nav-link" data-toggle="tab" href="#datasets" role="tab">Datasets</a>
 					</li>
 				{% endif %}
 				{% if object_type != 'tool' %}
 					<li class="nav-item">
-						<a class="nav-link" data-toggle="tab" href="#tools" role="tab">Tools ({{ landing_data.tools.display_options.count }})</a>
+						<a class="nav-link" data-toggle="tab" href="#tools" role="tab">Tools</a>
 					</li>
 				{% endif %}
 				{% if object_type != 'canned_analysis' %}
 					<li class="nav-item">
-						<a class="nav-link" data-toggle="tab" href="#canned_analyses" role="tab">Analyses ({{ landing_data.canned_analyses.display_options.count }})</a>
+						<a class="nav-link" data-toggle="tab" href="#canned_analyses" role="tab">Analyses</a>
 					</li>
 				{% endif %}
 				<li class="nav-item">
@@ -108,38 +109,39 @@
 		</div> <!-- #object-tabs -->
 
 		<div id="object-content" class="tab-content">
+
 			<div class="tab-pane active" id="overview" role="tabpanel">
 				<div id="general-info" class="info-card">
 					<div class="info-card-title">General Information</div>
 					<table class="info-card-table">
 						{% if object_type == 'dataset' %}
-							<tr><td>Accession</td><td>{{ landing_data[object_type]['dataset_accession'] }}</td></tr>
-							<tr><td>Title</td><td>{{ landing_data[object_type]['dataset_title'] }}</td></tr>
-							<tr><td>Description</td><td>{{ landing_data[object_type]['dataset_description'] }}</td></tr>
-							<tr><td>Landing Page</td><td><a href="{{ landing_data[object_type]['dataset_landing_url'] }}">{{ landing_data[object_type]['dataset_landing_url'] }}</a></td></tr>
-							<tr><td>Repository</td><td><a href="{{ landing_data[object_type]['repository_homepage_url'] }}">{{ landing_data[object_type]['repository_name'] }}</a></td></tr>
+							<tr><td>Accession</td><td>{{ object_data['dataset_accession'] }}</td></tr>
+							<tr><td>Title</td><td>{{ object_data['dataset_title'] }}</td></tr>
+							<tr><td>Description</td><td>{{ object_data['dataset_description'] }}</td></tr>
+							<tr><td>Landing Page</td><td><a href="{{ object_data['dataset_landing_url'] }}">{{ object_data['dataset_landing_url'] }}</a></td></tr>
+							<tr><td>Repository</td><td><a href="{{ object_data['repository_homepage_url'] }}">{{ object_data['repository_name'] }}</a></td></tr>
 							<tr>
 						{% elif object_type == 'tool' %}
-							<tr><td>Description</td><td>{{ landing_data[object_type]['tool_description'] }}</td></tr>
-							<tr><td>Homepage</td><td><a href="{{ landing_data[object_type]['tool_homepage_url'] }}">{{ landing_data[object_type]['tool_homepage_url'] }}</a></td></tr>
+							<tr><td>Description</td><td>{{ object_data['tool_description'] }}</td></tr>
+							<tr><td>Homepage</td><td><a href="{{ object_data['tool_homepage_url'] }}">{{ object_data['tool_homepage_url'] }}</a></td></tr>
 						{% elif object_type == 'canned_analysis' %}
-							<tr><td>Title</td><td>{{ landing_data[object_type]['canned_analysis_title'] }}</td></tr>
-							<tr><td>Description</td><td>{{ landing_data[object_type]['canned_analysis_description'] }}</td></tr>
-							<tr><td>Analysis URL</td><td><a href="{{ landing_data[object_type]['canned_analysis_url'] }}">{{ landing_data[object_type]['canned_analysis_url'] }}</a></td></tr>
-							<tr><td>Accession</td><td>{{ landing_data[object_type]['canned_analysis_accession'] }}</td></tr>
-							<tr><td>Upload Date</td><td>{{ landing_data[object_type]['date'] }}</td></tr>
+							<tr><td>Title</td><td>{{ object_data['canned_analysis_title'] }}</td></tr>
+							<tr><td>Description</td><td>{{ object_data['canned_analysis_description'] }}</td></tr>
+							<tr><td>Analysis URL</td><td><a href="{{ object_data['canned_analysis_url'] }}">{{ object_data['canned_analysis_url'] }}</a></td></tr>
+							<tr><td>Accession</td><td>{{ object_data['canned_analysis_accession'] }}</td></tr>
+							<tr><td>Upload Date</td><td>{{ object_data['date'] }}</td></tr>
 							<tr><td>Uploader</td><td><a href="#">maayanlab</a></td></tr>
 						{% endif %}
-						<td>Keywords</td><td>{% for keyword in landing_data[object_type]['keywords'] %} <a href="#" class="keyword">{{ keyword }}</a> {% endfor %} </td></tr>
+						<td>Keywords</td><td>{% for keyword in object_data['keywords'] %} <a href="#" class="keyword">{{ keyword }}</a> {% endfor %} </td></tr>
 					</table>
 				</div> <!-- #general-info -->
 
-				{% if object_type == 'tool' and landing_data[object_type]['articles']|length > 0 %}
+				{% if object_type == 'tool' and object_data['articles']|length > 0 %}
 					<div id="publication-info" class="info-card">
 						<div class="info-card-title">Publications</div>
 						<div class="info-card-tabs">
 							<ul class="nav nav-tabs" role="tablist">
-								{% for publication in landing_data[object_type]['articles'] %}
+								{% for publication in object_data['articles'] %}
 									<li class="nav-item">
 										<a class="nav-link{{' active' if loop.index == 1}}" data-toggle="tab" href="#publication-{{loop.index}}" role="tab">{{ publication['journal_name'] }} ({{ publication['date'].year }})</a>
 									</li>
@@ -147,7 +149,7 @@
 							</ul>
 						</div>
 						<div class="tab-content">
-							{% for publication in landing_data[object_type]['articles'] %}
+							{% for publication in object_data['articles'] %}
 								<div class="tab-pane {{ 'active' if loop.index == 1 }}" id="publication-{{loop.index}}" role="tabpanel">
 									<div class="info-card-publication">
 										<div class="info-card-publication-title">{{ publication['article_title'] }}</div>
@@ -170,11 +172,11 @@
 					</div> <!-- #publication-info -->
 				{% endif %}
 
-				{% if object_type == 'canned_analysis' and landing_data[object_type]['metadata']|length > 0 %}
+				{% if object_type == 'canned_analysis' and object_data['metadata']|length > 0 %}
 					<div id="metadata-info" class="info-card">
 						<div class="info-card-title">Metadata</div>
 						<table class="info-card-table">
-							{% for key, value in landing_data[object_type]['metadata'].iteritems() %}
+							{% for key, value in object_data['metadata'].iteritems() %}
 								<tr><td>{{ key }}</td><td>{{ value }}</td></tr>
 							{% endfor %}
 						</table>
@@ -184,7 +186,7 @@
 				<div id="related-object-info" class="info-card">
 					<div class="info-card-title">Related {{ object_type.replace('canned_analysis', 'Analyse').title()+'s' }}</div>
 					<div id="related-object-row" class="row">
-						{% for related_object in landing_data[object_type]['related_objects'] %}
+						{% for related_object in object_data['related_objects'] %}
 							{{ macros.display_object_card(related_object, object_type=object_type) }}
 						{% endfor %}
 					</div>
@@ -200,8 +202,8 @@
 						</div>
 						<div class="row">
 						</div>
-						{% if landing_data.datasets.search_results|length > 0  %}
-							{{ macros.display_search_results(landing_data.datasets, object_type='dataset') }}
+						{% if associated_objects['dataset'].search_results|length > 0  %}
+							{# macros.display_search_results(associated_objects['dataset'], object_type='dataset') #}
 						{% else %}
 							<div class="no-search-results">
 								{% if object_type == 'tool' %}
@@ -225,8 +227,8 @@
 						</div>
 						<div class="row">
 						</div>
-						{% if landing_data.tools.search_results|length > 0  %}
-							{{ macros.display_search_results(landing_data.tools, object_type='tool') }}
+						{% if associated_objects['tool'].search_results|length > 0  %}
+							{# macros.display_search_results(associated_objects['tool'], object_type='tool') #}
 						{% else %}
 							<div class="no-search-results">
 								{% if object_type == 'dataset' %}
@@ -250,8 +252,8 @@
 						</div>
 						<div class="row">
 						</div>
-						{% if landing_data.canned_analyses.search_results|length > 0  %}
-							{{ macros.display_search_results(landing_data.canned_analyses, object_type='canned_analysis') }}
+						{% if associated_objects['canned_analysis'].search_results|length > 0  %}
+							{# macros.display_search_results(associated_objects['canned_analysis'], object_type='canned_analysis') #}
 						{% else %}
 							<div class="no-search-results">
 								{% if object_type == 'tool' %}
@@ -275,15 +277,16 @@
 						{% if current_user.is_authenticated %}
 							<form id="fairness-form" action="javascript:submitFairness();" method="post">
 								<input type="hidden" name="object_type" value="{{object_type}}">
-								<input type="hidden" name="object_id" value="{{landing_data[object_type].id}}">
+								<input type="hidden" name="object_id" value="{{object_data.id}}">
 								<table id="fairness-table">
 									<tr><th>Question</th><th>Yes</th><th>No</th><th>Yes, but:</th><th>Comments</th></tr>
-									{% for index, fairness_data in landing_data[object_type]['fairness']['scores'].iterrows() %}
-										<tr><td><b>{{fairness_data.question_number}}.</b> {{fairness_data.question}}</td>
-										<td><input type="radio" name="fairness-question-{{fairness_data.id}}" value=1 {{'checked' if fairness_data.id in landing_data[object_type].fairness.user_scores.keys() and landing_data[object_type].fairness.user_scores[fairness_data.id].score == 1}}></td>
-										<td><input type="radio" name="fairness-question-{{fairness_data.id}}" value=-1 {{'checked' if fairness_data.id in landing_data[object_type].fairness.user_scores.keys() and landing_data[object_type].fairness.user_scores[fairness_data.id].score == -1}}></td>
-										<td><input type="radio" name="fairness-question-{{fairness_data.id}}" value=0 {{'checked' if fairness_data.id in landing_data[object_type].fairness.user_scores.keys() and landing_data[object_type].fairness.user_scores[fairness_data.id].score == 0}}></td>
-										<td><input type="text" class="yes-but-comment" name="fairness-question-{{fairness_data.id}}-comment" value="{{landing_data[object_type].fairness.user_scores[fairness_data.id].comment if fairness_data.id in landing_data[object_type].fairness.user_scores.keys() else '' }}"></td></tr>
+									{% for question in object_data['fairness']['questions'] %}
+										<tr>
+											<td><b>{{question.question_number}}.</b> {{question.question}}</td>
+											{% for score in [1, -1, 0] %}
+												<td><input type="radio" name="fairness-question-{{question.id}}" value={{score}} {{ 'checked' if object_data['fairness']['user_scores'].get(question.id) == score }}></td> <!-- to fix -->
+											{% endfor %}
+										<td><input type="text" class="yes-but-comment" name="fairness-question-{{question.id}}-comment" value="{{ object_data['fairness']['user_scores'].get(question.id, '') }}"></td></tr> <!-- to fix -->
 									{% endfor %}
 								</table>
 								<button id="fairness-button" class="btn" type="submit">Submit</button>
@@ -298,6 +301,9 @@
 			</div> <!-- #fairness -->
 
 		</div> <!-- #object-content -->
+
+
+
 	</div>
 
 {% endblock %}
@@ -326,7 +332,7 @@
 		};
 		color = d3.scaleLinear().domain([-1, 1]).interpolate(d3.interpolateRgb).range([d3.rgb(255,0,0), d3.rgb(0,0,255)]);
 		$('#object-fairness-col rect').each(function(i, elem) {
-			if ($(elem).attr('data-value') === 'nan') {
+			if ($(elem).attr('data-value') === 'None') {
 				$(elem).attr('fill', 'grey');
 			} else {
 				$(elem).attr('fill', color($(elem).attr('data-value')));

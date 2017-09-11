@@ -9,7 +9,67 @@
 
 {% block content %}
 
-	{{ macros.display_search_results2(search_data, object_type, page_type='search') }}
+	<div id="search-container" class="container">
+		<form id="object-search-form" action="{{ url_for('search') }}">
+			<div id="search-label">Search</div>
+			<div id="search-row" class="row">
+				<div class="col-12">
+					<div class="form-inline">
+						<input class="form-control" type="text" value="{{ request.args.get('q', default='') }}" name="q">
+						<button class="btn" type="button">
+							<i class="fa fa-search"></i>
+						</button>
+					</div>
+				</div>
+			</div> <!-- #search-row -->
+			<div id="search-tab-row" class="row">
+				<div class="col-12 search-tab-col">
+					<input id="canned_analyses" type="radio" name="object_type" value="canned_analysis"{{' checked' if object_type == 'canned_analysis' }}><label class="search-tab" for="canned_analyses">Analyses</label>
+					<input id="datasets" type="radio" name="object_type" value="dataset"{{' checked' if object_type == 'dataset' }}><label class="search-tab" for="datasets">Datasets</label>
+					<input id="tools" type="radio" name="object_type" value="tool"{{' checked' if object_type == 'tool' }}><label class="search-tab" for="tools">Tools</label>
+				</div>
+			</div> <!-- #search-tab-row -->
+			<div id="search-results-wrapper-row" class="row">
+				<div class="col-12">
+					{% if search_data.search_results|length > 0 %}
+
+						<!-- Filters -->
+						<div id="search-filters-row" class="row">
+							<div id="search-results-number" class="col-6 text-left">
+								{{ search_data.search_options.count }} search result{{ 's' if search_data.search_options.count > 1 else '' }}
+							</div>
+							<div class="col-6 text-right">
+								<a class="filter-button">Filters&nbsp&nbsp</a>
+							</div>
+						</div> <!-- #search-filters-row -->
+
+						<div id="search-options-wrapper">
+							<hr width="95%">
+							<div id="search-options-row" class="row">
+								{{ macros.display_filters(search_filters = search_data.search_filters, sort_by = search_data.search_options.sort_by) }}
+							</div> <!-- #search-options-row -->
+						</div>
+
+						<!-- Results -->
+						<hr width="95%">
+						<div id="search-results-row" class="row">
+							{% for object_data in search_data.search_results %}
+								{{ macros.display_object_card(object_data = object_data, object_type = object_type) }}
+							{% endfor %}
+						</div> <!-- #search-results-row -->
+
+						<!-- Navigation -->
+						<div id="search-navigation-row" class="row">
+							{{ macros.display_navigation(search_options = search_data.search_options) }}
+						</div> <!-- #search-offsets-row -->
+					{% else %}
+						<div id="no-search-results"> No results found.</div>
+					{% endif %}
+				</div>
+			</div>
+		</form>
+	</div>
+	
 
 {% endblock %}
 

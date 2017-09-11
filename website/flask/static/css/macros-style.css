@@ -93,9 +93,47 @@
 					}
 
 /*************************/
-/** SPECIFIC CARDs
+/** FILTERS 
 /*************************/
 
-.tool-card {
-	height: 130px;
+.search-option-label {
+	font-size: 9pt;
+	padding-left: 3px;
+	padding-top: 15px;
 }
+
+.search-options-row .chosen-single {
+	background-color: #f9f9f9 !important;
+	background-image: none !important;
+	padding-top: 5px;
+	border-radius: 3px !important;
+}
+
+	.search-options-row .chosen-single span {
+		font-weight: 300;
+	}
+
+/*************************/
+/** NAVIGATION 
+/*************************/
+
+.search-navigation-number {
+	font-size: 9pt;
+	display: inline-block;
+	border: 1px solid #c2c2c2;
+	border-radius: 2px;
+	background-color: #f9f9f9;
+	padding: 2px 8px;
+	margin-right: 5px;
+	cursor: pointer;
+}
+
+	.search-navigation-radio {
+		display: none;
+	}
+
+		.search-navigation-radio:checked + .search-navigation-number {
+			color: #c2c2c2;
+			border-color: lightgrey;
+			cursor: default;
+		}
