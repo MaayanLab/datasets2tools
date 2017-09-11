@@ -161,35 +161,45 @@ CREATE TABLE question (
 	`object_type` ENUM('dataset', 'tool', 'canned_analysis')
 );
 
-CREATE TABLE evaluation (
+CREATE TABLE dataset_evaluation (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`user_fk` INT NOT NULL,
+	`dataset_fk` INT DEFAULT NULL,
 	`question_fk` INT NOT NULL,
 	`score` INT,
 	`comment` TEXT,
-	`dataset_fk` INT DEFAULT NULL,
-	`tool_fk` INT DEFAULT NULL,
-	`canned_analysis_fk` INT DEFAULT NULL,
-	FOREIGN KEY (dataset_fk) REFERENCES dataset(id),
-	FOREIGN KEY (tool_fk) REFERENCES tool(id),
-	FOREIGN KEY (canned_analysis_fk) REFERENCES canned_analysis(id),
-	FOREIGN KEY (question_fk) REFERENCES question(id),
 	FOREIGN KEY (user_fk) REFERENCES user(id),
-	UNIQUE INDEX `unique_evaluation` (user_fk, question_fk, dataset_fk, tool_fk, canned_analysis_fk)
+	FOREIGN KEY (dataset_fk) REFERENCES dataset(id),
+	FOREIGN KEY (question_fk) REFERENCES question(id),
+	UNIQUE INDEX `unique_dataset_evaluation` (user_fk, dataset_fk, question_fk)
+);
+
+CREATE TABLE tool_evaluation (
+	`id` INT AUTO_INCREMENT PRIMARY KEY,
+	`user_fk` INT NOT NULL,
+	`tool_fk` INT DEFAULT NULL,
+	`question_fk` INT NOT NULL,
+	`score` INT,
+	`comment` TEXT,
+	FOREIGN KEY (user_fk) REFERENCES user(id),
+	FOREIGN KEY (tool_fk) REFERENCES tool(id),
+	FOREIGN KEY (question_fk) REFERENCES question(id),
+	UNIQUE INDEX `unique_tool_evaluation` (user_fk, tool_fk, question_fk)
 );
 
 
--- CREATE TABLE question_answer (
--- 	`id` INT AUTO_INCREMENT PRIMARY KEY,
--- 	`question_fk` INT NOT NULL,
--- 	`evaluation_fk` INT NOT NULL,
--- 	`score` INT,
--- 	`comment` TEXT,
--- 	FOREIGN KEY (question_fk) REFERENCES question(id),
--- 	FOREIGN KEY (evaluation_fk) REFERENCES evaluation(id),
--- 	UNIQUE KEY (question_fk, evaluation_fk)
--- );
-
+CREATE TABLE canned_analysis_evaluation (
+	`id` INT AUTO_INCREMENT PRIMARY KEY,
+	`user_fk` INT NOT NULL,
+	`canned_analysis_fk` INT DEFAULT NULL,
+	`question_fk` INT NOT NULL,
+	`score` INT,
+	`comment` TEXT,
+	FOREIGN KEY (user_fk) REFERENCES user(id),
+	FOREIGN KEY (canned_analysis_fk) REFERENCES canned_analysis(id),
+	FOREIGN KEY (question_fk) REFERENCES question(id),
+	UNIQUE INDEX `unique_canned_analysis_evaluation` (user_fk, canned_analysis_fk, question_fk)
+);
 
 ### Add Data
 

@@ -136,5 +136,74 @@
 			</div>
 		</form>
 	</div>
+{% endmacro %}
 
+<!-- Filters -->
+{% macro display_filters(search_filters, sort_by, object_type) %}
+	<div class="col-4">
+		<div class="search-option-label">Sort by</div>
+		<select data-placeholder="Select..." name="sort_by" class="search-sort-dropdown">
+			<option></option>
+			{% for value in sort_by_dict['values'] %}
+				<option value="{{ value }}"{{ ' selected' if value == sort_by_dict['selected'] else '' }}>{{ value.title().replace('Fair', 'FAIR') }}</option>
+			{% endfor %}
+		</select>
+	</div>
+	{% for options_dict in search_options %}
+		{% for option, option_data in options_dict.iteritems() %}
+			{% if option_data['values']|length > 0 %}
+				<div class="col-4">
+					<div class="search-option-label">{{ option.title().replace('_', ' ') }}</div>
+					<select data-placeholder="Select..." class="search-option-dropdown" name="{{ option }}">
+						<option></option>
+						{% for value in option_data['values'] %}
+							<option value="{{ value }}"{{ ' selected' if value == option_data['selected'] else '' }}>{{ value }}</option>
+						{% endfor %}
+					</select>
+				</div>
+			{% endif %}
+		{% endfor %}
+	{% endfor %}
+{% endmacro %}
+<!-- Search Results -->
+{% macro display_search_results2(search_data, object_type, page_type) %}
+
+	<div class="container search-container {{page_type}}-search">
+		<form class="object-search-form" action="{{ url_for('search') if page_type == 'search' else url_for('landing_search') }}">
+			<!-- Display Search Bar -->
+			{% if page_type== 'search' %}
+				<div id="search-label">Search</div>
+				<div id="search-row" class="row">
+					<div class="col-12">
+						<div class="form-inline">
+							<input class="form-control" type="text" value="{{ request.args.get('q', default='') }}" name="q">
+							<button class="btn" type="button">
+								<i class="fa fa-search"></i>
+							</button>
+						</div>
+					</div>
+				</div> <!-- #search-row -->
+				<div id="search-tab-row" class="row">
+					<div class="col-12 search-tab-col">
+						<input id="canned_analyses" type="radio" name="object_type" value="canned_analysis"{{' checked' if object_type == 'canned_analysis' }}><label class="search-tab" for="canned_analyses">Analyses</label>
+						<input id="datasets" type="radio" name="object_type" value="dataset"{{' checked' if object_type == 'dataset' }}><label class="search-tab" for="datasets">Datasets</label>
+						<input id="tools" type="radio" name="object_type" value="tool"{{' checked' if object_type == 'tool' }}><label class="search-tab" for="tools">Tools</label>
+					</div>
+				</div> <!-- #search-tab-row -->
+			{% else %}
+			asd
+			{% endif %}
+			<div class="search-results-wrapper-row row">
+				<div class="col-12">
+					{% if search_data.search_results|length > 0 %}
+					{% else %}
+						{% if page_type == 'search' %}
+							<div id="no-search-results"> No results found.</div>
+						{% elif page_type == 'landing' %}
+						{% endif %}
+					{% endif %}
+				</div>
+			</div>
+		</form>
+	</div>
 {% endmacro %}

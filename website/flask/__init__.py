@@ -17,14 +17,14 @@
 ########## 1. Load libraries
 #############################################
 ##### 1. Flask modules #####
-from flask import Flask, render_template, request, redirect, url_for, flash, abort
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from sqlalchemy.exc import IntegrityError
 from flask_dropzone import Dropzone
+from sqlalchemy import MetaData
 from sqlalchemy.orm import sessionmaker
-from flask_sqlalchemy import SQLAlchemy
 
 ##### 2. Python modules #####
 import pandas as pd
@@ -33,27 +33,30 @@ from StringIO import StringIO
 
 ##### 3. Custom modules #####
 sys.path.append('static/py')
-from upload_API import *
-from search_API import *
+from Datasets2Tools import Datasets2Tools
 
 #############################################
-########## 2. General Setup
+########## 2. App Setup
 #############################################
 ##### 1. Flask App #####
-app = Flask(__name__)
 entry_point = '/datasets2tools'
+app = Flask(__name__)
+dropzone = Dropzone(app)
+
+##### 2. Database connection #####
+# Database Connection Data
 dbFile = '../../db.txt'
 if os.path.exists(dbFile):
 	with open(dbFile) as openfile: os.environ['SQLALCHEMY_DATABASE_URI'], os.environ['SECRET_KEY'] = openfile.readlines()
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = os.environ['SQLALCHEMY_TRACK_MODIFICATIONS']
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DROPZONE_MAX_FILE_SIZE'] = 10
 
-##### 2. Database connection #####
+# Database App Connection
 db = SQLAlchemy(app)
 engine = db.engine
-dropzone = Dropzone(app)
+Session = sessionmaker(bind=engine)
 metadata = MetaData()
 metadata.reflect(bind=engine)
 tables = metadata.tables
@@ -71,18 +74,22 @@ class User(UserMixin, db.Model):
 	email = db.Column(db.String(50), unique=True)
 	password = db.Column(db.String(80))
 	
-# Lists
-fairness = [{"fairness_question": "The tool is hosted in one or more well-used repositories, if relevant repositories exist.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Source code is shared on a public repository.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Code is written in an open-source, free programming language.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "The tool inputs standard data format(s) consistent with community practice.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "All previous versions of the tool are made available.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Web-based version is available (in addition to desktop version).", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Source code is documented.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Pipelines that use the tool have been standardized and provide detailed usage guidelines.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "A tutorial page is provided for the tool.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Example datasets are provided.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Licensing information is provided on the tool's landing page.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Information is provided describing how to cite the tool.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Version information is provided for the tool.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "A paper about the tool has been published.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Video tutorials for the tool are available.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Contact information is provided for the originator(s) of the tool.", "fairness_score": random.uniform(-1, 1)}]
-
 #############################################
 ########## 3. General Setup
 #############################################
 ##### 1. Variables #####
-# Default display options
-default_display_options = {'offset': 1, 'page_size': 15, 'sort_by': 'relevance'}
+# Default options
+default_search_options = {'object_type': 'canned_analysis', 'offset': 1, 'page_size': 10, 'sort_by': 'relevance'}
 
 # Object identifiers
 object_identifier_columns = {'dataset': 'dataset_accession', 'tool': 'tool_name', 'canned_analysis': 'canned_analysis_accession'}
+
+# Other variables
+fairness = [{"fairness_question": "The tool is hosted in one or more well-used repositories, if relevant repositories exist.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Source code is shared on a public repository.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Code is written in an open-source, free programming language.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "The tool inputs standard data format(s) consistent with community practice.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "All previous versions of the tool are made available.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Web-based version is available (in addition to desktop version).", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Source code is documented.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Pipelines that use the tool have been standardized and provide detailed usage guidelines.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "A tutorial page is provided for the tool.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Example datasets are provided.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Licensing information is provided on the tool's landing page.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Information is provided describing how to cite the tool.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Version information is provided for the tool.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "A paper about the tool has been published.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Video tutorials for the tool are available.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Contact information is provided for the originator(s) of the tool.", "fairness_score": random.uniform(-1, 1)}]
+
+##### 2. Datasets2Tools API #####
+# Datasets2Tools API
+Datasets2Tools = Datasets2Tools(engine, Session, tables)
 
 #################################################################
 #################################################################
@@ -182,20 +189,17 @@ def index():
 @app.route(entry_point+'/search')
 def search():
 
-	# Get display options
-	display_options = {'offset': request.args.get('offset', default=1, type=int), 'page_size': request.args.get('page_size', default=10, type=int), 'sort_by': request.args.get('sort_by', default='relevance', type=str)}
+	# Get request dict
+	search_filters = request.args.to_dict()
 
-	# Get search query
-	search_options = {key:value for key, value in request.args.to_dict().iteritems() if key not in display_options.keys()}
-
-	# Get object type
-	object_type = search_options.pop('object_type')
+	# Get non-search options
+	search_options = {x: search_filters.pop(x, default_search_options[x]) for x in default_search_options.keys()}
 
 	# Search database
-	search_data = search_database(search_options, display_options, object_type, Session(), tables)
+	search_data = Datasets2Tools.search(search_filters = search_filters, search_options = search_options)
 
 	# Return template
-	return render_template('search.html', object_type=object_type, search_data=search_data)
+	return render_template('search.html', object_type=search_options['object_type'], search_data=search_data)
 
 #############################################
 ########## 3. Landing Pages
@@ -225,7 +229,7 @@ def landing(object_type, object_identifier):
 
 		# Add data
 		landing_data['datasets'] = search_database(associated_object_data['dataset']['search_options'], associated_object_data['dataset']['display_options'], 'dataset', Session(), tables)
-
+ 
 	# Get tools
 	if object_type != 'tool':
 
@@ -332,6 +336,22 @@ def upload_analysis_api():
 def static_files(path):
 	return send_from_directory('static', path)
 
+#############################################
+########## 4. Test Search
+#############################################
+
+@app.route(entry_point+'/testsearch')
+def test_search():
+
+	# Get request dict
+	search_filters = request.args.to_dict()
+
+	# Get non-search options
+	search_options = {x: search_filters.pop(x, default_search_options[x]) for x in default_search_options.keys()}
+
+	# Perform search
+	results = Datasets2Tools.search(search_filters = search_filters, search_options = search_options, get_fairness=True, user_id=current_user.get_id())
+	return json.dumps(results.search_results[0])
 
 #######################################################
 #######################################################
@@ -343,6 +363,4 @@ def static_files(path):
 ########## 1. Run
 #############################################
 if __name__ == "__main__":
-	app.jinja_env.auto_reload = True
-	app.config['TEMPLATES_AUTO_RELOAD'] = True
 	app.run(debug=True, host='0.0.0.0')
