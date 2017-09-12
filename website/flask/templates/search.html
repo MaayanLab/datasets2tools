@@ -60,8 +60,8 @@
 
 						<!-- Navigation -->
 						<div id="search-navigation-row" class="row">
-							{{ macros.display_navigation(search_options = search_data.search_options) }}
-						</div> <!-- #search-offsets-row -->
+							{{ macros.display_navigation(search_options = search_data.search_options, object_type = object_type) }}
+						</div> <!-- #search-navigation-row -->
 					{% else %}
 						<div id="no-search-results"> No results found.</div>
 					{% endif %}

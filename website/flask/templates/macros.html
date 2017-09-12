@@ -75,7 +75,7 @@
 {% endmacro %}
 
 <!-- Navigation -->
-{% macro display_navigation(search_options) %}
+{% macro display_navigation(search_options, object_type) %}
 		<div class="col-6 text-left offset-col">
 			{% if search_options.offset['values']|length > 1 %}
 				{% for offset in search_options.offset['values'] %}
@@ -96,4 +96,49 @@
 {% endmacro %}
 
 <!-- Search Results -->
+{% macro display_search_results(search_data, object_type) %}
+
+	<div class="row search-results-wrapper">
+		<form class="landing-search-form">
+			<input type="hidden" name="object_type" value="{{ object_type }}">
+			<div class="col-12">
+				{# if search_data.search_results|length > 1 #}
+				<div class="row search-filters-row">
+					<div class="col-12">
+						<div class="row search-row">
+							<div class="col-6 text-left">
+								<div class="form-inline">
+									<input class="form-control" type="text" placeholder="Search..." name="q"{{ ' value='+request.args.get('q') if request.args.get('q', default='') != ''}}>
+									<button class="btn" type="button">
+										<i class="fa fa-search"></i>
+									</button>
+								</div>
+							</div>
+							<div class="col-6 text-right">
+								<a class="filter-button">Filters&nbsp&nbsp</a>
+							</div>
+						</div>
+						<div class="search-options-wrapper">
+							<hr width="100%">
+							<div class="row search-options-row">
+								{{ display_filters(search_filters = search_data.search_filters, sort_by = search_data.search_options.sort_by) }}
+							</div>
+						</div>
+					</div>
+				</div>
+				<hr width="100%" class="my-1">
+				{# endif #}
+				<div class="row object-card-row">
+					{% for object_data in search_data.search_results %}
+						{{ display_object_card(object_data = object_data, object_type = object_type) }}
+					{% endfor %}
+				</div>
+				<div class="row search-navigation-row">
+					{{ display_navigation(search_options = search_data.search_options, object_type = object_type) }}
+				</div>
+			</div>
+		</form>
+	</div>
+
+{% endmacro %}
 
