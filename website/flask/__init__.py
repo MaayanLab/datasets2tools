@@ -226,7 +226,6 @@ def landing(object_type, object_identifier):
 				associated_search_filters.update(parameters)
 			associated_objects[associated_object_type] = Datasets2Tools.search(search_filters = associated_search_filters, search_options = associated_search_options, get_related_objects=False, get_fairness=False)
 
-	print associated_objects
 	# Return template
 	return render_template('landing.html', object_data=object_data, object_type=object_type, associated_objects=associated_objects)
 
@@ -251,53 +250,11 @@ def contribute():
 @app.route(entry_point+'/api/upload/fairness_evaluation', methods=['POST'])
 def upload_evaluation_api():
 
-	# Check if user is authenticated
+	# Upload
 	if current_user.is_authenticated:
+		Datasets2Tools.upload_evaluation(evaluation_scores = request.form.to_dict())
 
-		# Get evaluation data
-		evaluation_dict = request.form.to_dict()
-
-		# Get object data
-		object_info = {x: evaluation_dict.pop(x) for x in ['object_type', 'object_id']}
-
-		# Get results dict
-		melted_evaluation_dataframe = pd.Series(evaluation_dict).rename('score').to_frame()
-
-		# Add columns
-		melted_evaluation_dataframe['question_fk'] = [x.split('-')[2] for x in melted_evaluation_dataframe.index]
-
-		# Add comment
-		melted_evaluation_dataframe['column_type'] = ['comment' if 'comment' in x else 'score' for x in melted_evaluation_dataframe.index]
-
-		# Cast
-		evaluation_dataframe = pd.pivot_table(melted_evaluation_dataframe, index='question_fk', columns='column_type', values='score', aggfunc='first').reset_index()
-
-		# Add user ID
-		evaluation_dataframe['user_fk'] = current_user.get_id()
-		
-		# Add object FK
-		evaluation_dataframe[object_info['object_type']+'_fk'] = object_info['object_id']
-
-
-		# Create session
-		# session = Session()
-
-		# Try
-		# try:
-
-			# Upload evaluation
-		engine.execute(tables['evaluation'].insert(), evaluation_dataframe.to_dict(orient='records'))
-
-
-			# Commit
-		# 	session.commit()
-
-		# except:
-
-		# 	# Rollback
-		# 	session.rollback()
-
-	# Get 
+	# Return 
 	return ''
 
 #############################################

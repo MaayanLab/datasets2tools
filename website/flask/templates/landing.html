@@ -75,10 +75,12 @@
 				<svg height="95px" width="95px">
 					{% set w = 23 %}
 					{% for question in object_data['fairness']['questions'] %}
-						 <rect x="{{ ((loop.index-1) % 4)*w }}" y="{{ (((loop.index)/4)|round(0, 'ceil')-1)*w }}" width="{{w-2}}px" height="{{w-2}}px" fill="grey" data-value="{{object_data['fairness']['user_scores'].get(question['id'])}}" data-toggle="tooltip" data-placement="bottom" data-animation="false" data-html="true" title="<div class='fairness-tooltip'><div class='fairness-question'>{% if object_data['fairness']['user_scores'].get(question['id']) >= -1 %}<b>Score:</b> {{object_data['fairness']['user_scores'].get(question['id'])}}</div>{% endif %}<b>{{question.question_number}}.</b> {{question.question}}</div></div>"/>
+						{% set average_score = object_data['fairness']['all_evaluations'][question['id']].get('average_score') %}
+						{% set comments = object_data['fairness']['all_evaluations'][question['id']].get('comments') %}
+						 <rect x="{{ ((loop.index-1) % 4)*w }}" y="{{ (((loop.index)/4)|round(0, 'ceil')-1)*w }}" width="{{w-2}}px" height="{{w-2}}px" fill="grey" data-value="{{ average_score }}" data-toggle="tooltip" data-placement="bottom" data-animation="false" data-html="true" title="<div class='fairness-tooltip'><div class='fairness-question'>{% if average_score >= -1 %}<b>Score:</b> {{ average_score }}</div>{% endif %}<b>{{ question.question_number }}.</b> {{ question.question }}</div></div>"/>
 					{% endfor %}
 				</svg>
-				<div id="fairness-evaluation-number">{{ object_data['fairness']['evaluations'] }} evaluations</div>
+				<div id="fairness-evaluation-number">{{ object_data['fairness']['evaluations'] }} evaluation{% if object_data['fairness']['evaluations'] != 1 %}s{% endif %}</div>
 			</div>
 		</div> <!-- #object-overview -->
 
@@ -263,17 +265,18 @@
 					<div class="info-card-title">FAIR Evaluation</div>
 						{% if current_user.is_authenticated %}
 							<form id="fairness-form" action="javascript:submitFairness();" method="post">
-								<input type="hidden" name="object_type" value="{{object_type}}">
-								<input type="hidden" name="object_id" value="{{object_data.id}}">
+								<input type="hidden" name="object_type" value="{{ object_type }}">
+								<input type="hidden" name="object_id" value="{{ object_data.id }}">
+								<input type="hidden" name="user_id" value="{{ current_user.get_id() }}">
 								<table id="fairness-table">
 									<tr><th>Question</th><th>Yes</th><th>No</th><th>Yes, but:</th><th>Comments</th></tr>
 									{% for question in object_data['fairness']['questions'] %}
 										<tr>
-											<td><b>{{question.question_number}}.</b> {{question.question}}</td>
+											<td><b>{{question.question_number}}.</b> {{ question.question }}</td>
 											{% for score in [1, -1, 0] %}
-												<td><input type="radio" name="fairness-question-{{question.id}}" value={{score}} {{ 'checked' if object_data['fairness']['user_scores'].get(question.id) == score }}></td> <!-- to fix -->
+												<td><input type="radio" name="fairness-question-{{ question.id }}" value={{ score }} checked></td> <!-- to fix -->
 											{% endfor %}
-										<td><input type="text" class="yes-but-comment" name="fairness-question-{{question.id}}-comment" value="{{ object_data['fairness']['user_scores'].get(question.id, '') }}"></td></tr> <!-- to fix -->
+										<td><input type="text" class="yes-but-comment" name="fairness-question-{{ question.id }}-comment" value="{{ object_data['fairness']['user_evaluation'][question.id].get('comment', '') }}"></td></tr> <!-- to fix -->
 									{% endfor %}
 								</table>
 								<button id="fairness-button" class="btn" type="submit">Submit</button>

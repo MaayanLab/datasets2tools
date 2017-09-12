@@ -62,14 +62,14 @@ class Datasets2Tools:
 		return search_results
 			
 #############################################
-########## 3. Upload
+########## 3. Upload Analyses
 #############################################
 
-	def upload(self, uploaded_file, user_id):
+	def upload_analyses(self, uploaded_file, user_id):
 
 		# Try
 		try:
-			upload_results = Upload(self.engine, self.session, self.tables, uploaded_file, user_id)
+			upload_results = UploadAnalyses(self.engine, self.session, self.tables, uploaded_file, user_id)
 			self.session.commit()
 		except:
 			upload_results = None
@@ -78,6 +78,20 @@ class Datasets2Tools:
 
 		# Return
 		return upload_results
+			
+#############################################
+########## 4. Upload Evaluation
+#############################################
+
+	def upload_evaluation(self, evaluation_scores):
+
+		# Try
+		try:
+			UploadEvaluation(self.engine, self.tables, evaluation_scores)
+			self.session.commit()
+		except:
+			self.session.rollback()
+			raise
 
 #################################################################
 #################################################################
@@ -247,27 +261,25 @@ class Search:
 			# Get questions
 			questions_query = self.session.query(self.tables['question']).filter(self.tables['question'].columns['object_type'] == self.object_type).all()
 			object_data['fairness']['questions'] = [x._asdict() for x in questions_query]
+			question_ids = [x.get('id') for x in object_data['fairness']['questions']]
 
-			# Get user scores
-			user_scores_query = self.session.query(self.tables[self.object_type+'_evaluation']).filter(self.tables[self.object_type+'_evaluation'].columns[self.object_type+'_fk'] == object_id).filter(self.tables[self.object_type+'_evaluation'].columns['user_fk'] == user_id).all()
-			object_data['fairness']['user_scores'] = pd.DataFrame([x._asdict() for x in user_scores_query]).set_index('question_fk')[['score', 'comment']].to_dict(orient='index') if len(user_scores_query) > 0 else {}
+			# Evaluation queries (data not extracted)
+			all_evaluations_query = self.session.query(self.tables[self.object_type+'_evaluation']).filter(self.tables[self.object_type+'_evaluation'].columns[self.object_type+'_fk'] == object_id)
+			user_evaluations_query = all_evaluations_query.filter(self.tables[self.object_type+'_evaluation'].columns['user_fk'] == user_id)
 
-			# Get all scores
-			all_scores_query = self.session.query(self.tables[self.object_type+'_evaluation'].columns['question_fk'], func.avg(self.tables[self.object_type+'_evaluation'].columns['score'])).filter(self.tables[self.object_type+'_evaluation'].columns[self.object_type+'_fk'] == object_id).group_by(self.tables[self.object_type+'_evaluation'].columns['question_fk']).all()
-			object_data['fairness']['all_scores'] = {x[0]:{'average_score': float(x[1])} for x in all_scores_query}
+			# Add user evaluation
+			object_data['fairness']['user_evaluation'] = pd.DataFrame(user_evaluations_query.all()).set_index('question_fk')[['score', 'comment']].to_dict(orient='index') if len(user_evaluations_query.all()) > 0 else {x:{} for x in question_ids}
 
-			# Get all comments
-			all_comments_query = self.session.query(self.tables[self.object_type+'_evaluation'].columns['question_fk'], self.tables[self.object_type+'_evaluation'].columns['comment']).filter(self.tables[self.object_type+'_evaluation'].columns[self.object_type+'_fk'] == object_id).filter(self.tables[self.object_type+'_evaluation'].columns['comment'] != None).all()
-			comment_dataframe = pd.DataFrame([x._asdict() for x in all_comments_query]).set_index('question_fk') if len(all_comments_query) > 0 else {}
-
-			# Get number of evaluations
-			evaluation_number_query = self.session.query(func.count(self.tables[self.object_type+'_evaluation'].columns['user_fk'])).all()
-			object_data['fairness']['evaluations'] = [int(x[0]) for x in evaluation_number_query][0]
-
-			# Add comments and
-			if len(comment_dataframe) > 0:
-				for question_fk in comment_dataframe.index:
-					object_data['fairness']['all_scores'][question_fk]['comments'] = comment_dataframe.loc[question_fk, 'comment'].tolist() if isinstance(comment_dataframe.loc[question_fk, 'comment'], pd.Series) else [comment_dataframe.loc[question_fk, 'comment']]
+			# Add all evaluations
+			if len(all_evaluations_query.all()) > 0:
+				all_evaluations_dict = pd.DataFrame(all_evaluations_query.all()).groupby('question_fk').aggregate(lambda x: list(x)).to_dict(orient='index')
+				all_evaluations = {question_id: {'average_score': np.mean(all_evaluations_dict[question_id]['score']), 'comments': all_evaluations_dict[question_id]['comment']} for question_id in question_ids}
+				nr_evaluations = max([len(x['user_fk']) for x in all_evaluations_dict.values()])
+			else:
+				all_evaluations = {x: {} for x in question_ids}
+				nr_evaluations = 0
+			object_data['fairness']['all_evaluations'] = all_evaluations
+			object_data['fairness']['evaluations'] = nr_evaluations
 
 		# Return
 		return object_data
@@ -365,7 +377,7 @@ class Search:
 
 #################################################################
 #################################################################
-############### 3. Upload API ###################################
+############### 3. Upload Analysis API ##########################
 #################################################################
 #################################################################
 
@@ -373,7 +385,7 @@ class Search:
 ########## 1. Initialization
 #############################################
 
-class Upload:
+class UploadAnalyses:
 
 	def __init__(self, engine, session, tables, uploaded_file, user_id):
 
@@ -430,3 +442,60 @@ class Upload:
 	def upload_metadata(self, canned_analysis_ids, canned_analysis_metadata):
 
 		pass
+
+#################################################################
+#################################################################
+############### 4. Upload Evaluation API ########################
+#################################################################
+#################################################################
+
+#############################################
+########## 1. Initialization
+#############################################
+
+class UploadEvaluation:
+
+	def __init__(self, engine, tables, evaluation_scores):
+
+		# Get evaluation info
+		evaluation_info = {x: evaluation_scores.pop(x) for x in ['user_id', 'object_type', 'object_id']}
+
+		# Prepare dataframe
+		score_dataframe = self.prepare_score_dataframe(evaluation_scores = evaluation_scores, evaluation_info = evaluation_info)
+		# print score_dataframe
+
+		# Upload
+		engine.execute(tables[evaluation_info['object_type']+'_evaluation'].insert().prefix_with('IGNORE'), score_dataframe.to_dict(orient='records'))
+
+#############################################
+########## 2. Prepare Score Dataframe
+#############################################
+
+	def prepare_score_dataframe(self, evaluation_scores, evaluation_info):
+
+		# Convert to dataframe
+		melted_score_dataframe = pd.Series(evaluation_scores).rename('score').to_frame()
+
+		# Add columns
+		melted_score_dataframe['question_fk'] = [x.split('-')[2] for x in melted_score_dataframe.index]
+		melted_score_dataframe['column_type'] = ['comment' if 'comment' in x else 'score' for x in melted_score_dataframe.index]
+
+		# Cast
+		score_dataframe = pd.pivot_table(melted_score_dataframe, index='question_fk', columns='column_type', values='score', aggfunc='first').reset_index().fillna('')
+
+		# Add data
+		score_dataframe['user_fk'] = evaluation_info['user_id']
+		score_dataframe[evaluation_info['object_type']+'_fk'] = evaluation_info['object_id']
+
+		# Return
+		return score_dataframe
+
+#################################################################
+#################################################################
+############### 5. API ##########################################
+#################################################################
+#################################################################
+
+#############################################
+########## 1. Initialization
+#############################################
