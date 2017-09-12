@@ -192,7 +192,7 @@
 						<div class="info-card-title">Metadata</div>
 						<table class="info-card-table">
 							{% for key, value in object_data['metadata'].iteritems() %}
-								<tr><td>{{ key }}</td><td>{{ value }}</td></tr>
+								<tr><td>{{ key.title() }}</td><td>{{ value }}</td></tr>
 							{% endfor %}
 						</table>
 					</div> <!-- #metadata-info -->

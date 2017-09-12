@@ -65,11 +65,11 @@ class Datasets2Tools:
 ########## 3. Upload Analyses
 #############################################
 
-	def upload_analyses(self, uploaded_file, user_id):
+	def upload_analyses(self, analysis_file, user_id):
 
 		# Try
 		try:
-			upload_results = UploadAnalyses(self.engine, self.session, self.tables, uploaded_file, user_id)
+			upload_results = UploadAnalyses(self.engine, self.session, self.tables, analysis_file, user_id)
 			self.session.commit()
 		except:
 			upload_results = None
@@ -242,7 +242,7 @@ class Search:
 			object_data['metadata'] = pd.DataFrame([metadata_query_result._asdict() for metadata_query_result in canned_analysis_metadata_query]).set_index('term_name').to_dict()['value']
 
 		# Keywords
-		keyword_query = self.session.query(self.tables['keyword'].columns['keyword']).filter(self.tables['keyword'].columns[self.object_type+'_fk'] == object_id).all()
+		keyword_query = self.session.query(self.tables[self.object_type+'_keyword'].columns['keyword']).filter(self.tables[self.object_type+'_keyword'].columns[self.object_type+'_fk'] == object_id).all()
 		object_data['keywords'] = [x[0] for x in keyword_query]
 
 		# Get related objects
@@ -283,6 +283,9 @@ class Search:
 			object_data['fairness']['all_evaluations'] = all_evaluations
 			object_data['fairness']['evaluations'] = nr_evaluations
 
+		# Add ID
+		object_data['id'] = object_id
+
 		# Return
 		return object_data
 
@@ -301,7 +304,7 @@ class Search:
 		# Add keywords
 		search_filters.append({
 			'label': 'keyword',
-			'values': self.session.query(self.tables['keyword'].columns['keyword']).filter(self.tables['keyword'].columns[self.object_type+'_fk'].in_(object_ids)).distinct().all()
+			'values': self.session.query(self.tables[self.object_type+'_keyword'].columns['keyword']).filter(self.tables[self.object_type+'_keyword'].columns[self.object_type+'_fk'].in_(object_ids)).distinct().all()
 		})
 
 		# Get datasets and tools other object type
@@ -389,61 +392,120 @@ class Search:
 
 class UploadAnalyses:
 
-	def __init__(self, engine, session, tables, uploaded_file, user_id):
+	def __init__(self, engine, session, tables, analysis_file, user_id):
+		
+		# Save query data
+		self.engine, self.session, self.tables = engine, session, tables
 
-		# Save query data and identifiers
-		self.engine, self.session, self.tables, self.table_conversion = engine, session, tables, {'datasets': {'table': 'dataset', 'unique_column': 'dataset_accession'}, 'tools': {'table': 'tool', 'unique_column': 'tool_name'}, 'canned_analysis_url': {'table': 'canned_analysis', 'unique_column': 'canned_analysis_url'}}
-
-		# Read file
-		canned_analysis_dataframe = self.read_uploaded_file(uploaded_file).drop_duplicates()
+		# Read analysis file
+		canned_analysis_dataframe = self.read_analysis_file(analysis_file)
 
 		# Get object IDs
-		for column in ['datasets', 'tools', 'canned_analysis_url']:
-			canned_analysis_dataframe = self.get_object_ids(canned_analysis_dataframe = canned_analysis_dataframe, column = column)
+		for object_type in ['dataset', 'tool', 'canned_analysis']:
+			canned_analysis_dataframe = self.get_object_ids(canned_analysis_dataframe = canned_analysis_dataframe, object_type = object_type)
 
 		# Upload object relationships
-		self.upload_object_relationships(canned_analysis_ids = canned_analysis_dataframe['canned_analysis_fk'], dataset_ids = canned_analysis_dataframe['dataset_fk'], tool_ids = canned_analysis_dataframe['tool_fk'], )
+		self.upload_object_relationships(canned_analysis_dataframe)
 
 		# Upload metadata
-		self.upload_metadata(canned_analysis_ids = canned_analysis_dataframe['canned_analysis_fk'], canned_analysis_metadata = canned_analysis_dataframe['metadata'])
+		self.upload_metadata(canned_analysis_dataframe)
 
-		# Get canned analysis IDs
-		upload_results = str(canned_analysis_dataframe['canned_analysis_fk'])
-
-		# Return IDs
-		return upload_results
+		# Upload keywords
+		self.upload_keywords(canned_analysis_dataframe)
 
 #############################################
 ########## 2. Read Uploaded File
 #############################################
 
-	def read_uploaded_file(self, uploaded_file):
+	def read_analysis_file(self, uploaded_file):
 
-		pass
+		# Read table
+		canned_analysis_dataframe = pd.read_table(uploaded_file)
+
+		# Read metadata
+		canned_analysis_dataframe['metadata'] = [json.loads(x) for x in canned_analysis_dataframe['metadata']]		
+
+		# Split datasets and tools
+		for column in ['dataset_accession', 'tool_name']:
+			canned_analysis_dataframe[column] = [x.split(',') for x in canned_analysis_dataframe[column]]
+			unstacked_dataframe = canned_analysis_dataframe.set_index('canned_analysis_url')[column].apply(pd.Series).stack().reset_index(level=-1, drop=True).reset_index().rename(columns={0: column})
+			canned_analysis_dataframe = canned_analysis_dataframe.drop(column, axis=1).merge(unstacked_dataframe, on='canned_analysis_url', how='inner')
+
+		# Return
+		return canned_analysis_dataframe
 
 #############################################
-########## 3. Get Object Ids
+########## 3. Get Object IDs
 #############################################
 
-	def get_object_ids(self, canned_analysis_dataframe, column):
+	def get_object_ids(self, canned_analysis_dataframe, object_type):
 
-		pass
+		# Get data
+		if object_type == 'dataset':
+			dataframe_to_upload = canned_analysis_dataframe['dataset_accession'].drop_duplicates().to_frame().set_index('dataset_accession', drop=False)
+		elif object_type == 'tool':
+			dataframe_to_upload = canned_analysis_dataframe['tool_name'].drop_duplicates().to_frame().set_index('tool_name', drop=False)
+		elif object_type == 'canned_analysis':
+			dataframe_to_upload = canned_analysis_dataframe[['canned_analysis_title', 'canned_analysis_description', 'canned_analysis_url', 'canned_analysis_preview_url']].drop_duplicates().set_index('canned_analysis_url', drop=False)
+
+		# Insert ignore
+		self.engine.execute(self.tables[object_type].insert().prefix_with('IGNORE'), dataframe_to_upload.to_dict(orient='records'))
+
+		# Get IDs dict
+		id_query = self.session.query(self.tables[object_type].columns['id'], self.tables[object_type].columns[dataframe_to_upload.index.name]).filter(self.tables[object_type].columns[dataframe_to_upload.index.name].in_(dataframe_to_upload.index.tolist())).all()
+		id_dataframe = pd.DataFrame(id_query).rename(columns={'id': object_type+'_fk'})
+
+		# Join
+		canned_analysis_dataframe = canned_analysis_dataframe.merge(id_dataframe, on=dataframe_to_upload.index.name, how='inner')
+
+		return canned_analysis_dataframe
 
 #############################################
 ########## 4. Upload Object Relationships
 #############################################
 
-	def upload_object_relationships(self, canned_analysis_ids, dataset_ids, tool_ids):
+	def upload_object_relationships(self, canned_analysis_dataframe):
 
-		pass
+		# Upload object relationships
+		for object_type in ['dataset', 'tool']:
+			self.engine.execute(self.tables['analysis_to_'+object_type].insert().prefix_with('IGNORE'), canned_analysis_dataframe[['canned_analysis_fk', object_type+'_fk']].drop_duplicates().to_dict(orient='records'))
 
 #############################################
-########## 5. Upload Analysis Metadata
+########## 5. Upload Metadata
 #############################################
 
-	def upload_metadata(self, canned_analysis_ids, canned_analysis_metadata):
+	def upload_metadata(self, canned_analysis_dataframe):
 
-		pass
+		# Initialize metadata dataframe
+		metadata_dataframe = pd.DataFrame()
+
+		# Upload terms
+		terms = list(set([key for metadata_dict in canned_analysis_dataframe['metadata'] for key in metadata_dict.keys()]))
+		self.engine.execute(self.tables['term'].insert().prefix_with('IGNORE'), [{'term_name': x} for x in terms])
+
+		# Get term IDs
+		term_dataframe = pd.DataFrame(self.session.query(self.tables['term'].columns['id'], self.tables['term'].columns['term_name']).all()).rename(columns={'id': 'term_fk'})
+
+		# Append metadata
+		for index, rowData in canned_analysis_dataframe.iterrows():
+			analysis_metadata_dataframe = pd.Series(rowData['metadata']).to_frame().reset_index().rename(columns={'index': 'term_name', 0: 'value'}).merge(term_dataframe, on='term_name', how='left').drop('term_name', axis=1)
+			analysis_metadata_dataframe['canned_analysis_fk'] = rowData['canned_analysis_fk']
+			metadata_dataframe = pd.concat([metadata_dataframe, analysis_metadata_dataframe.dropna()]).drop_duplicates()
+
+		# Upload
+		self.engine.execute(self.tables['canned_analysis_metadata'].insert().prefix_with('IGNORE'), metadata_dataframe.to_dict(orient='records'))
+
+#############################################
+########## 5. Upload Keywords
+#############################################
+
+	def upload_keywords(self, canned_analysis_dataframe):
+
+		# Initialize keyword dataframe
+		keyword_dataframe = pd.DataFrame([{'keyword': keyword, 'canned_analysis_fk': rowData['canned_analysis_fk']} for index, rowData in canned_analysis_dataframe.iterrows() for keyword in rowData['keywords'].split(',')]).drop_duplicates()
+
+		# Upload
+		self.engine.execute(self.tables['canned_analysis_keyword'].insert().prefix_with('IGNORE'), keyword_dataframe.to_dict(orient='records'))
 
 #################################################################
 #################################################################
@@ -464,7 +526,6 @@ class UploadEvaluation:
 
 		# Prepare dataframe
 		score_dataframe = self.prepare_score_dataframe(evaluation_scores = evaluation_scores, evaluation_info = evaluation_info)
-		# print score_dataframe
 
 		# Upload
 		upload_string = 'REPLACE INTO {object_type}_evaluation (question_fk, user_fk, {object_type}_fk, score, comment) VALUES ('.format(**evaluation_info) + '), ('.join([', '.join([rowData[x] if x != 'comment' else '"'+rowData[x].replace('"', '')+'"' for x in ['question_fk', 'user_fk', evaluation_info['object_type']+'_fk', 'score', 'comment']]) for index, rowData in score_dataframe.iterrows()]) + ')'

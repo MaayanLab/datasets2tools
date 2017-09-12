@@ -38,6 +38,14 @@ CREATE TABLE related_dataset (
 	FOREIGN KEY (target_dataset_fk) REFERENCES dataset(id)
 );
 
+CREATE TABLE dataset_keyword (
+	`id` INT AUTO_INCREMENT PRIMARY KEY,
+	`dataset_fk` INT DEFAULT NULL,
+	`keyword` VARCHAR(255),
+	FOREIGN KEY (dataset_fk) REFERENCES dataset(id),
+	UNIQUE INDEX `unique_dataset_keyword` (dataset_fk, keyword)
+);
+
 ### Tool
 
 CREATE TABLE tool (
@@ -55,6 +63,14 @@ CREATE TABLE related_tool (
 	`similarity` DOUBLE,
 	FOREIGN KEY (source_tool_fk) REFERENCES tool(id),
 	FOREIGN KEY (target_tool_fk) REFERENCES tool(id)
+);
+
+CREATE TABLE tool_keyword (
+	`id` INT AUTO_INCREMENT PRIMARY KEY,
+	`tool_fk` INT DEFAULT NULL,
+	`keyword` VARCHAR(255),
+	FOREIGN KEY (tool_fk) REFERENCES tool(id),
+	UNIQUE INDEX `unique_tool_keyword` (tool_fk, keyword)
 );
 
 ### Article
@@ -99,12 +115,21 @@ CREATE TABLE related_canned_analysis (
 	FOREIGN KEY (target_canned_analysis_fk) REFERENCES canned_analysis(id)
 );
 
+CREATE TABLE canned_analysis_keyword (
+	`id` INT AUTO_INCREMENT PRIMARY KEY,
+	`canned_analysis_fk` INT DEFAULT NULL,
+	`keyword` VARCHAR(255),
+	FOREIGN KEY (canned_analysis_fk) REFERENCES canned_analysis(id),
+	UNIQUE INDEX `unique_canned_analysis_keyword` (canned_analysis_fk, keyword)
+);
+
 CREATE TABLE analysis_to_dataset (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`canned_analysis_fk` INT,
 	`dataset_fk` INT,
 	FOREIGN KEY (canned_analysis_fk) REFERENCES canned_analysis(id),
-	FOREIGN KEY (dataset_fk) REFERENCES dataset(id)
+	FOREIGN KEY (dataset_fk) REFERENCES dataset(id),
+	UNIQUE INDEX `unique_analysis_dataset` (canned_analysis_fk, dataset_fk)
 );
 
 CREATE TABLE analysis_to_tool (
@@ -112,7 +137,8 @@ CREATE TABLE analysis_to_tool (
 	`canned_analysis_fk` INT,
 	`tool_fk` INT,
 	FOREIGN KEY (canned_analysis_fk) REFERENCES canned_analysis(id),
-	FOREIGN KEY (tool_fk) REFERENCES tool(id)
+	FOREIGN KEY (tool_fk) REFERENCES tool(id),
+	UNIQUE INDEX `unique_analysis_tool` (canned_analysis_fk, tool_fk)
 );
 
 CREATE TABLE term (
@@ -125,22 +151,10 @@ CREATE TABLE canned_analysis_metadata (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`canned_analysis_fk` INT,
 	`term_fk` INT,
-	`value` TEXT,
+	`value` VARCHAR(255),
 	FOREIGN KEY (canned_analysis_fk) REFERENCES canned_analysis(id),
-	FOREIGN KEY (term_fk) REFERENCES term(id)
-);
-
-### Keywords
-
-CREATE TABLE keyword (
-	`id` INT AUTO_INCREMENT PRIMARY KEY,
-	`dataset_fk` INT DEFAULT NULL,
-	`tool_fk` INT DEFAULT NULL,
-	`canned_analysis_fk` INT DEFAULT NULL,
-	`keyword` VARCHAR(255),
-	FOREIGN KEY (dataset_fk) REFERENCES dataset(id),
-	FOREIGN KEY (tool_fk) REFERENCES tool(id),
-	FOREIGN KEY (canned_analysis_fk) REFERENCES canned_analysis(id)
+	FOREIGN KEY (term_fk) REFERENCES term(id),
+	UNIQUE INDEX `unique_canned_analysis_metadata` (canned_analysis_fk, term_fk, value)
 );
 
 ### User
@@ -186,7 +200,6 @@ CREATE TABLE tool_evaluation (
 	FOREIGN KEY (question_fk) REFERENCES question(id),
 	UNIQUE INDEX `unique_tool_evaluation` (user_fk, tool_fk, question_fk)
 );
-
 
 CREATE TABLE canned_analysis_evaluation (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,

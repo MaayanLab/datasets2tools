@@ -84,9 +84,6 @@ default_search_options = {'object_type': 'canned_analysis', 'offset': 1, 'page_s
 # Object identifiers
 object_identifier_columns = {'dataset': 'dataset_accession', 'tool': 'tool_name', 'canned_analysis': 'canned_analysis_accession'}
 
-# Other variables
-fairness = [{"fairness_question": "The tool is hosted in one or more well-used repositories, if relevant repositories exist.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Source code is shared on a public repository.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Code is written in an open-source, free programming language.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "The tool inputs standard data format(s) consistent with community practice.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "All previous versions of the tool are made available.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Web-based version is available (in addition to desktop version).", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Source code is documented.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Pipelines that use the tool have been standardized and provide detailed usage guidelines.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "A tutorial page is provided for the tool.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Example datasets are provided.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Licensing information is provided on the tool's landing page.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Information is provided describing how to cite the tool.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Version information is provided for the tool.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "A paper about the tool has been published.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Video tutorials for the tool are available.", "fairness_score": random.uniform(-1, 1)}, {"fairness_question": "Contact information is provided for the originator(s) of the tool.", "fairness_score": random.uniform(-1, 1)}]
-
 ##### 2. Datasets2Tools API #####
 # Datasets2Tools API
 Datasets2Tools = Datasets2Tools(engine, Session, tables)
@@ -225,7 +222,7 @@ def landing(object_type, object_identifier):
 				associated_search_options.update({x: parameters.pop(x, default_search_options[x]) for x in associated_search_options.keys()})
 				associated_search_filters.update(parameters)
 			associated_objects[associated_object_type] = Datasets2Tools.search(search_filters = associated_search_filters, search_options = associated_search_options, get_related_objects=False, get_fairness=False)
-	print object_data['fairness']['all_evaluations']
+	print object_data
 	# Return template
 	return render_template('landing.html', object_data=object_data, object_type=object_type, associated_objects=associated_objects)
 
@@ -263,12 +260,15 @@ def upload_evaluation_api():
 
 @app.route(entry_point+'/api/upload/analysis', methods=['POST'])
 def upload_analysis_api():
-	print 'uploading...'
-	canned_analysis_dataframe = pd.read_table(StringIO(request.files['file'].read())).dropna()
-	session = Session()
-	upload_results = upload_analyses(canned_analysis_dataframe, engine, session)
-	session.commit()
-	return upload_results
+
+	# Read file
+	analysis_file = StringIO(request.files['file'].read())
+
+	# Upload file
+	Datasets2Tools.upload_analyses(analysis_file = analysis_file, user_id = current_user.get_id)
+
+	# Return
+	return 'upload_results'
 
 #############################################
 ########## 3. Serve static files
