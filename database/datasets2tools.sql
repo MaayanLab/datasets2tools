@@ -2,6 +2,15 @@ DROP DATABASE IF EXISTS `datasets2tools`;
 CREATE DATABASE `datasets2tools` DEFAULT CHARACTER SET utf8;
 USE `datasets2tools`;
 
+### User
+
+CREATE TABLE user (
+	`id` INT AUTO_INCREMENT PRIMARY KEY,
+	`username` VARCHAR(50) UNIQUE NOT NULL,
+	`email` VARCHAR(50) UNIQUE NOT NULL,
+	`password` VARCHAR(80)
+);
+
 ### Dataset
 
 CREATE TABLE repository (
@@ -25,6 +34,7 @@ CREATE TABLE dataset (
 	`dataset_title` VARCHAR(255),
 	`dataset_description` TEXT,
 	`dataset_landing_url` TEXT,
+	`date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (repository_fk) REFERENCES repository(id),
 	FOREIGN KEY (dataset_type_fk) REFERENCES dataset_type(id)
 );
@@ -53,7 +63,8 @@ CREATE TABLE tool (
 	`tool_name` VARCHAR(100) UNIQUE NOT NULL,
 	`tool_description` TEXT,
 	`tool_homepage_url` TEXT,
-	`tool_icon_url` TEXT
+	`tool_icon_url` TEXT,
+	`date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE related_tool (
@@ -95,6 +106,15 @@ CREATE TABLE article (
 	FOREIGN KEY (tool_fk) REFERENCES tool(id)
 );
 
+### Contribution
+
+CREATE TABLE contribution (
+	`id` INT AUTO_INCREMENT PRIMARY KEY,
+	`user_fk` INT NOT NULL,
+	`date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (user_fk) REFERENCES user(id)
+);
+
 ### Canned analysis
 
 CREATE TABLE canned_analysis (
@@ -103,7 +123,10 @@ CREATE TABLE canned_analysis (
 	`canned_analysis_title` VARCHAR(255),
 	`canned_analysis_description` TEXT,
 	`canned_analysis_url` VARCHAR(255) UNIQUE NOT NULL,
-	`canned_analysis_preview_url` TEXT
+	`canned_analysis_preview_url` TEXT,
+	`contribution_fk` INT NOT NULL,
+	`date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (contribution_fk) REFERENCES contribution(id)
 );
 
 CREATE TABLE related_canned_analysis (
@@ -155,15 +178,6 @@ CREATE TABLE canned_analysis_metadata (
 	FOREIGN KEY (canned_analysis_fk) REFERENCES canned_analysis(id),
 	FOREIGN KEY (term_fk) REFERENCES term(id),
 	UNIQUE INDEX `unique_canned_analysis_metadata` (canned_analysis_fk, term_fk, value)
-);
-
-### User
-
-CREATE TABLE user (
-	`id` INT AUTO_INCREMENT PRIMARY KEY,
-	`username` VARCHAR(50) UNIQUE NOT NULL,
-	`email` VARCHAR(50) UNIQUE NOT NULL,
-	`password` VARCHAR(80)
 );
 
 ### Evaluations

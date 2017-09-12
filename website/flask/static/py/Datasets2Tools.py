@@ -234,7 +234,7 @@ class Search:
 		elif self.object_type == 'canned_analysis':
 					
 			# Perform analysis query
-			canned_analysis_query = self.session.query(self.tables['canned_analysis'], self.tables['tool'], self.tables['dataset'], self.tables['repository']).join(self.tables['analysis_to_tool']).join(self.tables['tool']).join(self.tables['analysis_to_dataset']).join(self.tables['dataset']).join(self.tables['repository']).filter(self.tables['canned_analysis'].columns['id'] == object_id).all()
+			canned_analysis_query = self.session.query(self.tables['canned_analysis'], self.tables['tool'], self.tables['dataset'], self.tables['repository'], self.tables['user'].columns['username']).join(self.tables['analysis_to_tool']).join(self.tables['tool']).join(self.tables['analysis_to_dataset']).join(self.tables['dataset']).join(self.tables['repository']).join(self.tables['contribution']).join(self.tables['user']).filter(self.tables['canned_analysis'].columns['id'] == object_id).all()
 			object_data = [x._asdict() for x in canned_analysis_query][0]
 
 			# Perform metadata query
@@ -400,18 +400,25 @@ class UploadAnalyses:
 		# Read analysis file
 		canned_analysis_dataframe = self.read_analysis_file(analysis_file)
 
-		# Get object IDs
-		for object_type in ['dataset', 'tool', 'canned_analysis']:
-			canned_analysis_dataframe = self.get_object_ids(canned_analysis_dataframe = canned_analysis_dataframe, object_type = object_type)
+		# Check if user can upload more analyses
+		if self.check_contributions(canned_analyses = len(canned_analysis_dataframe.index), user_id = user_id):
 
-		# Upload object relationships
-		self.upload_object_relationships(canned_analysis_dataframe)
+			# Get object IDs
+			for object_type in ['dataset', 'tool', 'canned_analysis']:
+				canned_analysis_dataframe = self.get_object_ids(canned_analysis_dataframe = canned_analysis_dataframe, object_type = object_type, user_id = user_id)
 
-		# Upload metadata
-		self.upload_metadata(canned_analysis_dataframe)
+			# Upload object relationships
+			self.upload_object_relationships(canned_analysis_dataframe)
 
-		# Upload keywords
-		self.upload_keywords(canned_analysis_dataframe)
+			# Upload metadata
+			self.upload_metadata(canned_analysis_dataframe)
+
+			# Upload keywords
+			self.upload_keywords(canned_analysis_dataframe)
+
+		# Else
+		else:
+			raise ValueError('Over the maximum allowed cap.')
 
 #############################################
 ########## 2. Read Uploaded File
@@ -435,10 +442,28 @@ class UploadAnalyses:
 		return canned_analysis_dataframe
 
 #############################################
-########## 3. Get Object IDs
+########## 3. Check Contributions
 #############################################
 
-	def get_object_ids(self, canned_analysis_dataframe, object_type):
+	def check_contributions(self, canned_analyses, user_id):
+
+		# Get max number of contributions
+		max_contributions = self.session.query(self.tables['user'].columns['max_contributions']).filter(self.tables['user'].columns['id'] == user_id).all()[0][0]
+
+		# Return
+		print canned_analyses, max_contributions
+		print canned_analyses, max_contributions
+		print canned_analyses, max_contributions
+		print canned_analyses, max_contributions
+		print canned_analyses, max_contributions
+		print canned_analyses, max_contributions
+		return canned_analyses <= max_contributions
+
+#############################################
+########## 4. Get Object IDs
+#############################################
+
+	def get_object_ids(self, canned_analysis_dataframe, object_type, user_id):
 
 		# Get data
 		if object_type == 'dataset':
@@ -447,11 +472,14 @@ class UploadAnalyses:
 			dataframe_to_upload = canned_analysis_dataframe['tool_name'].drop_duplicates().to_frame().set_index('tool_name', drop=False)
 		elif object_type == 'canned_analysis':
 			dataframe_to_upload = canned_analysis_dataframe[['canned_analysis_title', 'canned_analysis_description', 'canned_analysis_url', 'canned_analysis_preview_url']].drop_duplicates().set_index('canned_analysis_url', drop=False)
+			contribution_submission = self.engine.execute(self.tables['contribution'].insert(), {'user_fk': user_id})
+			dataframe_to_upload['contribution_fk'] = contribution_submission.inserted_primary_key[0]
 
 		# Insert ignore
 		self.engine.execute(self.tables[object_type].insert().prefix_with('IGNORE'), dataframe_to_upload.to_dict(orient='records'))
 
 		# Get IDs dict
+		print dataframe_to_upload
 		id_query = self.session.query(self.tables[object_type].columns['id'], self.tables[object_type].columns[dataframe_to_upload.index.name]).filter(self.tables[object_type].columns[dataframe_to_upload.index.name].in_(dataframe_to_upload.index.tolist())).all()
 		id_dataframe = pd.DataFrame(id_query).rename(columns={'id': object_type+'_fk'})
 
@@ -461,7 +489,7 @@ class UploadAnalyses:
 		return canned_analysis_dataframe
 
 #############################################
-########## 4. Upload Object Relationships
+########## 5. Upload Object Relationships
 #############################################
 
 	def upload_object_relationships(self, canned_analysis_dataframe):
@@ -471,7 +499,7 @@ class UploadAnalyses:
 			self.engine.execute(self.tables['analysis_to_'+object_type].insert().prefix_with('IGNORE'), canned_analysis_dataframe[['canned_analysis_fk', object_type+'_fk']].drop_duplicates().to_dict(orient='records'))
 
 #############################################
-########## 5. Upload Metadata
+########## 6. Upload Metadata
 #############################################
 
 	def upload_metadata(self, canned_analysis_dataframe):
@@ -496,7 +524,7 @@ class UploadAnalyses:
 		self.engine.execute(self.tables['canned_analysis_metadata'].insert().prefix_with('IGNORE'), metadata_dataframe.to_dict(orient='records'))
 
 #############################################
-########## 5. Upload Keywords
+########## 7. Upload Keywords
 #############################################
 
 	def upload_keywords(self, canned_analysis_dataframe):

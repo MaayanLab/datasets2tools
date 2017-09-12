@@ -222,7 +222,7 @@ def landing(object_type, object_identifier):
 				associated_search_options.update({x: parameters.pop(x, default_search_options[x]) for x in associated_search_options.keys()})
 				associated_search_filters.update(parameters)
 			associated_objects[associated_object_type] = Datasets2Tools.search(search_filters = associated_search_filters, search_options = associated_search_options, get_related_objects=False, get_fairness=False)
-	print object_data
+	print '\n'.join(object_data.keys())
 	# Return template
 	return render_template('landing.html', object_data=object_data, object_type=object_type, associated_objects=associated_objects)
 
@@ -265,7 +265,7 @@ def upload_analysis_api():
 	analysis_file = StringIO(request.files['file'].read())
 
 	# Upload file
-	Datasets2Tools.upload_analyses(analysis_file = analysis_file, user_id = current_user.get_id)
+	Datasets2Tools.upload_analyses(analysis_file = analysis_file, user_id = current_user.get_id())
 
 	# Return
 	return 'upload_results'
