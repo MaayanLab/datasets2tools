@@ -106,12 +106,14 @@
 					text-align: left;
 				}
 
-					.fairness-score {
-
+					.fairness-tooltip-section {
+						margin-bottom: 2px;
 					}
 
-					.fairness-question {
-
+					.fairness-comment-list {
+						padding-left: 0px;
+						margin: 0px;
+						font-style: italic;
 					}
 
 	#object-tabs {

@@ -212,7 +212,7 @@ def landing(object_type, object_identifier):
 	landing_search_options.update({'object_type': object_type})
 
 	# Get object data
-	object_data = Datasets2Tools.search(search_filters = landing_search_filters, search_options = landing_search_options, get_related_objects=True, get_fairness=True).search_results[0]
+	object_data = Datasets2Tools.search(search_filters = landing_search_filters, search_options = landing_search_options, get_related_objects=True, get_fairness=True, user_id=current_user.get_id()).search_results[0]
 
 	# Get associated objects
 	associated_objects = {}
@@ -225,7 +225,7 @@ def landing(object_type, object_identifier):
 				associated_search_options.update({x: parameters.pop(x, default_search_options[x]) for x in associated_search_options.keys()})
 				associated_search_filters.update(parameters)
 			associated_objects[associated_object_type] = Datasets2Tools.search(search_filters = associated_search_filters, search_options = associated_search_options, get_related_objects=False, get_fairness=False)
-
+	print object_data['fairness']['all_evaluations']
 	# Return template
 	return render_template('landing.html', object_data=object_data, object_type=object_type, associated_objects=associated_objects)
 

@@ -77,7 +77,7 @@
 					{% for question in object_data['fairness']['questions'] %}
 						{% set average_score = object_data['fairness']['all_evaluations'][question['id']].get('average_score') %}
 						{% set comments = object_data['fairness']['all_evaluations'][question['id']].get('comments') %}
-						 <rect x="{{ ((loop.index-1) % 4)*w }}" y="{{ (((loop.index)/4)|round(0, 'ceil')-1)*w }}" width="{{w-2}}px" height="{{w-2}}px" fill="grey" data-value="{{ average_score }}" data-toggle="tooltip" data-placement="bottom" data-animation="false" data-html="true" title="<div class='fairness-tooltip'><div class='fairness-question'>{% if average_score >= -1 %}<b>Score:</b> {{ average_score }}</div>{% endif %}<b>{{ question.question_number }}.</b> {{ question.question }}</div></div>"/>
+						 <rect x="{{ ((loop.index-1) % 4)*w }}" y="{{ (((loop.index)/4)|round(0, 'ceil')-1)*w }}" width="{{w-2}}px" height="{{w-2}}px" fill="grey" data-value="{{ average_score }}" data-toggle="tooltip" data-placement="bottom" data-animation="false" data-html="true" title="<div class='fairness-tooltip'>{% if average_score >= -1 %}<div class='fairness-tooltip-section'><b>Score:</b> {{ average_score }}</div>{% endif %}<div class='fairness-tooltip-section'><b>{{ question.question_number }}.</b> {{ question.question }}</div>{% if comments %}<div class='fairness-tooltip-section'><b>Comments:</b> <ul class='fairness-comment-list'>{% for comment in comments %}<li>{{comment}}</li>{% endfor %}</ul></div>{% endif %}</div>"/>
 					{% endfor %}
 				</svg>
 				<div id="fairness-evaluation-number">{{ object_data['fairness']['evaluations'] }} evaluation{% if object_data['fairness']['evaluations'] != 1 %}s{% endif %}</div>
@@ -274,7 +274,7 @@
 										<tr>
 											<td><b>{{question.question_number}}.</b> {{ question.question }}</td>
 											{% for score in [1, -1, 0] %}
-												<td><input type="radio" name="fairness-question-{{ question.id }}" value={{ score }} checked></td> <!-- to fix -->
+												<td><input type="radio" name="fairness-question-{{ question.id }}" value={{ score }} {% if object_data['fairness']['user_evaluation'][question.id].get('score') == score %} checked {% endif %}} }></td>
 											{% endfor %}
 										<td><input type="text" class="yes-but-comment" name="fairness-question-{{ question.id }}-comment" value="{{ object_data['fairness']['user_evaluation'][question.id].get('comment', '') }}"></td></tr> <!-- to fix -->
 									{% endfor %}

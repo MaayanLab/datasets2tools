@@ -271,9 +271,11 @@ class Search:
 			object_data['fairness']['user_evaluation'] = pd.DataFrame(user_evaluations_query.all()).set_index('question_fk')[['score', 'comment']].to_dict(orient='index') if len(user_evaluations_query.all()) > 0 else {x:{} for x in question_ids}
 
 			# Add all evaluations
-			if len(all_evaluations_query.all()) > 0:
-				all_evaluations_dict = pd.DataFrame(all_evaluations_query.all()).groupby('question_fk').aggregate(lambda x: list(x)).to_dict(orient='index')
-				all_evaluations = {question_id: {'average_score': np.mean(all_evaluations_dict[question_id]['score']), 'comments': all_evaluations_dict[question_id]['comment']} for question_id in question_ids}
+			if all_evaluations_query.all():
+				all_evaluations_dataframe = pd.DataFrame(all_evaluations_query.all()).groupby('question_fk').aggregate(lambda x: list(x))#.to_dict(orient='index')
+				all_evaluations_dataframe['comment'] = [[y for y in x if y != ''] for x in all_evaluations_dataframe['comment']]
+				all_evaluations_dict = all_evaluations_dataframe.to_dict(orient='index')
+				all_evaluations = {question_id: {'average_score': np.mean(all_evaluations_dict[question_id]['score']), 'comments': list(set(all_evaluations_dict[question_id]['comment']))} for question_id in question_ids}
 				nr_evaluations = max([len(x['user_fk']) for x in all_evaluations_dict.values()])
 			else:
 				all_evaluations = {x: {} for x in question_ids}
@@ -465,7 +467,8 @@ class UploadEvaluation:
 		# print score_dataframe
 
 		# Upload
-		engine.execute(tables[evaluation_info['object_type']+'_evaluation'].insert().prefix_with('IGNORE'), score_dataframe.to_dict(orient='records'))
+		upload_string = 'REPLACE INTO {object_type}_evaluation (question_fk, user_fk, {object_type}_fk, score, comment) VALUES ('.format(**evaluation_info) + '), ('.join([', '.join([rowData[x] if x != 'comment' else '"'+rowData[x].replace('"', '')+'"' for x in ['question_fk', 'user_fk', evaluation_info['object_type']+'_fk', 'score', 'comment']]) for index, rowData in score_dataframe.iterrows()]) + ')'
+		engine.execute(upload_string)
 
 #############################################
 ########## 2. Prepare Score Dataframe
