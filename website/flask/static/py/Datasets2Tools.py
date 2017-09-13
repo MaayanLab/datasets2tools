@@ -151,7 +151,7 @@ class Search:
 		# Keyword search
 		if 'keyword' in search_filters.keys():
 			keyword = search_filters.pop('keyword')
-			query = query.filter(self.tables[self.object_type].columns['id'].in_(self.session.query(self.tables['keyword'].columns[self.object_type+'_fk']).distinct().filter(self.tables['keyword'].columns['keyword'] == keyword).subquery()))
+			query = query.filter(self.tables[self.object_type].columns['id'].in_(self.session.query(self.tables[self.object_type+'_keyword'].columns[self.object_type+'_fk']).distinct().filter(self.tables[self.object_type+'_keyword'].columns['keyword'] == keyword).subquery()))
 
 		# Dataset search
 		if 'dataset_accession' in search_filters.keys():
@@ -451,12 +451,6 @@ class UploadAnalyses:
 		max_contributions = self.session.query(self.tables['user'].columns['max_contributions']).filter(self.tables['user'].columns['id'] == user_id).all()[0][0]
 
 		# Return
-		print canned_analyses, max_contributions
-		print canned_analyses, max_contributions
-		print canned_analyses, max_contributions
-		print canned_analyses, max_contributions
-		print canned_analyses, max_contributions
-		print canned_analyses, max_contributions
 		return canned_analyses <= max_contributions
 
 #############################################
@@ -479,7 +473,6 @@ class UploadAnalyses:
 		self.engine.execute(self.tables[object_type].insert().prefix_with('IGNORE'), dataframe_to_upload.to_dict(orient='records'))
 
 		# Get IDs dict
-		print dataframe_to_upload
 		id_query = self.session.query(self.tables[object_type].columns['id'], self.tables[object_type].columns[dataframe_to_upload.index.name]).filter(self.tables[object_type].columns[dataframe_to_upload.index.name].in_(dataframe_to_upload.index.tolist())).all()
 		id_dataframe = pd.DataFrame(id_query).rename(columns={'id': object_type+'_fk'})
 
@@ -530,7 +523,7 @@ class UploadAnalyses:
 	def upload_keywords(self, canned_analysis_dataframe):
 
 		# Initialize keyword dataframe
-		keyword_dataframe = pd.DataFrame([{'keyword': keyword, 'canned_analysis_fk': rowData['canned_analysis_fk']} for index, rowData in canned_analysis_dataframe.iterrows() for keyword in rowData['keywords'].split(',')]).drop_duplicates()
+		keyword_dataframe = pd.DataFrame([{'keyword': keyword, 'canned_analysis_fk': rowData['canned_analysis_fk']} for index, rowData in canned_analysis_dataframe.iterrows() for keyword in rowData['keywords'].split(',') if keyword]).drop_duplicates()
 
 		# Upload
 		self.engine.execute(self.tables['canned_analysis_keyword'].insert().prefix_with('IGNORE'), keyword_dataframe.to_dict(orient='records'))

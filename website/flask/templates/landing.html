@@ -141,7 +141,7 @@
 							<tr><td>Upload Date</td><td>{{ '{:%B %d, %Y}'.format(object_data['date']) }}</td></tr>
 							<tr><td>Uploader</td><td><a href="#">{{ object_data['username'] }}</a></td></tr>
 						{% endif %}
-						<td>Keywords</td><td>{% for keyword in object_data['keywords'] %} <a href="#" class="keyword">{{ keyword }}</a> {% endfor %} </td></tr>
+						{% if object_data['keywords']|length %}<td>Keywords</td><td>{% for keyword in object_data['keywords'] %} <a href="#" class="keyword">{{ keyword }}</a> {% endfor %} </td></tr>{% endif %}
 					</table>
 				</div> <!-- #general-info -->
 

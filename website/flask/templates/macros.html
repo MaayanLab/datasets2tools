@@ -21,7 +21,7 @@
 		{% set max_description_length = 100 %}
 	{% elif object_type == 'canned_analysis' %}
 		{% set card_title = object_data.canned_analysis_title %}
-		{% set card_source = 'maayanlab' %}
+		{% set card_source = object_data.username %}
 		{% set card_source_url = '#' %}
 		{% set card_description = object_data.canned_analysis_description %}
 		{% set card_icon_url = object_data.canned_analysis_preview_url if object_data.canned_analysis_preview_url else url_for('static', filename='icons/analysis.png')%}

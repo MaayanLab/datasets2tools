@@ -61,6 +61,9 @@ def process_text(text):
 
     # Remove stopwords
     processed_text = [x for x in processed_text if x not in stopwords]
+
+    # Check length
+    processed_text = [x for x in processed_text if len(x) < 20 and 'http' not in x]
     
     # Stem
     # processed_text = [nltk.PorterStemmer().stem(x) for x in processed_text]
