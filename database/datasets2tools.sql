@@ -35,7 +35,6 @@ CREATE TABLE dataset (
 	`dataset_title` VARCHAR(255),
 	`dataset_description` TEXT,
 	`dataset_landing_url` TEXT,
-	`date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (repository_fk) REFERENCES repository(id),
 	FOREIGN KEY (dataset_type_fk) REFERENCES dataset_type(id)
 );
@@ -64,8 +63,7 @@ CREATE TABLE tool (
 	`tool_name` VARCHAR(100) UNIQUE NOT NULL,
 	`tool_description` TEXT,
 	`tool_homepage_url` TEXT,
-	`tool_icon_url` TEXT,
-	`date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+	`tool_icon_url` TEXT
 );
 
 CREATE TABLE related_tool (

@@ -316,101 +316,114 @@ def getArticleMetrics(infile, outfile):
 #######################################################
 
 #############################################
-########## 8. Annotate Datasets
+########## 1. Annotate Datasets
 #############################################
 
 @originate('results/dataset.txt')
 
 def annotateDatasets(outfile):
 
+	# Get dataset dataframe
+	all_dataset_dataframe = pd.read_sql_query('SELECT * FROM dataset', engine).set_index('dataset_accession', drop=False).head(50)
+
 	# Get dataset table
-	unannotated_datasets = pd.read_sql_query('SELECT * FROM dataset WHERE dataset_title IS NULL', engine, index_col='id').head()['dataset_accession'].to_dict()
+	unannotated_dataset_accessions = [dataset_accession for dataset_accession, dataset_title in all_dataset_dataframe[['dataset_accession', 'dataset_title']].as_matrix() if not dataset_title]
 
-	print unannotated_datasets
+	# Initialize annotation dict
+	annotation_dict = {}
 
-	# # Perform dataset query
-	# unannotated_datasets_query = session.query(metadata.tables['dataset'].columns['dataset_accession']).filter(and_(or_(metadata.tables['dataset'].columns['dataset_accession'].like('GSE%'), metadata.tables['dataset'].columns['dataset_accession'].like('GDS%')), metadata.tables['dataset'].columns['dataset_title'] == None)).all()
+	# Get annotations
+	for i, dataset_accession in enumerate(unannotated_dataset_accessions):
+		print i+1
+		try:
+			annotation_dict[dataset_accession] = json.loads(os.popen('python pipeline/annotate_dataset.py ' + dataset_accession).read())
+		except:
+			pass
 
-	# # Loop through datasets
-	# for unannotated_dataset in unannotated_datasets_query:
-	# 	print unannotated_dataset
-	# 	# Get annotation
-	# 	dataset_annotation = json.loads(os.popen('python pipeline/annotate_dataset.py '+unannotated_dataset[0]).read())
-		
-	# 	# Update
-	# 	session.execute(metadata.tables['dataset'].update().values(dataset_annotation).where(metadata.tables['dataset'].columns['dataset_accession'] == unannotated_dataset[0]))
+	# Update
+	all_dataset_dataframe.update(pd.DataFrame(annotation_dict).T)
 
-	# # Commit session
-	# session.commit()
+	# Write
+	all_dataset_dataframe.to_csv(outfile, sep='\t', index=False)
 
 #############################################
-########## 9. Dataset Similarity
+########## 2. Dataset Similarity
 #############################################
 
-@follows(mkdir('09-dataset_similarity'))
+@transform(annotateDatasets,
+		   regex(r'(.*)/(.*).txt'),
+		   r'\1/related_\2.txt')
 
-@originate('09-dataset_similarity/dataset_similarity.txt')
-
-def getDatasetSimilarity(outfile):
+def getRelatedDatasets(infile, outfile):
 
 	# Get dataset dataframe
-	dataset_dataframe = pd.read_sql_query('SELECT * FROM dataset WHERE dataset_title IS NOT NULL', engine)
+	dataset_dataframe = pd.read_table(infile)
 
 	# Get processed text
 	processed_texts = [P.process_text(x) for x in dataset_dataframe['dataset_title']+dataset_dataframe['dataset_description']]
 
 	# Get similarity and keywords
-	similarity_dataframe, keyword_dataframe = P.extract_text_similarity_and_keywords(processed_texts, labels=dataset_dataframe['dataset_accession'], identifier='dataset_accession')
+	dataset_similarity_dataframe, dataset_keyword_dataframe = P.extract_text_similarity_and_keywords(processed_texts, labels=dataset_dataframe['dataset_accession'], identifier='dataset_accession')
 
 	# Fill diagonal
-	np.fill_diagonal(similarity_dataframe.values, np.nan)
+	np.fill_diagonal(dataset_similarity_dataframe.values, np.nan)
 
-	# Melt tool similarity
-	similarity_dataframe = pd.melt(similarity_dataframe.reset_index('dataset_accession').rename(columns={'dataset_accession': 'source_dataset_accession'}), id_vars='source_dataset_accession', var_name='target_dataset_accession', value_name='similarity').dropna()
+	# Melt dataset similarity
+	melted_dataset_similarity_dataframe = pd.melt(dataset_similarity_dataframe.reset_index('dataset_accession').rename(columns={'dataset_accession': 'source_dataset_accession'}), id_vars='source_dataset_accession', var_name='target_dataset_accession', value_name='similarity').dropna()
+
+	# Remove 0
+	melted_dataset_similarity_dataframe = melted_dataset_similarity_dataframe.loc[[x > 0 for x in melted_dataset_similarity_dataframe['similarity']]]
+	
+	# Get related datasets
+	related_dataset_dataframe = melted_dataset_similarity_dataframe.groupby(['source_dataset_accession'])['target_dataset_accession','similarity'].apply(lambda x: x.nlargest(5, columns=['similarity'])).reset_index().drop('level_1', axis=1)
 
 	# Write
-	keyword_dataframe.to_csv(outfile.replace('similarity.txt', 'keywords.txt'), sep='\t')
-	similarity_dataframe.to_csv(outfile, sep='\t', index=False)
+	related_dataset_dataframe.to_csv(outfile, sep='\t', index=False)
+	dataset_keyword_dataframe.to_csv('results/dataset_keyword.txt', sep='\t', index=True)
+
+#################################################################
+#################################################################
+############### 3. Canned Analyses ##############################
+#################################################################
+#################################################################
+
+#######################################################
+#######################################################
+########## S1. Similarity
+#######################################################
+#######################################################
 
 #############################################
-########## 10. Upload Dataset Data
+########## 1. Canned Analysis Similarity
 #############################################
 
-@follows(mkdir('10-upload_dataset_data'))
+@originate('results/related_canned_analysis.txt')
 
-@follows(getDatasetSimilarity)
+def getRelatedAnalyses(outfile):
 
-@files(glob.glob('09-dataset_similarity/*.txt'),
-	   '10-upload_dataset_data/upload_dataset_data.txt')
+	# Get canned analysis dataframe
+	canned_analysis_dataframe = pd.read_sql_query('SELECT canned_analysis_accession, canned_analysis_title, canned_analysis_description FROM canned_analysis', engine)
 
-def uploadDatasetData(infiles, outfile):
+	# Get processed text
+	processed_texts = [P.process_text(x) for x in canned_analysis_dataframe['canned_analysis_title']+canned_analysis_dataframe['canned_analysis_description']]
 
-	# Split infiles
-	keywordFile, similarityFile = infiles
+	# Get similarity and keywords
+	canned_analysis_similarity_dataframe, canned_analysis_keyword_dataframe = P.extract_text_similarity_and_keywords(processed_texts, labels=canned_analysis_dataframe['canned_analysis_accession'], identifier='canned_analysis_accession')
 
-	# Read dataset similarity dataframe
-	dataset_similarity_dataframe = pd.read_table(similarityFile)
+	# Fill diagonal
+	np.fill_diagonal(canned_analysis_similarity_dataframe.values, np.nan)
 
-	# Get dataset ID dataframe
-	dataset_id_dataframe = pd.read_sql_query('SELECT id AS dataset_fk, dataset_accession FROM dataset', engine)
+	# Melt analysis similarity
+	melted_canned_analysis_similarity_dataframe = pd.melt(canned_analysis_similarity_dataframe.reset_index('canned_analysis_accession').rename(columns={'canned_analysis_accession': 'source_canned_analysis_accession'}), id_vars='source_canned_analysis_accession', var_name='target_canned_analysis_accession', value_name='similarity').dropna()
 
-	# Truncate similarity
-	engine.execute('TRUNCATE TABLE related_dataset;')
+	# Remove 0
+	melted_canned_analysis_similarity_dataframe = melted_canned_analysis_similarity_dataframe.loc[[x > 0 for x in melted_canned_analysis_similarity_dataframe['similarity']]]
+	
+	# Get related analyses
+	related_canned_analysis_dataframe = melted_canned_analysis_similarity_dataframe.groupby(['source_canned_analysis_accession'])['target_canned_analysis_accession','similarity'].apply(lambda x: x.nlargest(5, columns=['similarity'])).reset_index().drop('level_1', axis=1)
 
-	# Prepare dataframes ready to upload
-	dataframes_ready_to_upload = {
-		'related_dataset': dataset_similarity_dataframe.groupby(['source_dataset_accession'])['target_dataset_accession','similarity'].apply(lambda x: x.nlargest(10, columns=['similarity'])).reset_index().drop('level_1', axis=1).merge(dataset_id_dataframe, left_on='source_dataset_accession', right_on='dataset_accession', how='left').rename(columns={'dataset_fk': 'source_dataset_fk'}).merge(dataset_id_dataframe, left_on='target_dataset_accession', right_on='dataset_accession', how='left').rename(columns={'dataset_fk': 'target_dataset_fk'})[['source_dataset_fk', 'target_dataset_fk', 'similarity']].dropna(),
-		'keyword': pd.read_table(keywordFile).merge(dataset_id_dataframe, on='dataset_accession', how='left')[['dataset_fk', 'keyword']].dropna()
-	}
-
-	# Loop through prepared dataframes
-	for table_name, dataframe_ready_to_upload in dataframes_ready_to_upload.iteritems():
-
-		# Upload
-		engine.execute('SET GLOBAL max_allowed_packet=1073741824;')
-		engine.execute(Table(table_name, MetaData(), autoload=True, autoload_with=engine).insert().prefix_with('IGNORE'), dataframe_ready_to_upload.to_dict(orient='records'))
-
-
+	# Write
+	related_canned_analysis_dataframe.to_csv(outfile, sep='\t', index=False)
 
 ##################################################
 ##################################################

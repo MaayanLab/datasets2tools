@@ -27,11 +27,14 @@ if dataset_accession[:3] in ['GDS', 'GSE']:
     
     # Add repository FK
     annotated_dataset['repository_fk'] = 1
+
+    # Add accession
+    annotated_dataset['dataset_accession'] = dataset_accession
     
 else:
     
     # Return empty
-    annotated_dataset = {'title': '', 'summary': '', 'repository_name': '', 'dataset_landing_url': ''}
+    annotated_dataset = {'title': '', 'summary': '', 'repository_name': '', 'dataset_landing_url': '', 'dataset_accession': dataset_accession}
 
 # Return data
 print json.dumps(annotated_dataset)
