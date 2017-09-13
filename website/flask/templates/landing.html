@@ -201,14 +201,16 @@
 				<!-- 				 -->
 				<!-- Related Objects -->
 				<!-- 				 -->
-				<div id="related-object-info" class="info-card">
-					<div class="info-card-title">Related {{ object_type.replace('canned_analysis', 'Analyse').title()+'s' }}</div>
-					<div id="related-object-row" class="row">
-						{% for related_object in object_data['related_objects'] %}
-							{{ macros.display_object_card(related_object, object_type=object_type) }}
-						{% endfor %}
-					</div>
-				</div> <!-- #related-objects -->
+				{% if object_data['related_objects']|length > 0 %}
+					<div id="related-object-info" class="info-card">
+						<div class="info-card-title">Related {{ object_type.replace('canned_analysis', 'Analyse').title()+'s' }}</div>
+						<div id="related-object-row" class="row">
+							{% for related_object in object_data['related_objects'] %}
+								{{ macros.display_object_card(related_object, object_type=object_type) }}
+							{% endfor %}
+						</div>
+					</div> <!-- #related-objects -->
+				{% endif %}
 
 			</div> <!-- #overview -->
 
@@ -361,7 +363,7 @@
 			$(evt.target).parents('.landing-search-form').submit();
 		});
 		$('#related-object-row').slick({
-			slidesToShow: {{ 3 if object_type == 'tool' else 2 }},
+			slidesToShow: 2,
 			arrows: true,
 			dots: true
 		});

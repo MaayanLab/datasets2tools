@@ -21,31 +21,24 @@ CREATE TABLE repository (
 	`repository_icon_url` TEXT
 );
 
-CREATE TABLE dataset_type (
-	`id` INT AUTO_INCREMENT PRIMARY KEY,
-	`dataset_type_name` VARCHAR(50),
-	`dataset_type_icon_url` TEXT
-);
-
 CREATE TABLE dataset (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`repository_fk` INT DEFAULT 3,
-	`dataset_type_fk` INT,
 	`dataset_accession` VARCHAR(30) UNIQUE NOT NULL,
 	`dataset_title` VARCHAR(255),
 	`dataset_description` TEXT,
 	`dataset_landing_url` TEXT,
-	FOREIGN KEY (repository_fk) REFERENCES repository(id),
-	FOREIGN KEY (dataset_type_fk) REFERENCES dataset_type(id)
+	FOREIGN KEY (repository_fk) REFERENCES repository(id)
 );
 
 CREATE TABLE related_dataset (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
-	`source_dataset_fk` INT,
-	`target_dataset_fk` INT,
+	`source_dataset_fk` INT NOT NULL,
+	`target_dataset_fk` INT NOT NULL,
 	`similarity` DOUBLE,
 	FOREIGN KEY (source_dataset_fk) REFERENCES dataset(id),
-	FOREIGN KEY (target_dataset_fk) REFERENCES dataset(id)
+	FOREIGN KEY (target_dataset_fk) REFERENCES dataset(id),
+	UNIQUE INDEX `unique_related_dataset` (source_dataset_fk, target_dataset_fk)
 );
 
 CREATE TABLE dataset_keyword (
@@ -62,17 +55,19 @@ CREATE TABLE tool (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`tool_name` VARCHAR(100) UNIQUE NOT NULL,
 	`tool_description` TEXT,
-	`tool_homepage_url` TEXT,
-	`tool_icon_url` TEXT
+	`tool_homepage_url` TEXT, # UNIQUE NOT NULL
+	`tool_icon_url` TEXT,
+	`display` BOOL DEFAULT TRUE
 );
 
 CREATE TABLE related_tool (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
-	`source_tool_fk` INT,
-	`target_tool_fk` INT,
+	`source_tool_fk` INT NOT NULL,
+	`target_tool_fk` INT NOT NULL,
 	`similarity` DOUBLE,
 	FOREIGN KEY (source_tool_fk) REFERENCES tool(id),
-	FOREIGN KEY (target_tool_fk) REFERENCES tool(id)
+	FOREIGN KEY (target_tool_fk) REFERENCES tool(id),
+	UNIQUE INDEX `unique_related_tool` (source_tool_fk, target_tool_fk)
 );
 
 CREATE TABLE tool_keyword (
@@ -105,6 +100,16 @@ CREATE TABLE article (
 	FOREIGN KEY (tool_fk) REFERENCES tool(id)
 );
 
+CREATE TABLE article_metrics (
+	`id` INT AUTO_INCREMENT PRIMARY KEY,
+	`article_fk` INT,
+	`altmetric_badge_url` VARCHAR(255),
+	`attention_percentile` INT,
+	`attention_score` DOUBLE,
+	`citations` INT,
+	FOREIGN KEY (article_fk) REFERENCES article(id)
+);
+
 ### Contribution
 
 CREATE TABLE contribution (
@@ -130,11 +135,12 @@ CREATE TABLE canned_analysis (
 
 CREATE TABLE related_canned_analysis (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
-	`source_canned_analysis_fk` INT,
-	`target_canned_analysis_fk` INT,
+	`source_canned_analysis_fk` INT NOT NULL,
+	`target_canned_analysis_fk` INT NOT NULL,
 	`similarity` DOUBLE,
 	FOREIGN KEY (source_canned_analysis_fk) REFERENCES canned_analysis(id),
-	FOREIGN KEY (target_canned_analysis_fk) REFERENCES canned_analysis(id)
+	FOREIGN KEY (target_canned_analysis_fk) REFERENCES canned_analysis(id),
+	UNIQUE INDEX `unique_related_canned_analysis` (source_canned_analysis_fk, target_canned_analysis_fk)
 );
 
 CREATE TABLE canned_analysis_keyword (

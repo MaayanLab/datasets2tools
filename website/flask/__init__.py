@@ -294,6 +294,16 @@ def test_search():
 	results = Datasets2Tools.search(search_filters = search_filters, search_options = search_options, get_fairness=True, user_id=current_user.get_id())
 	return json.dumps(results.search_results[0])
 
+#############################################
+########## 5. Regular Update
+#############################################
+
+@app.route(entry_point+'/api/update')
+def update_api():
+	if current_user.get_id() == '1':
+		Datasets2Tools.update_database(os.getcwd().replace('/website/flask', '/updater/results'))
+	return ''
+
 #######################################################
 #######################################################
 ########## 3. Run App

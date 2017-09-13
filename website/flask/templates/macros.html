@@ -18,7 +18,7 @@
 		{% set card_landing_url = url_for('landing', object_type=object_type, object_identifier=object_data.tool_name) %}
 		{% set card_colsize = 'col-6' %}
 		{% set image_colsize = 4 %}
-		{% set max_description_length = 100 %}
+		{% set max_description_length = 150 %}
 	{% elif object_type == 'canned_analysis' %}
 		{% set card_title = object_data.canned_analysis_title %}
 		{% set card_source = object_data.username %}
@@ -42,7 +42,6 @@
 						{% if object_type == 'tool' %} <div class="tool-metrics">{{ '30 citations' }}</div> {% endif %}
 						{% if object_type == 'dataset' or object_type == 'canned_analysis' %} <a href="{{ card_source_url }}" class="card-source">{{ card_source }}</a> {% endif %}
 						<div class="card-description" data-toggle="tooltip" data-placement="bottom" data-animation="false" data-html="true" data-template='<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner card-description-tooltip"></div></div>' title="{{ card_description if card_description and card_description|length > max_description_length else ''}}">{{ card_description[:max_description_length]+'...' if card_description and card_description|length > max_description_length else card_description }}</div>
-						<i class="fa fa-info-circle card-info-icon"></i>
 					</div>
 				</div>
 			</div>

@@ -17,9 +17,10 @@
 ########## 1. Load libraries
 #############################################
 ##### 1. Python modules #####
-import json
+import json, os
 import pandas as pd
 import numpy as np
+from datetime import datetime
 
 ##### 2. Database modules #####
 from sqlalchemy import or_, and_, func
@@ -92,6 +93,20 @@ class Datasets2Tools:
 		except:
 			self.session.rollback()
 			raise
+			
+#############################################
+########## 5. Update Database
+#############################################
+
+	def update_database(self, file_directory):
+
+		# Try
+		try:
+			UpdateDatabase(self.engine, self.session, self.tables, file_directory)
+			self.session.commit()
+		except:
+			self.session.rollback()
+			raise
 
 #################################################################
 #################################################################
@@ -132,9 +147,9 @@ class Search:
 
 		# Expand query
 		if self.object_type == 'dataset':
-			query = query.join(self.tables['analysis_to_dataset']).join(self.tables['canned_analysis']).join(self.tables['analysis_to_tool']).join(self.tables['tool'])
+			query = query.outerjoin(self.tables['analysis_to_dataset']).outerjoin(self.tables['canned_analysis']).outerjoin(self.tables['analysis_to_tool']).outerjoin(self.tables['tool'])
 		elif self.object_type == 'tool':
-			query = query.join(self.tables['analysis_to_tool']).join(self.tables['canned_analysis']).join(self.tables['analysis_to_dataset']).join(self.tables['dataset'])
+			query = query.outerjoin(self.tables['analysis_to_tool']).outerjoin(self.tables['canned_analysis']).outerjoin(self.tables['analysis_to_dataset']).outerjoin(self.tables['dataset']).filter(self.tables['tool'].columns['display'] == True)
 		elif self.object_type == 'canned_analysis':
 			query = query.join(self.tables['analysis_to_dataset']).join(self.tables['dataset']).join(self.tables['analysis_to_tool']).join(self.tables['tool'])
 
@@ -304,7 +319,7 @@ class Search:
 		# Add keywords
 		search_filters.append({
 			'label': 'keyword',
-			'values': self.session.query(self.tables[self.object_type+'_keyword'].columns['keyword']).filter(self.tables[self.object_type+'_keyword'].columns[self.object_type+'_fk'].in_(object_ids)).distinct().all()
+			'values': [x[0] for x in self.session.query(self.tables[self.object_type+'_keyword'].columns['keyword']).filter(self.tables[self.object_type+'_keyword'].columns[self.object_type+'_fk'].in_(object_ids)).distinct().all()]
 		})
 
 		# Get datasets and tools other object type
@@ -374,7 +389,7 @@ class Search:
 			search_options['sort_by']['values'].append([])
 
 		# Get page sizes
-		page_sizes = [(x+1)*10 for x in range(min(count/10, 3)+1)] if count > 10 else []
+		page_sizes = [(x+1)*10 for x in range(min(count/10, 2)+1)] if count > 10 else []
 		search_options['page_size'] = {'values': page_sizes, 'selected': page_size}
 		
 		# Return
@@ -577,10 +592,114 @@ class UploadEvaluation:
 
 #################################################################
 #################################################################
-############### 5. API ##########################################
+############### 5. Update Database API ##########################
 #################################################################
 #################################################################
 
 #############################################
 ########## 1. Initialization
 #############################################
+
+class UpdateDatabase:
+
+	def __init__(self, engine, session, tables, file_directory):
+
+		# Add query data
+		self.engine, self.session, self.tables = engine, session, tables
+
+		# Upload tool data
+		self.upload_tool_data(file_directory)
+
+		# Upload dataset data
+		self.upload_dataset_data(file_directory)
+
+		# Upload canned analysis data
+		self.upload_canned_analysis_data(file_directory)
+
+#############################################
+########## 2. Upload
+#############################################
+
+	def upload_table(self, dataframe, table_name, identifier=None):
+
+		# Fix date
+		if 'date' in dataframe.columns:
+			dataframe['date'] = [datetime.strptime(x, '%d %B %Y') for x in dataframe['date']]
+
+		# Upload
+		self.engine.execute(self.tables[table_name].insert().prefix_with('IGNORE'), dataframe.to_dict(orient='records'))
+
+		# If identifier
+		if identifier:
+
+			# Get IDs
+			id_dataframe = pd.DataFrame(self.session.query(self.tables[table_name].columns['id'], self.tables[table_name].columns[identifier]).all()).rename(columns={'id': table_name+'_fk'})
+
+			# Return 
+			return id_dataframe
+
+#############################################
+########## 3. Tool Data
+#############################################
+
+	def upload_tool_data(self, file_directory):
+
+		# Read dataframes
+		dataframes = {x: pd.read_table(os.path.join(file_directory, x+'.txt')) for x in ['article', 'article_metrics', 'tool', 'related_tool', 'tool_keyword']}
+
+		# Upload tools
+		tool_id_dataframe = self.upload_table(dataframe = dataframes['tool'], table_name = 'tool', identifier = 'tool_name')
+
+		# Upload articles
+		article_dataframe = dataframes['article'].merge(dataframes['tool'], on='doi').merge(tool_id_dataframe, on='tool_name')[['doi', 'abstract', 'article_title', 'authors', 'date', 'journal_fk', 'tool_fk']]
+		article_id_dataframe = self.upload_table(dataframe = article_dataframe, table_name = 'article', identifier = 'doi')
+
+		# Upload article metrics
+		article_metrics_dataframe = dataframes['article_metrics'].merge(article_id_dataframe, on='doi').dropna()
+		self.upload_table(dataframe = article_metrics_dataframe, table_name = 'article_metrics')
+
+		# Upload keywords
+		tool_keyword_dataframe = dataframes['tool_keyword'].merge(tool_id_dataframe, on='tool_name').drop('tool_name', axis=1)
+		self.upload_table(dataframe = tool_keyword_dataframe, table_name = 'tool_keyword')
+
+		# Upload related tools
+		related_tool_dataframe = dataframes['related_tool'].merge(tool_id_dataframe, left_on='source_tool_name', right_on='tool_name').rename(columns={'tool_fk': 'source_tool_fk'}).merge(tool_id_dataframe, left_on='target_tool_name', right_on='tool_name').rename(columns={'tool_fk': 'target_tool_fk'})[['source_tool_fk', 'target_tool_fk', 'similarity']]
+		self.upload_table(dataframe = related_tool_dataframe, table_name = 'related_tool')
+
+#############################################
+########## 4. Dataset Data
+#############################################
+
+	def upload_dataset_data(self, file_directory):
+
+		# Read dataframes
+		dataframes = {x: pd.read_table(os.path.join(file_directory, x+'.txt')) for x in ['dataset', 'related_dataset', 'dataset_keyword', 'related_tool', 'tool_keyword']}
+
+		# Upload datasets
+		dataset_id_dataframe = self.upload_table(dataframe = dataframes['dataset'], table_name = 'dataset', identifier = 'dataset_accession')
+
+		# Upload keywords
+		dataset_keyword_dataframe = dataframes['dataset_keyword'].merge(dataset_id_dataframe, on='dataset_accession').drop('dataset_accession', axis=1)
+		self.upload_table(dataframe = dataset_keyword_dataframe, table_name = 'dataset_keyword')
+
+		# Upload related datasets
+		related_dataset_dataframe = dataframes['related_dataset'].merge(dataset_id_dataframe, left_on='source_dataset_accession', right_on='dataset_accession').rename(columns={'dataset_fk': 'source_dataset_fk'}).merge(dataset_id_dataframe, left_on='target_dataset_accession', right_on='dataset_accession').rename(columns={'dataset_fk': 'target_dataset_fk'})[['source_dataset_fk', 'target_dataset_fk', 'similarity']]
+		self.upload_table(dataframe = related_dataset_dataframe, table_name = 'related_dataset')
+
+
+#############################################
+########## 5. Canned Analysis Data
+#############################################
+
+	def upload_canned_analysis_data(self, file_directory):
+
+		# Read dataframes
+		dataframes = {x: pd.read_table(os.path.join(file_directory, x+'.txt')) for x in ['related_canned_analysis']}
+
+		# Read canned analysis ID
+		canned_analysis_id_dataframe = pd.DataFrame(self.session.query(self.tables['canned_analysis'].columns['id'], self.tables['canned_analysis'].columns['canned_analysis_accession']).all()).rename(columns={'id': 'canned_analysis_fk'})
+
+		# Upload related canned analyses
+		related_canned_analysis_dataframe = dataframes['related_canned_analysis'].merge(canned_analysis_id_dataframe, left_on='source_canned_analysis_accession', right_on='canned_analysis_accession').rename(columns={'canned_analysis_fk': 'source_canned_analysis_fk'}).merge(canned_analysis_id_dataframe, left_on='target_canned_analysis_accession', right_on='canned_analysis_accession').rename(columns={'canned_analysis_fk': 'target_canned_analysis_fk'})[['source_canned_analysis_fk', 'target_canned_analysis_fk', 'similarity']]
+		self.upload_table(dataframe = related_canned_analysis_dataframe, table_name = 'related_canned_analysis')
+
