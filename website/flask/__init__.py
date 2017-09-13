@@ -210,7 +210,7 @@ def landing(object_type, object_identifier):
 
 	# Get object data
 	object_data = Datasets2Tools.search(search_filters = landing_search_filters, search_options = landing_search_options, get_related_objects=True, get_fairness=True, user_id=current_user.get_id()).search_results[0]
-
+	print '\n'.join(object_data.keys())
 	# Get associated objects
 	associated_objects = {}
 	for associated_object_type in ['dataset', 'tool', 'canned_analysis']:

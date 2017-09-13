@@ -155,13 +155,13 @@ class Search:
 
 		# Text search
 		if 'q' in search_filters.keys():
-			q = search_filters.pop('q')
+			q = '%'+search_filters.pop('q')+'%'
 			if self.object_type == 'dataset':
 				query = query.filter(or_(self.tables['dataset'].columns['dataset_accession'].like(q), self.tables['dataset'].columns['dataset_title'].like(q), self.tables['dataset'].columns['dataset_description'].like(q)))
 			elif self.object_type == 'tool':
-				query = query.filter(or_(self.tables['tool'].columns['tool_name'].like(q), self.tables['tool'].columns['tool_description'].like(q)))
+				query = query.join(self.tables['article']).filter(or_(self.tables['tool'].columns['tool_name'].like(q), self.tables['tool'].columns['tool_description'].like(q), self.tables['article'].columns['article_title'].like(q), self.tables['article'].columns['authors'].like(q), self.tables['article'].columns['abstract'].like(q)))
 			elif self.object_type == 'canned_analysis':
-				query = query.filter(or_(self.tables['canned_analysis'].columns['canned_analysis_accession'].like(q), self.tables['canned_analysis'].columns['canned_analysis_title'].like(q), self.tables['canned_analysis'].columns['canned_analysis_description'].like(q), self.tables['dataset'].columns['dataset_accession'].like(q), self.tables['tool'].columns['tool_name'].like(q)))
+				query = query.filter(or_(self.tables['canned_analysis'].columns['canned_analysis_accession'].like(q), self.tables['canned_analysis'].columns['canned_analysis_title'].like(q), self.tables['canned_analysis'].columns['canned_analysis_description'].like(q), self.tables['dataset'].columns['dataset_accession'].like(q), self.tables['tool'].columns['tool_name'].like(q), self.tables['dataset'].columns['dataset_title'].like(q),  self.tables['dataset'].columns['dataset_description'].like(q), ))
 
 		# Keyword search
 		if 'keyword' in search_filters.keys():
@@ -236,6 +236,10 @@ class Search:
 			# Get tool data
 			tool_query = self.session.query(self.tables['tool']).filter(self.tables['tool'].columns['id'] == object_id)
 			object_data = {key: value for key, value in zip(self.tables[self.object_type].columns.keys(), tool_query.all()[0])}
+
+			# Get metrics
+			tool_metrics_query = self.session.query(self.tables['article_metrics'].columns['citations'], self.tables['article_metrics'].columns['altmetric_badge_url'], self.tables['article_metrics'].columns['attention_score']).join(self.tables['article']).join(self.tables['tool']).filter(self.tables['tool'].columns['id'] == object_id).all()
+			object_data.update(pd.DataFrame(tool_metrics_query).T.to_dict()[0])
 
 			# Get article data
 			article_query = self.session.query(self.tables['article'], self.tables['journal']).join(self.tables['journal']).filter(self.tables['article'].columns['tool_fk'] == object_id).all()
