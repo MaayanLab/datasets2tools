@@ -149,7 +149,7 @@ class Search:
 		if self.object_type == 'dataset':
 			query = query.outerjoin(self.tables['analysis_to_dataset']).outerjoin(self.tables['canned_analysis']).outerjoin(self.tables['analysis_to_tool']).outerjoin(self.tables['tool'])
 		elif self.object_type == 'tool':
-			query = query.outerjoin(self.tables['analysis_to_tool']).outerjoin(self.tables['canned_analysis']).outerjoin(self.tables['analysis_to_dataset']).outerjoin(self.tables['dataset']).filter(self.tables['tool'].columns['display'] == True)
+			query = query.outerjoin(self.tables['analysis_to_tool']).outerjoin(self.tables['canned_analysis']).outerjoin(self.tables['analysis_to_dataset']).outerjoin(self.tables['dataset']).outerjoin(self.tables['article']).filter(self.tables['tool'].columns['display'] == True)
 		elif self.object_type == 'canned_analysis':
 			query = query.join(self.tables['analysis_to_dataset']).join(self.tables['dataset']).join(self.tables['analysis_to_tool']).join(self.tables['tool'])
 
@@ -159,7 +159,7 @@ class Search:
 			if self.object_type == 'dataset':
 				query = query.filter(or_(self.tables['dataset'].columns['dataset_accession'].like(q), self.tables['dataset'].columns['dataset_title'].like(q), self.tables['dataset'].columns['dataset_description'].like(q)))
 			elif self.object_type == 'tool':
-				query = query.join(self.tables['article']).filter(or_(self.tables['tool'].columns['tool_name'].like(q), self.tables['tool'].columns['tool_description'].like(q), self.tables['article'].columns['article_title'].like(q), self.tables['article'].columns['authors'].like(q), self.tables['article'].columns['abstract'].like(q)))
+				query = query.filter(or_(self.tables['tool'].columns['tool_name'].like(q), self.tables['tool'].columns['tool_description'].like(q), self.tables['article'].columns['article_title'].like(q), self.tables['article'].columns['authors'].like(q), self.tables['article'].columns['abstract'].like(q)))
 			elif self.object_type == 'canned_analysis':
 				query = query.filter(or_(self.tables['canned_analysis'].columns['canned_analysis_accession'].like(q), self.tables['canned_analysis'].columns['canned_analysis_title'].like(q), self.tables['canned_analysis'].columns['canned_analysis_description'].like(q), self.tables['dataset'].columns['dataset_accession'].like(q), self.tables['tool'].columns['tool_name'].like(q), self.tables['dataset'].columns['dataset_title'].like(q),  self.tables['dataset'].columns['dataset_description'].like(q), ))
 
@@ -193,6 +193,7 @@ class Search:
 			if self.object_type == 'dataset':
 				pass
 			elif self.object_type == 'tool':
+				query = query.outerjoin(self.tables['article_metrics']).group_by(self.tables['tool'].columns['tool_name']).order_by(func.count(self.tables['analysis_to_tool'].columns['tool_fk']).desc(), self.tables['article_metrics'].columns['attention_score'].desc())
 				pass
 			elif self.object_type == 'canned_analysis':
 				pass
@@ -230,6 +231,9 @@ class Search:
 			dataset_query = self.session.query(self.tables['dataset'], self.tables['repository']).join(self.tables['repository']).filter(self.tables['dataset'].columns['id'] == object_id).all()
 			object_data = [x._asdict() for x in dataset_query][0]
 
+			# Add analyses
+			object_data['analyses'] = self.session.query(func.count(self.tables['analysis_to_dataset'].columns['dataset_fk'])).filter(self.tables['analysis_to_dataset'].columns['dataset_fk'] == object_id).all()[0][0]
+
 		# Tool
 		elif self.object_type == 'tool':
 			
@@ -239,7 +243,10 @@ class Search:
 
 			# Get metrics
 			tool_metrics_query = self.session.query(self.tables['article_metrics'].columns['citations'], self.tables['article_metrics'].columns['altmetric_badge_url'], self.tables['article_metrics'].columns['attention_score']).join(self.tables['article']).join(self.tables['tool']).filter(self.tables['tool'].columns['id'] == object_id).all()
-			object_data.update(pd.DataFrame(tool_metrics_query).T.to_dict()[0])
+			try:
+				object_data.update(pd.DataFrame(tool_metrics_query).T.to_dict()[0])
+			except:
+				pass
 
 			# Get article data
 			article_query = self.session.query(self.tables['article'], self.tables['journal']).join(self.tables['journal']).filter(self.tables['article'].columns['tool_fk'] == object_id).all()
@@ -248,6 +255,9 @@ class Search:
 			# Convert article abstracts
 			for i in range(len(object_data['articles'])):
 				object_data['articles'][i]['abstract'] = json.loads(object_data['articles'][i]['abstract'])
+
+			# Add analyses
+			object_data['analyses'] = self.session.query(func.count(self.tables['analysis_to_tool'].columns['tool_fk'])).filter(self.tables['analysis_to_tool'].columns['tool_fk'] == object_id).all()[0][0]
 
 		# Canned Analysis
 		elif self.object_type == 'canned_analysis':
@@ -341,7 +351,7 @@ class Search:
 			for associated_object_type in ['dataset', 'tool']:
 				search_filters.append({
 					'label': object_identifiers[associated_object_type],
-					'values': [x[0] for x in self.session.query(self.tables[associated_object_type].columns[object_identifiers[associated_object_type]]).join(self.tables['analysis_to_'+associated_object_type]).join(self.tables['canned_analysis']).distinct().all()]
+					'values': [x[0] for x in self.session.query(self.tables[associated_object_type].columns[object_identifiers[associated_object_type]]).join(self.tables['analysis_to_'+associated_object_type]).join(self.tables['canned_analysis']).distinct().filter(self.tables['canned_analysis'].columns['id'].in_(object_ids)).all()]
 				})
 
 			# Perform metadata query
@@ -358,7 +368,7 @@ class Search:
 					})
 
 		# Filter filters (so meta)
-		search_filters = [x for x in search_filters if len(x['values']) > 1 or x['label'] in used_filters]
+		search_filters = [x for x in search_filters if x['label'] not in ['pert_ids', 'ctrl_ids', 'creeds_id', 'curator', 'chdir_norm', 'pubchem_cid', 'drugbank_id', 'smiles'] and (len(x['values']) > 1 or x['label'] in used_filters+['dataset_accession', 'tool_name'])]
 
 		# Return
 		return search_filters
@@ -420,19 +430,23 @@ class UploadAnalyses:
 		canned_analysis_dataframe = self.read_analysis_file(analysis_file)
 
 		# Check if user can upload more analyses
-		if self.check_contributions(canned_analyses = len(canned_analysis_dataframe.index), user_id = user_id):
+		if self.check_contributions(nr_canned_analyses = len(canned_analysis_dataframe.index), user_id = user_id):
 
 			# Get object IDs
+			print 'uploading objects...'
 			for object_type in ['dataset', 'tool', 'canned_analysis']:
 				canned_analysis_dataframe = self.get_object_ids(canned_analysis_dataframe = canned_analysis_dataframe, object_type = object_type, user_id = user_id)
 
 			# Upload object relationships
+			print 'uploading object relationships...'
 			self.upload_object_relationships(canned_analysis_dataframe)
 
 			# Upload metadata
+			print 'uploading metadata...'
 			self.upload_metadata(canned_analysis_dataframe)
 
 			# Upload keywords
+			print 'uploading keywords...'
 			self.upload_keywords(canned_analysis_dataframe)
 
 		# Else
@@ -464,13 +478,16 @@ class UploadAnalyses:
 ########## 3. Check Contributions
 #############################################
 
-	def check_contributions(self, canned_analyses, user_id):
+	def check_contributions(self, nr_canned_analyses, user_id):
 
 		# Get max number of contributions
 		max_contributions = self.session.query(self.tables['user'].columns['max_contributions']).filter(self.tables['user'].columns['id'] == user_id).all()[0][0]
 
+		# Get number of existing contributions
+		nr_contributions = len(self.session.query(self.tables['canned_analysis'].columns['id']).join(self.tables['contribution']).filter(self.tables['contribution'].columns['user_fk'] == user_id).all())
+
 		# Return
-		return canned_analyses <= max_contributions
+		return (max_contributions-nr_canned_analyses)>nr_contributions
 
 #############################################
 ########## 4. Get Object IDs
@@ -541,11 +558,15 @@ class UploadAnalyses:
 
 	def upload_keywords(self, canned_analysis_dataframe):
 
-		# Initialize keyword dataframe
-		keyword_dataframe = pd.DataFrame([{'keyword': keyword, 'canned_analysis_fk': rowData['canned_analysis_fk']} for index, rowData in canned_analysis_dataframe.iterrows() for keyword in rowData['keywords'].split(',') if keyword]).drop_duplicates()
+		try:
+			# Initialize keyword dataframe
+			keyword_dataframe = canned_analysis_dataframe.copy()[['canned_analysis_fk', 'keywords']].dropna()
+			keyword_dataframe = pd.DataFrame([{'keyword': keyword, 'canned_analysis_fk': rowData['canned_analysis_fk']} for index, rowData in keyword_dataframe.iterrows() for keyword in rowData['keywords'].split(',') if rowData['keywords']]).drop_duplicates()
 
-		# Upload
-		self.engine.execute(self.tables['canned_analysis_keyword'].insert().prefix_with('IGNORE'), keyword_dataframe.to_dict(orient='records'))
+			# Upload
+			self.engine.execute(self.tables['canned_analysis_keyword'].insert().prefix_with('IGNORE'), keyword_dataframe.to_dict(orient='records'))
+		except:
+			pass
 
 #################################################################
 #################################################################

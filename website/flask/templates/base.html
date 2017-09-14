@@ -185,6 +185,34 @@
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
             <script src="{{ url_for('static', filename='js/base-scripts.js') }}"></script>
             <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+            <script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>
+            <script type="text/javascript" src="//d39af2mgp1pqhg.cloudfront.net/widget-popup.js"></script>
+            <script src="https://d3js.org/d3.v4.min.js"></script>
+            <script type="text/javascript">
+                  $('.fairness-insignia').each(function(i, elem) {
+                    $.ajax({
+                      url: "{{ url_for('fairness_insignia_api') }}",
+                      data: {
+                        object_type: $(elem).attr('data-object-type'),
+                        object_identifier: $(elem).attr('data-identifier')
+                      },
+                      success: function(data) {
+                        fairness_data = JSON.parse(data);
+                        var $fairness_insignia = $("<div>").css('border-radius', '3px').css('font-size', '8pt').css('color', 'white').css('margin-top', 'auto').css('margin-bottom', 'auto').css('padding', '2px 5px');
+                        if (fairness_data['fairness_score']){
+                          color = d3.scaleLinear().domain([-1, 1]).interpolate(d3.interpolateRgb).range([d3.rgb(255,0,0), d3.rgb(0,0,255)]);
+                          $fairness_insignia.css('background-color', color(fairness_data['fairness_score']))
+                          $fairness_insignia.html(fairness_data['fairness_score'])
+                        } else {
+                          $fairness_insignia.css('background-color', 'grey')
+                          $fairness_insignia.html('None')
+                        }
+                        $(elem).html($fairness_insignia);
+                        console.log(fairness_data);
+                      }
+                    });
+                  });
+            </script>
             {% block footer %}{% endblock %}
         </div> <!-- #js -->
     </div> <!-- #footer -->

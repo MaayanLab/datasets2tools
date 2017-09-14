@@ -324,7 +324,7 @@ def getArticleMetrics(infile, outfile):
 def annotateDatasets(outfile):
 
 	# Get dataset dataframe
-	all_dataset_dataframe = pd.read_sql_query('SELECT * FROM dataset', engine).set_index('dataset_accession', drop=False).head(50)
+	all_dataset_dataframe = pd.read_sql_query('SELECT * FROM dataset', engine).set_index('dataset_accession', drop=False)
 
 	# Get dataset table
 	unannotated_dataset_accessions = [dataset_accession for dataset_accession, dataset_title in all_dataset_dataframe[['dataset_accession', 'dataset_title']].as_matrix() if not dataset_title]

@@ -42,7 +42,7 @@
 				}
 
 					.card-title {
-						font-size: 9pt;
+						font-size: 10pt;
 						color: darkblue;
 						font-weight: 600;
 						display: block;
@@ -50,12 +50,17 @@
 						/*word-break: break-all;*/
 					}
 
+						.tool-card .card-title {
+							padding-right: 50px;
+							padding-bottom: 5px;
+						}
+
 						.card-title:hover {
 							color: darkblue;
 						}
 
 					.card-source {
-						font-size: 7pt;
+						font-size: 8pt;
 						margin-top: 3px;
 						margin-bottom: 5px;
 						color: darkblue;
@@ -71,7 +76,7 @@
 					}
 
 					.card-description {
-						font-size: 7pt;
+						font-size: 8pt;
 						margin-bottom: 3px;
 						color: black;
 						font-weight: 400;

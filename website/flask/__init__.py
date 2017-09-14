@@ -304,6 +304,31 @@ def update_api():
 		Datasets2Tools.update_database(os.getcwd().replace('/website/flask', '/updater/results'))
 	return ''
 
+#############################################
+########## 6. FAIRness Insignia API
+#############################################
+
+@app.route(entry_point+'/api/fairness_insignia', methods=['GET', 'POST'])
+def fairness_insignia_api():
+
+	# Get object type
+	object_type = request.args.get('object_type')
+
+	# Get search options
+	insignia_search_options = default_search_options.copy()
+	insignia_search_options.update({'object_type': object_type})
+
+	# Get evaluation score
+	object_data = Datasets2Tools.search(search_filters = {object_identifier_columns[object_type]: request.args.get('object_identifier')}, search_options = insignia_search_options, get_fairness=True).search_results[0]
+	score_dataframe = pd.DataFrame(object_data['fairness']['questions']).set_index('id').merge(pd.DataFrame(object_data['fairness']['all_evaluations']).T, left_index=True, right_index=True)
+	fairness_score = round(score_dataframe['average_score'].mean(), ndigits=2) if 'average_score' in score_dataframe else None
+
+	# Get result
+	result = {'fairness_score': fairness_score, 'questions': score_dataframe.to_dict(orient='records')}
+
+	# Return result
+	return json.dumps(result)
+
 #######################################################
 #######################################################
 ########## 3. Run App
