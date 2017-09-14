@@ -275,8 +275,8 @@
 									{% for question in object_data['fairness']['questions'] %}
 										<tr>
 											<td><b>{{question.question_number}}.</b> {{ question.question }}</td>
-											{% for score in [1, -1, 0] %}
-												<td><input type="radio" name="fairness-question-{{ question.id }}" value={{ score }} {% if object_data['fairness']['user_evaluation'][question.id].get('score') == score %} checked {% endif %}} }></td>
+											{% for answer in ['yes', 'no', 'yes-but'] %}
+												<td><input type="radio" name="fairness-question-{{ question.id }}" value="{{ answer }}" {% if object_data['fairness']['user_evaluation'][question.id].get('answer') == answer %} checked {% endif %}} }></td>
 											{% endfor %}
 										<td><input type="text" class="yes-but-comment" name="fairness-question-{{ question.id }}-comment" value="{{ object_data['fairness']['user_evaluation'][question.id].get('comment', '') }}"></td></tr> <!-- to fix -->
 									{% endfor %}
@@ -322,7 +322,7 @@
 		if (window.location.hash != "") {
 			$('a[href="' + window.location.hash + '"]').click()
 		};
-		color = d3.scaleLinear().domain([-1, 1]).interpolate(d3.interpolateRgb).range([d3.rgb(255,0,0), d3.rgb(0,0,255)]);
+		color = d3.scaleLinear().domain([0, 1]).interpolate(d3.interpolateRgb).range([d3.rgb(255,0,0), d3.rgb(0,0,255)]);
 		$('#object-fairness-col rect').each(function(i, elem) {
 			if ($(elem).attr('data-value') === 'None') {
 				$(elem).attr('fill', 'grey');
@@ -331,13 +331,13 @@
 			}
 		});
 		$('#fairness-table input[type="radio"]').click(function(evt) {
-			if ($(evt.target).val() === "0") {
+			if ($(evt.target).val() === "yes-but") {
 				$(evt.target).parents('tr').find('.yes-but-comment').css('visibility', 'visible');
 			} else {
 				$(evt.target).parents('tr').find('.yes-but-comment').css('visibility', 'hidden');
 			}
 		});
-		$('#fairness-table input[type="radio"][value="0"]:checked').click();
+		$('#fairness-table input[type="radio"][value="yes-but"]:checked').click();
 		$('#evaluate-button').click(function(evt) {
 			$('a[href="#fairness"]').click();
 		});	

@@ -210,7 +210,6 @@ def landing(object_type, object_identifier):
 
 	# Get object data
 	object_data = Datasets2Tools.search(search_filters = landing_search_filters, search_options = landing_search_options, get_related_objects=True, get_fairness=True, user_id=current_user.get_id()).search_results[0]
-	print '\n'.join(object_data.keys())
 	# Get associated objects
 	associated_objects = {}
 	for associated_object_type in ['dataset', 'tool', 'canned_analysis']:
@@ -321,7 +320,7 @@ def fairness_insignia_api():
 	# Get evaluation score
 	object_data = Datasets2Tools.search(search_filters = {object_identifier_columns[object_type]: request.args.get('object_identifier')}, search_options = insignia_search_options, get_fairness=True).search_results[0]
 	score_dataframe = pd.DataFrame(object_data['fairness']['questions']).set_index('id').merge(pd.DataFrame(object_data['fairness']['all_evaluations']).T, left_index=True, right_index=True)
-	fairness_score = round(score_dataframe['average_score'].mean(), ndigits=2) if 'average_score' in score_dataframe else None
+	fairness_score = sum(score_dataframe['average_score'] > 0.5) if 'average_score' in score_dataframe else None
 
 	# Get result
 	result = {'fairness_score': fairness_score, 'questions': score_dataframe.to_dict(orient='records')}

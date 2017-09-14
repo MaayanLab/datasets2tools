@@ -183,7 +183,6 @@
             <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
-            <script src="{{ url_for('static', filename='js/base-scripts.js') }}"></script>
             <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
             <script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>
             <script type="text/javascript" src="//d39af2mgp1pqhg.cloudfront.net/widget-popup.js"></script>
@@ -198,21 +197,34 @@
                       },
                       success: function(data) {
                         fairness_data = JSON.parse(data);
-                        var $fairness_insignia = $("<div>").css('border-radius', '3px').css('font-size', '8pt').css('color', 'white').css('margin-top', 'auto').css('margin-bottom', 'auto').css('padding', '2px 5px');
-                        if (fairness_data['fairness_score']){
-                          color = d3.scaleLinear().domain([-1, 1]).interpolate(d3.interpolateRgb).range([d3.rgb(255,0,0), d3.rgb(0,0,255)]);
-                          $fairness_insignia.css('background-color', color(fairness_data['fairness_score']))
-                          $fairness_insignia.html(fairness_data['fairness_score'])
+                        if (fairness_data['fairness_score']) {
+                          color = d3.scaleLinear().domain([0, 9]).interpolate(d3.interpolateRgb).range([d3.rgb(255,0,0), d3.rgb(0,0,255)]);
+                          $(elem).html(
+                            $("<div>").css('border-radius', '3px')
+                              .css('font-size', '9pt')
+                              .css('color', 'white')
+                              .css('margin-top', 'auto')
+                              .css('margin-bottom', 'auto')
+                              .css('cursor', 'pointer')
+                              .css('padding', '2px 5px')
+                              .css('padding', '2px 5px')
+                              .attr('data-toggle', 'tooltip')
+                              .attr('data-placement', 'right')
+                              .attr('data-animation', 'false')
+                              .attr('data-html', 'true')
+                              .attr('data-original-title', 'FAIRness')
+                              .css('background-color', color(fairness_data['fairness_score']))
+                              .html(fairness_data['fairness_score'])
+                              .prepend($("<i>", {class: 'fa fa-certificate'}).css('margin-right', '5px'))
+                            );
                         } else {
-                          $fairness_insignia.css('background-color', 'grey')
-                          $fairness_insignia.html('None')
                         }
-                        $(elem).html($fairness_insignia);
-                        console.log(fairness_data);
                       }
                     });
                   });
             </script>
+            <script src="{{ url_for('static', filename='js/base-scripts.js') }}"></script>
+
             {% block footer %}{% endblock %}
         </div> <!-- #js -->
     </div> <!-- #footer -->

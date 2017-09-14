@@ -297,14 +297,14 @@ class Search:
 			user_evaluations_query = all_evaluations_query.filter(self.tables[self.object_type+'_evaluation'].columns['user_fk'] == user_id)
 
 			# Add user evaluation
-			object_data['fairness']['user_evaluation'] = pd.DataFrame(user_evaluations_query.all()).set_index('question_fk')[['score', 'comment']].to_dict(orient='index') if len(user_evaluations_query.all()) > 0 else {x:{} for x in question_ids}
+			object_data['fairness']['user_evaluation'] = pd.DataFrame(user_evaluations_query.all()).set_index('question_fk')[['answer', 'comment']].to_dict(orient='index') if len(user_evaluations_query.all()) > 0 else {x:{} for x in question_ids}
 
 			# Add all evaluations
 			if all_evaluations_query.all():
 				all_evaluations_dataframe = pd.DataFrame(all_evaluations_query.all()).groupby('question_fk').aggregate(lambda x: list(x))#.to_dict(orient='index')
 				all_evaluations_dataframe['comment'] = [[y for y in x if y != ''] for x in all_evaluations_dataframe['comment']]
 				all_evaluations_dict = all_evaluations_dataframe.to_dict(orient='index')
-				all_evaluations = {question_id: {'average_score': np.mean(all_evaluations_dict[question_id]['score']), 'comments': list(set(all_evaluations_dict[question_id]['comment']))} for question_id in question_ids}
+				all_evaluations = {question_id: {'average_score': np.mean([x == 'yes' for x in all_evaluations_dict[question_id]['answer'] if x]), 'comments': list(set(all_evaluations_dict[question_id]['comment']))} for question_id in question_ids}
 				nr_evaluations = max([len(x['user_fk']) for x in all_evaluations_dict.values()])
 			else:
 				all_evaluations = {x: {} for x in question_ids}
@@ -589,7 +589,7 @@ class UploadEvaluation:
 		score_dataframe = self.prepare_score_dataframe(evaluation_scores = evaluation_scores, evaluation_info = evaluation_info)
 
 		# Upload
-		upload_string = 'REPLACE INTO {object_type}_evaluation (question_fk, user_fk, {object_type}_fk, score, comment) VALUES ('.format(**evaluation_info) + '), ('.join([', '.join([rowData[x] if x != 'comment' else '"'+rowData[x].replace('"', '')+'"' for x in ['question_fk', 'user_fk', evaluation_info['object_type']+'_fk', 'score', 'comment']]) for index, rowData in score_dataframe.iterrows()]) + ')'
+		upload_string = 'REPLACE INTO {object_type}_evaluation (question_fk, user_fk, {object_type}_fk, answer, comment) VALUES ('.format(**evaluation_info) + '), ('.join([', '.join([rowData[x] if x not in ['comment', 'answer'] else '"'+rowData[x].replace('"', '')+'"' for x in ['question_fk', 'user_fk', evaluation_info['object_type']+'_fk', 'answer', 'comment']]) for index, rowData in score_dataframe.iterrows()]) + ')'
 		engine.execute(upload_string)
 
 #############################################
@@ -599,18 +599,19 @@ class UploadEvaluation:
 	def prepare_score_dataframe(self, evaluation_scores, evaluation_info):
 
 		# Convert to dataframe
-		melted_score_dataframe = pd.Series(evaluation_scores).rename('score').to_frame()
+		melted_score_dataframe = pd.Series(evaluation_scores).rename('answer').to_frame()
 
 		# Add columns
 		melted_score_dataframe['question_fk'] = [x.split('-')[2] for x in melted_score_dataframe.index]
-		melted_score_dataframe['column_type'] = ['comment' if 'comment' in x else 'score' for x in melted_score_dataframe.index]
+		melted_score_dataframe['column_type'] = ['comment' if 'comment' in x else 'answer' for x in melted_score_dataframe.index]
 
 		# Cast
-		score_dataframe = pd.pivot_table(melted_score_dataframe, index='question_fk', columns='column_type', values='score', aggfunc='first').reset_index().fillna('')
+		score_dataframe = pd.pivot_table(melted_score_dataframe, index='question_fk', columns='column_type', values='answer', aggfunc='first').reset_index().replace('None', 'NULL')
 
 		# Add data
 		score_dataframe['user_fk'] = evaluation_info['user_id']
 		score_dataframe[evaluation_info['object_type']+'_fk'] = evaluation_info['object_id']
+		print score_dataframe
 
 		# Return
 		return score_dataframe
