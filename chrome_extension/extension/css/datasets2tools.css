@@ -17,13 +17,20 @@
 	margin: 0 auto;
 }
 
-	.d2t-table-wrapper .d2t-table {
-		width: 500px;
+	.d2t-table-wrapper .dataTables_length, .d2t-table-wrapper .dataTables_filter {
+		display: none;
 	}
 
-		.d2t-table-wrapper .dataTables_length, .d2t-table-wrapper .dataTables_filter {
-			display: none;
-		}
+	.d2t-table-wrapper .dataTables_info {
+		padding-left: 10px;
+		padding-top: 10px;
+		font-size: 9pt;
+	}
+
+	.d2t-table-wrapper .paginate_button {
+		font-size: 9pt;
+		padding: 0.3em 0.7em !important;
+	}
 
 
 /* Structural */
@@ -152,27 +159,19 @@
 				text-align: center;
 			}
 
-				.d2t-link-col {
-
+				.d2t-link-icon {
+					height: 15px;
 				}
 
-					.d2t-link-icon {
-						height: 15px;
-					}
-
-				.d2t-description-col {
-
+				.d2t-canned-analysis-description-tooltip {
+					padding: 5px 7px;
+					font-size: 8pt;
+					text-align: justify;
+					width: 300px;
 				}
-
-					.d2t-canned-analysis-description-tooltip {
-						padding: 5px 7px;
-						font-size: 8pt;
-						text-align: justify;
-						width: 300px;
-					}
 
 				.d2t-metadata-col {
-					font-size: 9pt;
+					font-size: 11pt;
 				}
 
 					.d2t-metadata-tooltip {
@@ -199,15 +198,20 @@
 /* Page-Specific */
 
 /* GEO */
-.d2t-table-wrapper .dataTables_info {
-	padding-left: 10px;
-	padding-top: 10px;
-	font-size: 9pt;
+
+.d2t-geo#d2t-landing-wrapper {
+	width: 100%;
+	margin-top: 5px;
 }
 
-.d2t-table-wrapper .paginate_button {
-	font-size: 9pt;
-	padding: 0.3em 0.7em !important;
+.d2t-gds th {
+	text-align: center;
+	padding: 3px 0px;
+}
+
+.d2t-gse th {
+	background-color: #eeeeee;
+	text-align: left;
 }
 
 /* DataMed */

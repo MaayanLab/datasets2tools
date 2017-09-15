@@ -113,13 +113,40 @@ var Page = {
 			if (Page.isDataMedSearchResults() || Page.isGeoSearchResults()) {
 				parentDiv.append(analysisInterface);
 			} else if (Page.isDataMedLanding()) {
-				// parents[datasetAccession].after('<div class="panel-group" id="accordion-cannedAnalyses" role="tablist" aria-multiselectable="true"><div class="panel panel-info"><div class="panel-heading" role="tab" id="heading-dataset-cannedAnalyses"><h4 class="panel-title"><a role="button" data-toggle="collapse" data-parent="#accordion-cannedAnalyses" data-target="#collapse-dataset-cannedAnalyses" href="#collapse-dataset-cannedAnalyses" aria-expanded="true" aria-controls="collapse-dataset-cannedAnalyses"><i class="fa fa-chevron-up"></i>&nbspCanned Analyses</a></h4></div><div id="collapse-dataset-cannedAnalyses" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading-dataset-cannedAnalyses"><div class="panel-body">' + datasetInterfaces['tool_table'] + '</div></div></div></div>');
-			} else if (Page.isGeoSeriesLanding()) {
-				// parents[datasetAccession].after('<div class="gse-landing-wrapper"><div class="gse-header">Canned Analyses</div>'+datasetInterfaces['tool_table']+'</div>');
-			} else if (Page.isGeoDatasetLanding()) {
-				// parents[datasetAccession].after('<div class="gds-header">Canned Analyses</div><div class="gds-landing-wrapper">'+datasetInterfaces['tool_table']+'</div>');
-			}
 
+				parentDiv.after($('<div>', {'id':'accordion-d2t', 'class': 'panel-group', 'role': 'tablist', 'aria-multiselectable': 'true'})
+									.html($('<div>', {'class': 'panel panel-info'})
+										.append($('<div>', {'id': 'heading-dataset-d2t', 'class': 'panel-heading', 'role': 'tab'})
+											.html($('<h4>', {'class': 'panel-title'})
+												.html($('<a>', {'role': 'button', 'data-toggle': 'collapse', 'data-parent': '#accordion-d2t', 'data-target': 'collapse-dataset-d2t', 'aria-expanded': 'true', 'aria-controls': 'collapse-dataset-d2t'})
+													.append($('<i>', {'class': 'fa fa-chevron-up'}))
+													.append(' Canned Analyses'))))
+										.append($('<div>', {'id': 'collapse-dataset-d2t', 'class': 'panel-collapse collapse in', 'role': 'tabpanel', 'aria-labelledby': 'heading-dataset-d2t'})
+											.html($('<div>', {'class': 'panel-body'})
+												.html(analysisInterface)))));
+
+			} else if (Page.isGeoSeriesLanding()) {
+
+				parentDiv.after($('<table>', {'id': 'd2t-landing-wrapper', 'class': 'd2t-geo d2t-gse'})
+									.html($('<tbody>')
+										.append($('<tr>')
+											.html($('<th>')
+												.html('Canned Analyses')))
+										.append($('<tr>')
+											.html($('<td>')
+												.html(analysisInterface)))))
+
+			} else if (Page.isGeoDatasetLanding()) {
+
+				parentDiv.after($('<table>', {'id': 'd2t-landing-wrapper', 'class': 'd2t-geo d2t-gds gds_panel'})
+									.html($('<tbody>')
+										.append($('<tr>', {'class': 'caption'})
+											.html($('<th>')
+												.html('Canned Analyses')))
+										.append($('<tr>')
+											.html($('<td>')
+												.html(analysisInterface)))));
+			}
 	}
 };
 
@@ -132,12 +159,12 @@ var Page = {
 var Interfaces = {
 
 	//////////////////////////////
-	///// 1. Create Interfaces
+	///// 1. Create Search Interface
 	//////////////////////////////
 
-	///// Gets interfaces relevant to identified datasets from the API
+	///// Gets interfaces relevant to identified datasets from the API on search pages
 
-	createInterface: function(apiData, datasetAccession) {
+	createSearchInterface: function(apiData, datasetAccession) {
 
 		// Get page class
 		if (Page.isDataMedSearchResults() || Page.isDataMedLanding()) {
@@ -175,7 +202,6 @@ var Interfaces = {
 
 		// Get tables
 		$tables = $('<div>', {'class': 'd2t-table-wrapper'});
-
 		$.each(apiData, function(toolName, toolData) {
 
 			// Table header
@@ -215,6 +241,7 @@ var Interfaces = {
 
 		});
 
+		// Return
 		return $('<div>', {'data-dataset-accession': datasetAccession, 'class': 'd2t-wrapper d2t-' + pageClass})
 					.append($toolbar)
 					.append($toolinfo)
@@ -222,10 +249,46 @@ var Interfaces = {
 	},
 
 	//////////////////////////////
-	///// 2. Add
+	///// 2. Create Landing Interface
 	//////////////////////////////
 
-	///// Gets interfaces relevant to identified datasets from the API
+	///// Gets interfaces relevant to identified datasets from the API on landing pages
+
+	createLandingInterface: function(apiData, datasetAccession) {
+		
+		// Get tool table
+		$toolTable = $('<table>', {'class': 'd2t-tool-table'})
+						.append($('<thead>')
+							.html($('<tr>')
+								.append($('<th>', {'class': 'd2t-tool-name-header'}).html('Tool'))
+								.append($('<th>', {'class': 'd2t-tool-description-header'}).html('Description'))
+								.append($('<th>', {'class': 'd2t-canned-analyses-header'}).html('Analyses'))))
+						.append($('<tbody>'));
+		$.each(apiData, function(toolName, toolData) {
+			$toolTable.find('tbody')
+				.append($('<tr>')
+					.append($('<td>')
+						.html(toolName))
+					.append($('<td>')
+						.html(toolData['tool_description']))
+					.append($('<td>')
+						.html(toolData['canned_analyses'].length)))
+		});
+
+		// Get analysis tables
+		$analysisTables = $('<div>')
+
+		// Return
+		return $('<div>')
+					.append($toolTable)
+					.append($analysisTables);
+	},
+
+	//////////////////////////////
+	///// 3. Add
+	//////////////////////////////
+
+	///// Creates and add interfaces
 
 	add: function(parents) {
 
@@ -235,8 +298,16 @@ var Interfaces = {
 		
 		// Loop through parents
 		$.each(parents, function(datasetAccession, parentDiv) {
-			Page.addInterface(self.createInterface(apiData, datasetAccession), parentDiv);
-			console.log('asd');
+
+			// Create interfaces
+			if (Page.isDataMedSearchResults() || Page.isGeoSearchResults()) {
+				analysisInterface = self.createSearchInterface(apiData, datasetAccession);
+			} else if (Page.isDataMedLanding() || Page.isGeoSeriesLanding() || Page.isGeoDatasetLanding()) {
+				analysisInterface = self.createLandingInterface(apiData, datasetAccession);
+			}
+
+			// Add
+			Page.addInterface(analysisInterface, parentDiv);
 
 			// console.log(key);
 			// $.ajax({
