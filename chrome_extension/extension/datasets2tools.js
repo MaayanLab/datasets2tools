@@ -89,7 +89,7 @@ var Page = {
 	locateParents: function() {
 		var parents = {};
 		if (Page.isDataMedSearchResults()) {
-			$('.search-result li').each(function(i, elem){ parents[$(elem).find('span[data-original-title]').first().text().trim()] = $(elem) });
+			$('.search-result li').each(function(i, elem){ parents[$(elem).find('em:contains(ID:) + span').text().trim()] = $(elem) });
 		} else if (Page.isDataMedLanding()) {
 			$('#accordion-dataset').each(function(i, elem) { parents[$(elem).find('strong:contains(ID:)').parent().next().children(0).text().trim()] = $(elem) });
 		} else if (Page.isGeoSearchResults()) {
@@ -100,65 +100,6 @@ var Page = {
 			$('.acc').each(function(i, elem) { parents[$(elem).attr('id')] = $(elem).parents().eq(7) });
 		}
 		return parents;
-	},
-
-	//////////////////////////////
-	///// 6. loadTooltips
-	//////////////////////////////
-
-	///// Loads tooltips
-
-	loadTooltips: function() {
-
-		$.widget("ui.tooltip", $.ui.tooltip, {
-		    options: {
-		        content: function () {
-		            return $(this).prop('title');
-		        }
-		    }
-		});
-
-		$('.d2t-tooltip').each(function(i, elem) { $(elem).prev().attr('title', $(elem).remove().html());});
-
-		$('.tool-icon').tooltip({
-			classes:{'ui-tooltip':'tooltip-wrapper', 'ui-tooltip-content':'tooltip-black tooltip-bottom tool-icon-tooltip'},
-			position:{my: 'center top', at: 'center bottom+5'},
-			show:{duration: 0},
-			hide:{duration: 0}
-		});
-
-		$('.canned-analysis-title').tooltip({
-			classes:{'ui-tooltip':'tooltip-wrapper', 'ui-tooltip-content':'tooltip-black tooltip-bottom canned-analysis-title-tooltip'},
-			position:{my: 'center top', at: 'center bottom+5'},
-			show:{duration: 0},
-			hide:{duration: 0}
-		});
-
-		$('.view-metadata').tooltip({
-			classes:{'ui-tooltip':'tooltip-wrapper', 'ui-tooltip-content':'tooltip-black tooltip-right view-metadata-tooltip'},
-			position:{my: 'left center', at: 'left+25 center'},
-			show:{duration: 0},
-			hide:{duration: 0}
-		});
-
-		$('.download-metadata').tooltip({
-			classes:{'ui-tooltip':'tooltip-wrapper', 'ui-tooltip-content':'tooltip-white tooltip-right download-metadata-tooltip'},
-			position:{my: 'left center', at: 'left+25 center'},
-		    open:function(event, ui) { if (typeof(event.originalEvent) === 'undefined') { return false; }; var $id = $(ui.tooltip).attr('id'); $('div.ui-tooltip').not('#' + $id).remove(); },
-		    close:function(event, ui) { ui.tooltip.hover(function() { $(this).stop(true).fadeTo(400, 1);; }, function() { $(this).remove(); }); },
-			show:{duration: 0},
-			hide:{duration: 500}
-		});
-
-		$('.share').tooltip({
-			classes:{'ui-tooltip':'tooltip-wrapper', 'ui-tooltip-content':'tooltip-white tooltip-right share-tooltip'},
-			position:{my: 'left center', at: 'left+25 center'},
-		    open:function(event, ui) { if (typeof(event.originalEvent) === 'undefined') { return false; }; var $id = $(ui.tooltip).attr('id'); $('div.ui-tooltip').not('#' + $id).remove(); },
-		    close:function(event, ui) { ui.tooltip.hover(function() { $(this).stop(true).fadeTo(400, 1); }, function() { $(this).fadeOut('400', function() { $(this).remove(); }); }); },
-			show:{duration: 0},
-			hide:{duration: 500}
-		});
-
 	},
 
 	//////////////////////////////
@@ -202,6 +143,13 @@ var Interfaces = {
 
 	createInterface: function(apiData, datasetAccession) {
 
+		// Get page class
+		if (Page.isDataMedSearchResults() || Page.isDataMedLanding()) {
+			pageClass = 'datamed'
+		} else if (Page.isGeoSearchResults() || Page.isGeoSeriesLanding() || Page.isGeoDatasetLanding()) {
+			pageClass = 'geo'
+		}
+
 		// Get toolbar
 		$toolbar = $('<div>', {'class': 'd2t-toolbar'})
 						.append($('<div>', {'class': 'd2t-logo-wrapper'})
@@ -211,13 +159,12 @@ var Interfaces = {
 							.html($('<div>', {'class': 'd2t-tool-icon-inner-wrapper'})));
 
 		$.each(apiData, function(toolName, toolData) { $toolbar.find('.d2t-tool-icon-inner-wrapper')
-														.append($('<img>', {'class': 'd2t-tool-icon', 'src': 'https://pbs.twimg.com/profile_images/745655614081220610/GA9jRnsf.jpg', 'data-tool-name': toolName, 'data-toggle': "tooltip", 'data-placement': "top", 'data-html': "true", 'data-original-title': "<div class='d2t-tool-icon-tooltip'><div class='d2t-tool-icon-tooltip-name'>"+toolName+"</div><div class='d2t-tool-icon-tooltip-count'>"+toolData['canned_analyses'].length+" analyses</div><div class='d2t-tool-icon-tooltip-description'>"+toolData['tool_description']+"</div></div>"}))});
+														.append($('<img>', {'class': 'd2t-tool-icon', 'src': 'https://pbs.twimg.com/profile_images/745655614081220610/GA9jRnsf.jpg', 'data-tool-name': toolName, 'data-toggle': "d2t-tooltip", 'data-placement': "top", 'data-html': "true", 'data-original-title': "<div class='d2t-tool-icon-tooltip'><div class='d2t-tool-icon-tooltip-name'>"+toolName+"</div><div class='d2t-tool-icon-tooltip-count'>"+toolData['canned_analyses'].length+" analyses</div><div class='d2t-tool-icon-tooltip-description'>"+toolData['tool_description']+"</div></div>"}))});
 
 		// Get tool info
 		$toolinfo = $('<div>', {'class': 'd2t-tool-info-wrapper'})
 						.append($('<div>', {'class': 'd2t-logo-wrapper'})
-							.append($('<a>', {'href': '#'})
-								.append($('<img>', {'class': 'd2t-back-arrow', 'src': 'https://image.freepik.com/free-icon/left-arrow-inside-a-circle_318-42520.jpg'}))));
+								.append($('<img>', {'class': 'd2t-back-arrow', 'src': 'https://image.freepik.com/free-icon/left-arrow-inside-a-circle_318-42520.jpg'})));
 
 		$.each(apiData, function(toolName, toolData) { $toolinfo.append($('<div>', {'id': datasetAccession+'-'+toolName+'-info', 'class': 'd2t-tool-info'})
 																			.append($('<div>', {'class': 'd2t-tool-icon-outer-wrapper'})
@@ -252,10 +199,10 @@ var Interfaces = {
 								.html($('<a>', {'href': analysisData['canned_analysis_url']})
 									.html($('<img>', {'class': 'd2t-link-icon', 'src': 'https://pbs.twimg.com/profile_images/745655614081220610/GA9jRnsf.jpg'}))))
 							.append($('<td>', {'class': 'd2t-description-col'})
-								.html($('<span>', {'data-toggle': "tooltip", 'data-placement': "top", 'data-html': "true", 'data-original-title': "<div class='d2t-canned-analysis-description-tooltip'>"+analysisData['canned_analysis_description']+""})
+								.html($('<span>', {'data-toggle': "d2t-tooltip", 'data-placement': "top", 'data-html': "true", 'data-original-title': "<div class='d2t-canned-analysis-description-tooltip'>"+analysisData['canned_analysis_description']+""})
 									.html(analysisData['canned_analysis_title'])))
 							.append($('<td>', {'class': 'd2t-metadata-col'})
-								.html($('<i>', {'class': 'fa fa-info-circle', 'data-toggle': "tooltip", 'data-placement': "right", 'data-html': "true"})))));
+								.html($('<i>', {'class': 'fa fa-info-circle', 'data-toggle': "d2t-tooltip", 'data-placement': "top", 'data-html': "true"})))));
 
 				// Row metadata tooltips
 				metadataTooltip = $('<div>', {'class': 'd2t-metadata-tooltip'}).html($('<ul>', {'class': 'd2t-metadata-list'}));
@@ -272,7 +219,7 @@ var Interfaces = {
 
 		});
 
-		return $('<div>', {'data-dataset-accession': datasetAccession, 'class': 'd2t-wrapper'})
+		return $('<div>', {'data-dataset-accession': datasetAccession, 'class': 'd2t-wrapper d2t-' + pageClass})
 					.append($toolbar)
 					.append($toolinfo)
 					.append($tables);
@@ -308,8 +255,11 @@ var Interfaces = {
 		});
 
 		// Activate
-		$('.d2t-table').DataTable();
-		$("[data-toggle='tooltip']").tooltip();
+		$('.d2t-table').removeAttr('width').DataTable({
+			// 'columns': [{'width': '25px'},{'width': '25px'},{'width': '25px'}],
+	        autowidth: false
+		});
+		$("[data-toggle='d2t-tooltip']").tooltip();
 
 	}
 
