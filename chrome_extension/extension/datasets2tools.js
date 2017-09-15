@@ -122,12 +122,12 @@ var Page = {
 													.append($('<i>', {'class': 'fa fa-chevron-up'}))
 													.append(' Canned Analyses'))))
 										.append($('<div>', {'id': 'collapse-dataset-d2t', 'class': 'panel-collapse collapse in', 'role': 'tabpanel', 'aria-labelledby': 'heading-dataset-d2t'})
-											.html($('<div>', {'class': 'panel-body'})
+											.html($('<div>', {'class': 'panel-body d2t-landing-wrapper'})
 												.html(analysisInterface)))));
 
 			} else if (Page.isGeoSeriesLanding()) {
 
-				parentDiv.after($('<table>', {'id': 'd2t-landing-wrapper', 'class': 'd2t-geo d2t-gse'})
+				parentDiv.after($('<table>', {'class': 'd2t-geo d2t-gse d2t-landing-wrapper'})
 									.html($('<tbody>')
 										.append($('<tr>')
 											.html($('<th>')
@@ -138,7 +138,7 @@ var Page = {
 
 			} else if (Page.isGeoDatasetLanding()) {
 
-				parentDiv.after($('<table>', {'id': 'd2t-landing-wrapper', 'class': 'd2t-geo d2t-gds gds_panel'})
+				parentDiv.after($('<table>', {'class': 'd2t-geo d2t-gds gds_panel d2t-landing-wrapper'})
 									.html($('<tbody>')
 										.append($('<tr>', {'class': 'caption'})
 											.html($('<th>')
@@ -205,12 +205,12 @@ var Interfaces = {
 		$.each(apiData, function(toolName, toolData) {
 
 			// Table header
-			$tables.append($('<table>', {'id': datasetAccession+'-'+toolName+'-table', 'class': 'd2t-table'})
+			$tables.append($('<table>', {'id': datasetAccession+'-'+toolName+'-table', 'class': 'd2t-table  d2t-datatable'})
 				.append($('<thead>')
 					.html($('<tr>')
-						.append($('<th>', {'class': 'd2t-link-header'}).html('Link'))
-						.append($('<th>', {'class': 'd2t-description-header'}).html('Description'))
-						.append($('<th>', {'class': 'd2t-metadata-header'}).html('Metadata')))));
+						.append($('<th>').html('Link'))
+						.append($('<th>').html('Description'))
+						.append($('<th>').html('Metadata')))));
 
 			// Table rows
 			$.each(toolData['canned_analyses'], function(index, analysisData) {
@@ -257,26 +257,82 @@ var Interfaces = {
 	createLandingInterface: function(apiData, datasetAccession) {
 		
 		// Get tool table
-		$toolTable = $('<table>', {'class': 'd2t-tool-table'})
+		$toolTable = $('<table>', {'id': 'd2t-tool-table', 'class': 'd2t-datatable'})
 						.append($('<thead>')
 							.html($('<tr>')
-								.append($('<th>', {'class': 'd2t-tool-name-header'}).html('Tool'))
-								.append($('<th>', {'class': 'd2t-tool-description-header'}).html('Description'))
-								.append($('<th>', {'class': 'd2t-canned-analyses-header'}).html('Analyses'))))
+								.append($('<th>').html('Tool'))
+								.append($('<th>').html('Description'))
+								.append($('<th>').html('Analyses'))))
 						.append($('<tbody>'));
+
 		$.each(apiData, function(toolName, toolData) {
 			$toolTable.find('tbody')
 				.append($('<tr>')
 					.append($('<td>')
-						.html(toolName))
+						.append($('<img>', {'src': 'https://pbs.twimg.com/profile_images/745655614081220610/GA9jRnsf.jpg', 'class': 'd2t-tool-icon'}))
+						.append($('<div>', {'class': 'd2t-tool-table-tool-name'})
+							.html(toolName)))
 					.append($('<td>')
 						.html(toolData['tool_description']))
 					.append($('<td>')
-						.html(toolData['canned_analyses'].length)))
+						.append(toolData['canned_analyses'].length)
+						.append($('<i>', {'class': 'fa fa-plus-square-o d2t-expand', 'data-tool-name': toolName}))))
 		});
 
 		// Get analysis tables
-		$analysisTables = $('<div>')
+		$analysisTables = $('<div>');
+		$.each(apiData, function(toolName, toolData) {
+
+			// Tool info
+			$analysisTables.append($('<div>', {'id': toolName+'-wrapper', 'class': 'd2t-analysis-table-wrapper'})
+				.append($('<div>', {'class': 'd2t-landing-go-back'})
+					.html('<< Go Back'))
+				.append($('<div>', {'class': 'd2t-landing-tool-info'})
+				.append($('<img>', {'class': 'd2t-landing-tool-info-icon', 'src': 'https://pbs.twimg.com/profile_images/745655614081220610/GA9jRnsf.jpg'}))
+				.append($('<div>', {'class': 'd2t-landing-tool-info-text'})
+					.append($('<div>', {'class': 'd2t-landing-tool-info-title'}).
+						html(toolName))
+					.append($('<div>', {'class': 'd2t-landing-tool-info-description'})
+						.html(toolData['tool_description'])))));
+
+			// Table header
+			$analysisTables.find('#'+toolName+'-wrapper')
+				.append($('<table>', {'id': toolName+'-table','class': 'd2t-analysis-table d2t-datatable'})
+					.append($('<thead>')
+						.html($('<tr>')
+							.append($('<th>').html('Link'))
+							.append($('<th>').html('Description'))
+							.append($('<th>').html('Metadata')))));
+
+			// Table rows
+			$.each(toolData['canned_analyses'], function(index, analysisData) {
+				$analysisTables.find('#'+toolName+'-table')
+					.append($('<tbody>')
+						.append($('<tr>')
+							.append($('<td>', {'class': 'd2t-link-col'})
+								.html($('<a>', {'href': analysisData['canned_analysis_url']})
+									.html($('<img>', {'class': 'd2t-link-icon', 'src': 'https://pbs.twimg.com/profile_images/745655614081220610/GA9jRnsf.jpg'}))))
+							.append($('<td>', {'class': 'd2t-description-col'})
+								.html($('<span>', {'data-toggle': "d2t-tooltip", 'data-placement': "top", 'data-html': "true", 'data-original-title': "<div class='d2t-canned-analysis-description-tooltip'>"+analysisData['canned_analysis_description']+""})
+									.html(analysisData['canned_analysis_title'])))
+							.append($('<td>', {'class': 'd2t-metadata-col'})
+								.html($('<i>', {'class': 'fa fa-info-circle', 'data-toggle': "d2t-tooltip", 'data-placement': "top", 'data-html': "true"})))));
+
+				// Row metadata tooltips
+				metadataTooltip = $('<div>', {'class': 'd2t-metadata-tooltip'}).html($('<ul>', {'class': 'd2t-metadata-list'}));
+				$.each(analysisData['metadata'], function(termName, termValue) {
+					metadataTooltip.find('ul').append($('<li>')
+						.append($('<span>', {'class': 'd2t-metadata-term'})
+							.html(termName+':'))
+						.append($('<span>', {'class': 'd2t-metadata-value'})
+							.html(termValue)))
+				});
+				$analysisTables.find('#'+toolName+'-table i').last().attr('data-original-title', metadataTooltip.html())
+
+			});
+
+		});
+
 
 		// Return
 		return $('<div>')
@@ -323,7 +379,7 @@ var Interfaces = {
 		});
 
 		// Tables and tooltips
-		$('.d2t-table').DataTable({});
+		$('.d2t-datatable').DataTable({});
 		$("[data-toggle='d2t-tooltip']").tooltip();
 
 	}
@@ -372,6 +428,29 @@ var eventListener = {
 		})
 	},
 
+	clickExpandIcon: function() {
+		$('.d2t-expand').click(function(evt) {
+			// Get click info
+			toolName = $(evt.target).attr('data-tool-name');
+
+			// Hide and show
+			$('#d2t-tool-table_wrapper').hide();
+			$('#'+toolName+'-wrapper').show();
+
+		})
+	},
+
+	clickLandingGoBack: function() {
+		$('.d2t-landing-go-back').click(function(evt) {
+
+			// Hide and show
+			$('#d2t-tool-table_wrapper').show();
+			$('#'+toolName+'-wrapper').hide();
+			// $('.d2t-analysis-table-wrapper table')hide();
+
+		})
+	},
+
 	//////////////////////////////
 	///// . main
 	//////////////////////////////
@@ -381,6 +460,8 @@ var eventListener = {
 	main: function() {
 		this.clickToolIcon();
 		this.clickBackArrow();
+		this.clickExpandIcon();
+		this.clickLandingGoBack();
 	}
 
 };

@@ -17,7 +17,7 @@
 	margin: 0 auto;
 }
 
-	.d2t-table-wrapper .dataTables_length, .d2t-table-wrapper .dataTables_filter {
+	.d2t-table-wrapper .dataTables_length, .d2t-table-wrapper .dataTables_filter, .d2t-landing-wrapper .dataTables_length, .d2t-landing-wrapper .dataTables_filter {
 		display: none;
 	}
 
@@ -33,7 +33,7 @@
 	}
 
 
-/* Structural */
+/* Search */
 
 .d2t-wrapper {
 	border: 1px solid grey;
@@ -195,6 +195,55 @@
 								font-weight: 300;
 							}
 
+
+/* Landing */
+.d2t-landing-wrapper {
+
+}
+
+	.d2t-tool-table {
+
+	}
+
+		.d2t-expand {
+			cursor: pointer;
+		}
+
+	.d2t-analysis-table-wrapper {
+		display: none;
+	}
+
+		.d2t-landing-go-back {
+			cursor: pointer;
+		}
+
+		.d2t-landing-tool-info {
+			display: table;
+		}
+
+			.d2t-landing-tool-info-icon {
+				height: 35px;
+				display: table-cell;
+				vertical-align: middle;
+			}
+
+			.d2t-landing-tool-info-text {
+				display: table-cell;
+				vertical-align: middle;
+			}
+
+				.d2t-landing-tool-info-title {
+
+				}
+
+				.d2t-landing-tool-info-description {
+
+				}
+
+		.d2t-analysis-table {
+
+		}
+
 /* Page-Specific */
 
 /* GEO */
@@ -216,7 +265,7 @@
 
 /* DataMed */
 
-.d2t-datamed table {
+.d2t-datatable {
 	table-layout: auto;
 }
 
