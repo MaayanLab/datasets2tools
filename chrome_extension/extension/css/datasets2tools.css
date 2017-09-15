@@ -17,9 +17,13 @@
 	margin: 0 auto;
 }
 
-	.d2t-table-wrapper .dataTables_length, .d2t-table-wrapper .dataTables_filter {
-		display: none;
+	.d2t-table-wrapper .d2t-table {
+		width: 500px;
 	}
+
+		.d2t-table-wrapper .dataTables_length, .d2t-table-wrapper .dataTables_filter {
+			display: none;
+		}
 
 
 /* Structural */
@@ -195,24 +199,32 @@
 /* Page-Specific */
 
 /* GEO */
-.d2t-geo .d2t-table-wrapper .dataTables_info {
+.d2t-table-wrapper .dataTables_info {
 	padding-left: 10px;
 	padding-top: 10px;
 	font-size: 9pt;
 }
 
-.d2t-geo .paginate_button {
+.d2t-table-wrapper .paginate_button {
 	font-size: 9pt;
 	padding: 0.3em 0.7em !important;
 }
 
 /* DataMed */
 
-.d2t-datamed th {
-	font-size: 11pt !important;
-	text-align: center;
+.d2t-datamed table {
+	table-layout: auto;
 }
 
-.d2t-datamed .d2t-description-col {
-	font-size: 10pt !important;
-}
+	.d2t-datamed th {
+		font-size: 11pt !important;
+		text-align: center;
+	}
+
+	.d2t-datamed td {
+		border: 1px solid #eceeef;
+	}
+
+	.d2t-datamed .d2t-description-col {
+		font-size: 10pt !important;
+	}

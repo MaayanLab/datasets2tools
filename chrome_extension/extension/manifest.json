@@ -22,7 +22,6 @@
 				"css/font-awesome.css",
 				"css/bootstrap.css",
 				"css/jquery.dataTables.min.css",
-				"css/fixedColumns.dataTables.min.css",
 				"css/datasets2tools.css"
 			],
 
@@ -30,7 +29,6 @@
 				"js/jquery.js",
 				"js/bootstrap.min.js",
 				"js/jquery.dataTables.min.js",
-				"js/dataTables.fixedColumns.min.js",
 				"datasets2tools.js"
 			]
 		}

@@ -255,9 +255,7 @@ var Interfaces = {
 		});
 
 		// Activate
-		$('.d2t-table').removeAttr('width').DataTable({
-			// 'columns': [{'width': '25px'},{'width': '25px'},{'width': '25px'}],
-	        autowidth: false
+		$('.d2t-table').DataTable({
 		});
 		$("[data-toggle='d2t-tooltip']").tooltip();
 
