@@ -282,7 +282,7 @@ $('<div>', {'class': ''})
 		// Loop through parents
 		$.each(parents, function(datasetAccession, resultDiv) {
 			$(resultDiv).append(self.createInterface(apiData, datasetAccession));
-			$('.d2t-table').DataTable();
+			// $('.d2t-table').DataTable();
 			// console.log(key);
 			// $.ajax({
 			// 	url: 'localhost:5000/datasets2tools/api/search',
@@ -316,8 +316,12 @@ var eventListener = {
 
 			// Hide and show
 			$(evt.target).parents('.d2t-toolbar').css('display', 'none');
+
 			$(evt.target).parents('.d2t-wrapper').find('.d2t-tool-info-wrapper').css('display', 'table');
 			$(evt.target).parents('.d2t-wrapper').find('#'+datasetAccession+'-'+toolName+'-info').css('display', 'table');
+
+			$(evt.target).parents('.d2t-wrapper').find('.d2t-table-wrapper').show();
+			$(evt.target).parents('.d2t-wrapper').find('#'+datasetAccession+'-'+toolName+'-table').show();
 		})
 	},
 
@@ -331,6 +335,9 @@ var eventListener = {
 			$(evt.target).parents('.d2t-wrapper').find('.d2t-toolbar').css('display', 'table');
 			$(evt.target).parents('.d2t-wrapper').find('.d2t-tool-info-wrapper').css('display', 'none');
 			$(evt.target).parents('.d2t-wrapper').find('.d2t-tool-info').css('display', 'none');
+
+			$(evt.target).parents('.d2t-wrapper').find('.d2t-table-wrapper').css('display', 'none');
+			$(evt.target).parents('.d2t-wrapper').find('.d2t-table').css('display', 'none');
 		})
 	},
 

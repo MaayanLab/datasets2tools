@@ -134,9 +134,13 @@
 				}
 
 	.d2t-table-wrapper {
-
+		display: none;
 	}
 
-		.d2t-link-icon {
-			height: 10px;
+		.d2t-table {
+			display: none;
 		}
+
+			.d2t-link-icon {
+				height: 10px;
+			}
