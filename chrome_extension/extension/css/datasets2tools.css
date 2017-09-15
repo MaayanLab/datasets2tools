@@ -1,0 +1,142 @@
+@font-face {
+    font-family: 'FontAwesome';
+    src: url('chrome-extension://__MSG_@@extension_id__/fonts/fontawesome-webfont.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.d2t-wrapper {
+	border: 1px solid grey;
+	box-shadow: 0 2px 4px rgba(0,0,0,.1);
+	border-top-color: rgb(229, 230, 233);
+	border-right-color: rgb(223, 224, 228);
+	border-bottom-color: rgb(208, 209, 213);
+	border-left-color: rgb(223, 224, 228);
+	border-radius: .2rem;
+	margin-top: 5px;
+	display: inline-block;
+}
+
+	.d2t-toolbar {
+		height: 47px;
+        vertical-align: middle;
+        display: table;
+	}
+
+		.d2t-logo-wrapper {
+			height: 100%;
+			margin: auto;
+			display: table-cell;
+			vertical-align: middle;
+			border-right: 1px solid rgb(229, 230, 233);
+		}
+
+			.d2t-logo {
+				height: 35px;
+				margin-left: 7px;
+				margin-right: 7px;
+			}
+
+		.d2t-tool-icon-outer-wrapper {
+			display: table;
+			height: 100%;
+			padding-left: 10px;
+		}
+
+			.d2t-tool-icon-inner-wrapper {
+				display: table-cell;
+				vertical-align: middle;
+			}
+
+				.d2t-tool-icon {
+					height: 30px;
+					margin-right: 13px;
+					border: 1px solid rgb(208, 209, 213);
+					box-shadow: 0 2px 4px rgba(0,0,0,.1);
+					border-radius: 3px;
+					padding: 1px;
+					cursor: pointer;
+				}
+
+				.d2t-tool-icon-tooltip {
+					visibility: hidden;
+					position: absolute;
+					z-index: 1;
+					background-color: black;
+					border-radius: 5px;
+					color: white;
+					padding: 7px 13px;
+					left: 50%;
+					margin-left: -30px;
+				}
+
+					.d2t-tool-icon-tooltip-name {
+						font-weight: 500;
+						font-size: 9pt;
+						margin-bottom: 1px;
+					}
+
+					.d2t-tool-icon-tooltip-count {
+						font-style: italic;
+						font-weight: 300;
+						font-size: 8pt;
+						margin-bottom: 5px;
+					}
+
+					.d2t-tool-icon-tooltip-description {
+						font-weight: 300;
+						font-size: 8pt;
+					}
+
+				.d2t-tool-icon:hover + .d2t-tool-icon-tooltip {
+					visibility: hidden;
+				}
+
+					.d2t-tool-icon + .d2t-tool-icon-tooltip::after {
+						content: " ";
+						position: absolute;
+						bottom: 100%;
+						left: 50%;
+						margin-left: -5px;
+						border-width: 5px;
+						border-style: solid;
+						border-color: transparent transparent black transparent;
+					}
+
+	.d2t-tool-info-wrapper {
+		display: none;
+		vertical-align: middle;
+	}
+
+		.d2t-back-arrow {
+			height: 45px;
+		}
+
+		.d2t-tool-info {
+			height: 47px;
+			display: none;
+		}
+
+			.d2t-tool-info-text-wrapper {
+				display: table-cell;
+				vertical-align: middle;
+				padding-right: 10px;
+			}
+
+				.d2t-tool-info-tool-name {
+					font-size: 9pt;
+					font-weight: 500;
+				}
+
+				.d2t-tool-info-tool-description {
+					font-size: 7pt;
+					font-weight: 400;
+				}
+
+	.d2t-table-wrapper {
+
+	}
+
+		.d2t-link-icon {
+			height: 10px;
+		}

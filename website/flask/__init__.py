@@ -277,11 +277,11 @@ def static_files(path):
 	return send_from_directory('static', path)
 
 #############################################
-########## 4. Test Search
+########## 4. Search
 #############################################
 
-@app.route(entry_point+'/testsearch')
-def test_search():
+@app.route(entry_point+'/api/search', methods=['GET', 'POST'])
+def search_api():
 
 	# Get request dict
 	search_filters = request.args.to_dict()
@@ -290,11 +290,46 @@ def test_search():
 	search_options = {x: search_filters.pop(x, default_search_options[x]) for x in default_search_options.keys()}
 
 	# Perform search
-	results = Datasets2Tools.search(search_filters = search_filters, search_options = search_options, get_fairness=True, user_id=current_user.get_id())
-	return json.dumps(results.search_results[0])
+	results = Datasets2Tools.search(search_filters = search_filters, search_options = search_options)
+
+	# Return
+	return json.dumps(results.search_results)
 
 #############################################
-########## 5. Regular Update
+########## 5. Search
+#############################################
+
+@app.route(entry_point+'/api/chrome_extension', methods=['GET', 'POST'])
+def chrome_extension_api():
+
+	# Get dataset accession
+	dataset_accession = request.args.get('dataset_accession')
+
+	# Perform search
+	results = Datasets2Tools.search(search_filters = {'dataset_accession': dataset_accession}, search_options = default_search_options)
+
+	# Check length of results
+	if len(results.search_results):
+
+		# Get dataframe
+		search_results_dataframe = pd.DataFrame(results.search_results).set_index('tool_name')
+
+		# Get results
+		chrome_data = search_results_dataframe[['tool_description', 'tool_icon_url', 'tool_homepage_url']].to_dict(orient='index')
+
+		# Loop through tools
+		for tool_name in chrome_data.keys():
+			tool_analysis_dataframe = search_results_dataframe.loc[tool_name] if isinstance(search_results_dataframe.loc[tool_name], pd.DataFrame) else search_results_dataframe.loc[tool_name].to_frame().T
+			chrome_data[tool_name]['canned_analyses'] = [dict(rowData[['canned_analysis_title', 'canned_analysis_description', 'metadata', 'canned_analysis_url']]) for index, rowData in tool_analysis_dataframe.iterrows()]
+
+	else:
+		chrome_data = {}
+
+	# Return
+	return json.dumps(chrome_data)
+
+#############################################
+########## 6. Regular Update
 #############################################
 
 @app.route(entry_point+'/api/update')
@@ -304,7 +339,7 @@ def update_api():
 	return ''
 
 #############################################
-########## 6. FAIRness Insignia API
+########## 7. FAIRness Insignia API
 #############################################
 
 @app.route(entry_point+'/api/fairness_insignia', methods=['GET', 'POST'])

@@ -1,0 +1,45 @@
+{
+	"name": "Datasets2Tools",
+	"version": "1.0",
+	"description": "Ma'ayan Lab",
+	
+	"icons":{
+		"720": "icons/icon_720.png"
+	},
+	
+	"browser_action": {
+		"default_icon": "icons/icon_720.png"
+	},
+		
+	"content_scripts": [
+		{
+			"matches": [
+				"https://datamed.org/*",
+				"https://www.ncbi.nlm.nih.gov/*"
+			],
+
+			"css": [
+				"css/datasets2tools.css",
+				"css/jquery.dataTables.min.css",
+				"css/font-awesome.css"
+			],
+
+			"js": [
+				"js/jquery.js",
+				"js/jquery.dataTables.min.js",
+				"datasets2tools.js"
+			]
+		}
+	],
+
+	"web_accessible_resources": [
+		"icons/icon_720.png",
+		"fonts/*"
+	],
+
+	"permissions": [
+		"https://amp.pharm.mssm.edu/datasets2tools/api/search?*"
+	],
+
+	"manifest_version": 2
+}
