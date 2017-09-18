@@ -269,7 +269,7 @@ class Search:
 			# Perform metadata query
 			canned_analysis_metadata_query = self.session.query(self.tables['canned_analysis_metadata'].columns['value'], self.tables['term'].columns['term_name']).join(self.tables['term']).filter(self.tables['canned_analysis_metadata'].columns['canned_analysis_fk'] == object_id).all()
 			object_data['metadata'] = pd.DataFrame([metadata_query_result._asdict() for metadata_query_result in canned_analysis_metadata_query]).set_index('term_name').to_dict()['value']
-			object_data.pop('date')
+			object_data['date'] = '{:%B %d, %Y}'.format(object_data['date'])
 
 		# Keywords
 		keyword_query = self.session.query(self.tables[self.object_type+'_keyword'].columns['keyword']).filter(self.tables[self.object_type+'_keyword'].columns[self.object_type+'_fk'] == object_id).all()

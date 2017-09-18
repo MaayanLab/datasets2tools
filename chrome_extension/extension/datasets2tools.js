@@ -15,7 +15,6 @@ function main() {
 
 	// Add event listeners for interactivity
 	eventListener.main();
-
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -350,32 +349,33 @@ var Interfaces = {
 
 		// Define self
 		var self = this;
-		var apiData = {"l1000cds2": {"tool_description": "sdfsdfsf", "tool_homepage_url": "NULLdfgdfgdfg", "canned_analyses": [{"canned_analysis_title": "Small molecules which mimic acute myocardial infarction", "canned_analysis_description": "The L1000 database was queried in order to identify small molecule perturbations which mimic the acute myocardial infarction gene expression signature in the  Heart left ventricles above LAD artery (AMI -induced by left coronary artery ligation) - 1 Hour  cell type.", "canned_analysis_url": "http://amp.pharm.mssm.edu/L1000CDS2/#/result/58d1c047e467bea600fb84f2", "metadata": {"do_id": "DOID:9408", "cell_type": "Heart left ventricles above LAD artery (AMI -induced by left coronary artery ligation) - 1 Hour", "pert_ids": "GSM12363, GSM12364, GSM12365", "direction": "mimic", "umls_cui": "C0155626", "curator": "cadimo", "disease_name": "acute myocardial infarction", "ctrl_ids": "GSM12322, GSM12323, GSM12324", "organism": "mouse", "creeds_id": "dz:1000"}}, {"canned_analysis_title": "Small molecules which reverse acute myocardial infarction", "canned_analysis_description": "The L1000 database was queried in order to identify small molecule perturbations which reverse the acute myocardial infarction gene expression signature in the  Heart left ventricles above LAD artery (AMI -induced by left coronary artery ligation) - 1 Hour  cell type.", "canned_analysis_url": "http://amp.pharm.mssm.edu/L1000CDS2/#/result/58d1c04ae467bea600fb84f4", "metadata": {"do_id": "DOID:9408", "cell_type": "Heart left ventricles above LAD artery (AMI -induced by left coronary artery ligation) - 1 Hour", "pert_ids": "GSM12363, GSM12364, GSM12365", "direction": "reverse", "umls_cui": "C0155626", "curator": "cadimo", "disease_name": "acute myocardial infarction", "ctrl_ids": "GSM12322, GSM12323, GSM12324", "organism": "mouse", "creeds_id": "dz:1000"}}, {"canned_analysis_title": "Small molecules which mimic acute myocardial infarction", "canned_analysis_description": "The L1000 database was queried in order to identify small molecule perturbations which mimic the acute myocardial infarction gene expression signature in the  Heart left ventricles above LAD artery (AMI -induced by left coronary artery ligation) - 4 Hours  cell type.", "canned_analysis_url": "http://amp.pharm.mssm.edu/L1000CDS2/#/result/58d1c04fe467bea600fb84f6", "metadata": {"do_id": "DOID:9408", "cell_type": "Heart left ventricles above LAD artery (AMI -induced by left coronary artery ligation) - 4 Hours", "pert_ids": "GSM12375, GSM12376, GSM12377", "direction": "mimic", "umls_cui": "C0155626", "curator": "cadimo", "disease_name": "acute myocardial infarction", "ctrl_ids": "GSM12334, GSM12335, GSM12336", "organism": "mouse", "creeds_id": "dz:1001"}}, {"canned_analysis_title": "Small molecules which reverse acute myocardial infarction", "canned_analysis_description": "The L1000 database was queried in order to identify small molecule perturbations which reverse the acute myocardial infarction gene expression signature in the  Heart left ventricles above LAD artery (AMI -induced by left coronary artery ligation) - 4 Hours  cell type.", "canned_analysis_url": "http://amp.pharm.mssm.edu/L1000CDS2/#/result/58d1c052e467bea600fb84f8", "metadata": {"do_id": "DOID:9408", "cell_type": "Heart left ventricles above LAD artery (AMI -induced by left coronary artery ligation) - 4 Hours", "pert_ids": "GSM12375, GSM12376, GSM12377", "direction": "reverse", "umls_cui": "C0155626", "curator": "cadimo", "disease_name": "acute myocardial infarction", "ctrl_ids": "GSM12334, GSM12335, GSM12336", "organism": "mouse", "creeds_id": "dz:1001"}}], "tool_icon_url": null}, "PAEA": {"tool_description": "EGGCELLENT\n", "tool_homepage_url": "NULLdfsgdsfgdfsg", "canned_analyses": [{"canned_analysis_title": "Enrichment analysis of genes dysregulated  in acute myocardial infarction", "canned_analysis_description": "An enrichment analysis was performed on the top most dyresgulated genes determined by applying the principal angle method to compare gene expression between cells affected by acute myocardial infarction and healthy control cells in the  Heart left ventricles above LAD artery (AMI -induced by left coronary artery ligation) - 1 Hour  cell type.", "canned_analysis_url": "http://amp.pharm.mssm.edu/PAEA?id=3085542", "metadata": {"do_id": "DOID:9408", "cell_type": "Heart left ventricles above LAD artery (AMI -induced by left coronary artery ligation) - 1 Hour", "pert_ids": "GSM12363, GSM12364, GSM12365", "curator": "cadimo", "umls_cui": "C0155626", "disease_name": "acute myocardial infarction", "ctrl_ids": "GSM12322, GSM12323, GSM12324", "organism": "mouse", "creeds_id": "dz:1000"}}], "tool_icon_url": null}};
 		
 		// Loop through parents
 		$.each(parents, function(datasetAccession, parentDiv) {
+			// AJAX request
+			$.ajax({
+				url: 'https://amp.pharm.mssm.edu/datasets2tools-dev/api/chrome_extension',
+				data: {
+					'object_type': 'canned_analysis',
+					'dataset_accession': datasetAccession
+				},
+				success: function(data) {
+					// Load
+					var apiData = JSON.parse(data);
 
-			// Create interfaces
-			if (Page.isDataMedSearchResults() || Page.isGeoSearchResults()) {
-				analysisInterface = self.createSearchInterface(apiData, datasetAccession);
-			} else if (Page.isDataMedLanding() || Page.isGeoSeriesLanding() || Page.isGeoDatasetLanding()) {
-				analysisInterface = self.createLandingInterface(apiData, datasetAccession);
-			}
+					// Create interfaces
+					if (Page.isDataMedSearchResults() || Page.isGeoSearchResults()) {
+						analysisInterface = self.createSearchInterface(apiData, datasetAccession);
+					} else if (Page.isDataMedLanding() || Page.isGeoSeriesLanding() || Page.isGeoDatasetLanding()) {
+						analysisInterface = self.createLandingInterface(apiData, datasetAccession);
+					}
 
-			// Add
-			Page.addInterface(analysisInterface, parentDiv);
-
-			// console.log(key);
-			// $.ajax({
-			// 	url: 'localhost:5000/datasets2tools/api/search',
-			// 	data: {
-			// 		'object_type': 'canned_analysis',
-			// 		'dataset_accession': key
-			// 	},
-			// 	success: function(data) {
-			// 		console.log(data);
-			// 	}
-			// });
+					// Add
+					if (Object.keys(apiData).length) {
+						Page.addInterface(analysisInterface, parentDiv);
+					}
+				}
+			});
 		});
 
 		// Tables and tooltips
@@ -383,7 +383,6 @@ var Interfaces = {
 		$("[data-toggle='d2t-tooltip']").tooltip();
 
 	}
-
 };
 
 //////////////////////////////////////////////////
@@ -396,6 +395,7 @@ var eventListener = {
 
 	clickToolIcon: function() {
 		$('.d2t-tool-icon').click(function(evt) {
+			console.log('asd');
 			// Get click info
 			datasetAccession = $(evt.target).parents('.d2t-wrapper').attr('data-dataset-accession');
 			toolName = $(evt.target).attr('data-tool-name');
@@ -408,7 +408,7 @@ var eventListener = {
 
 			$(evt.target).parents('.d2t-wrapper').find('.d2t-table-wrapper').show();
 			$(evt.target).parents('.d2t-wrapper').find('#'+datasetAccession+'-'+toolName+'-table_wrapper').show();
-		})
+		});
 	},
 
 	clickBackArrow: function() {
@@ -425,7 +425,7 @@ var eventListener = {
 
 			$(evt.target).parents('.d2t-wrapper').find('.d2t-table-wrapper').css('display', 'none');
 			$(evt.target).parents('.d2t-wrapper').find('.dataTables_wrapper').css('display', 'none');
-		})
+		});
 	},
 
 	clickExpandIcon: function() {
@@ -437,7 +437,7 @@ var eventListener = {
 			$('#d2t-tool-table_wrapper').hide();
 			$('#'+toolName+'-wrapper').show();
 
-		})
+		});
 	},
 
 	clickLandingGoBack: function() {
@@ -448,7 +448,7 @@ var eventListener = {
 			$('#'+toolName+'-wrapper').hide();
 			// $('.d2t-analysis-table-wrapper table')hide();
 
-		})
+		});
 	},
 
 	//////////////////////////////
@@ -463,7 +463,6 @@ var eventListener = {
 		this.clickExpandIcon();
 		this.clickLandingGoBack();
 	}
-
 };
 
 //////////////////////////////////////////////////////////////////////

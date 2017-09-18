@@ -138,7 +138,7 @@
 							<tr><td>Title</td><td>{{ object_data['canned_analysis_title'] }}</td></tr>
 							<tr><td>Description</td><td>{{ object_data['canned_analysis_description'] }}</td></tr>
 							<tr><td>Analysis URL</td><td><a href="{{ object_data['canned_analysis_url'] }}">{{ object_data['canned_analysis_url'] }}</a></td></tr>
-							<tr><td>Upload Date</td><td>{{ '{:%B %d, %Y}'.format(object_data['date']) }}</td></tr>
+							<tr><td>Upload Date</td><td>{{ object_data['date'] }}</td></tr>
 							<tr><td>Uploader</td><td><a href="#">{{ object_data['username'] }}</a></td></tr>
 						{% endif %}
 						{% if object_data['keywords']|length %}<td>Keywords</td><td>{% for keyword in object_data['keywords'] %} <a href="#" class="keyword">{{ keyword }}</a> {% endfor %} </td></tr>{% endif %}

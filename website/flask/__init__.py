@@ -39,8 +39,8 @@ from Datasets2Tools import Datasets2Tools
 ########## 2. App Setup
 #############################################
 ##### 1. Flask App #####
-entry_point = '/datasets2tools'
-app = Flask(__name__)
+entry_point = '/datasets2tools-dev'
+app = Flask(__name__, static_url_path=os.path.join(entry_point, 'static'))
 dropzone = Dropzone(app)
 
 ##### 2. Database connection #####
@@ -210,6 +210,7 @@ def landing(object_type, object_identifier):
 
 	# Get object data
 	object_data = Datasets2Tools.search(search_filters = landing_search_filters, search_options = landing_search_options, get_related_objects=True, get_fairness=True, user_id=current_user.get_id()).search_results[0]
+
 	# Get associated objects
 	associated_objects = {}
 	for associated_object_type in ['dataset', 'tool', 'canned_analysis']:
@@ -266,7 +267,7 @@ def upload_analysis_api():
 	Datasets2Tools.upload_analyses(analysis_file = analysis_file, user_id = current_user.get_id())
 
 	# Return
-	return 'upload_results'
+	return ''
 
 #############################################
 ########## 3. Serve static files
@@ -308,20 +309,13 @@ def chrome_extension_api():
 	# Perform search
 	results = Datasets2Tools.search(search_filters = {'dataset_accession': dataset_accession}, search_options = default_search_options)
 
-	# Check length of results
+	# Get data
 	if len(results.search_results):
-
-		# Get dataframe
 		search_results_dataframe = pd.DataFrame(results.search_results).set_index('tool_name')
-
-		# Get results
 		chrome_data = search_results_dataframe[['tool_description', 'tool_icon_url', 'tool_homepage_url']].to_dict(orient='index')
-
-		# Loop through tools
 		for tool_name in chrome_data.keys():
 			tool_analysis_dataframe = search_results_dataframe.loc[tool_name] if isinstance(search_results_dataframe.loc[tool_name], pd.DataFrame) else search_results_dataframe.loc[tool_name].to_frame().T
 			chrome_data[tool_name]['canned_analyses'] = [dict(rowData[['canned_analysis_title', 'canned_analysis_description', 'metadata', 'canned_analysis_url']]) for index, rowData in tool_analysis_dataframe.iterrows()]
-
 	else:
 		chrome_data = {}
 
@@ -334,8 +328,8 @@ def chrome_extension_api():
 
 @app.route(entry_point+'/api/update')
 def update_api():
-	if current_user.get_id() == '1':
-		Datasets2Tools.update_database(os.getcwd().replace('/website/flask', '/updater/results'))
+	# if current_user.get_id() == '1':
+		# Datasets2Tools.update_database(os.getcwd().replace('/website/flask', '/updater/results'))
 	return ''
 
 #############################################
