@@ -39,7 +39,7 @@ from Datasets2Tools import Datasets2Tools
 ########## 2. App Setup
 #############################################
 ##### 1. Flask App #####
-entry_point = '/datasets2tools-dev'
+entry_point = '/datasets2tools'
 app = Flask(__name__, static_url_path=os.path.join(entry_point, 'static'))
 dropzone = Dropzone(app)
 
@@ -297,7 +297,7 @@ def search_api():
 	return json.dumps(results.search_results)
 
 #############################################
-########## 5. Search
+########## 5. Chrome Extension
 #############################################
 
 @app.route(entry_point+'/api/chrome_extension', methods=['GET', 'POST'])
@@ -329,7 +329,7 @@ def chrome_extension_api():
 @app.route(entry_point+'/api/update')
 def update_api():
 	# if current_user.get_id() == '1':
-		# Datasets2Tools.update_database(os.getcwd().replace('/website/flask', '/updater/results'))
+	Datasets2Tools.update_database(os.getcwd().replace('/website/flask', '/updater/results'))
 	return ''
 
 #############################################

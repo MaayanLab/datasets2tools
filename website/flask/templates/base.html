@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <title>Datasets2Tools</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
     <link rel="icon" type="image/ico" href="{{ url_for('static', filename='icons/favicon.ico') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/base-style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/macros-style.css') }}">
@@ -36,7 +36,7 @@
                       <a class="nav-link" href="{{url_for('contribute')}}">Contribute</a>
                   </li>
                   <li class="nav-item">
-                      <a class="nav-link" href="https://chrome.google.com/webstore/detail/datasets2tools/fbamphimpljabaailcaidmeegpcpkdel">Extension</a>
+                      <a class="nav-link" href="https://chrome.google.com/webstore/detail/datasets2tools/fbamphimpljabaailcaidmeegpcpkdel" target="_blank">Extension</a>
                   </li>
                   <li class="nav-item">
                       <a class="nav-link" href="{{url_for('index')}}">Help</a>
@@ -178,50 +178,12 @@
 
         <div id="js">
             <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
-            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+            <script src="{{ url_for('static', filename='js/tether.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
             <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
-            <script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>
-            <script type="text/javascript" src="//d39af2mgp1pqhg.cloudfront.net/widget-popup.js"></script>
-            <script src="https://d3js.org/d3.v4.min.js"></script>
-            <script type="text/javascript">
-                  $('.fairness-insignia').each(function(i, elem) {
-                    $.ajax({
-                      url: "{{ url_for('fairness_insignia_api') }}",
-                      data: {
-                        object_type: $(elem).attr('data-object-type'),
-                        object_identifier: $(elem).attr('data-identifier')
-                      },
-                      success: function(data) {
-                        fairness_data = JSON.parse(data);
-                        if (fairness_data['fairness_score']) {
-                          color = d3.scaleLinear().domain([0, 9]).interpolate(d3.interpolateRgb).range([d3.rgb(255,0,0), d3.rgb(0,0,255)]);
-                          $(elem).html(
-                            $("<div>").css('border-radius', '3px')
-                              .css('font-size', '9pt')
-                              .css('color', 'white')
-                              .css('margin-top', 'auto')
-                              .css('margin-bottom', 'auto')
-                              .css('cursor', 'pointer')
-                              .css('padding', '2px 5px')
-                              .css('padding', '2px 5px')
-                              .attr('data-toggle', 'tooltip')
-                              .attr('data-placement', 'right')
-                              .attr('data-animation', 'false')
-                              .attr('data-html', 'true')
-                              .attr('data-original-title', 'FAIRness')
-                              .css('background-color', color(fairness_data['fairness_score']))
-                              .html(fairness_data['fairness_score'])
-                              .prepend($("<i>", {class: 'fa fa-certificate'}).css('margin-right', '5px'))
-                            );
-                        } else {
-                        }
-                      }
-                    });
-                  });
-            </script>
+            <script src="{{ url_for('static', filename='js/embed.js') }}"></script> <!-- Altmetric -->
+            <script src="{{ url_for('static', filename='js/widget-popup.js') }}"></script> <!-- PlumX -->
             <script src="{{ url_for('static', filename='js/base-scripts.js') }}"></script>
-
             {% block footer %}{% endblock %}
         </div> <!-- #js -->
     </div> <!-- #footer -->

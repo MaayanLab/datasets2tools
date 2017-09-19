@@ -73,11 +73,11 @@
 			<div id="object-fairness-col" class="col-2">
 				<div id="fairness-label">FAIR Metrics</div>
 				<svg height="95px" width="95px">
-					{% set w = 23 %}
+					{% set w = 32 %}
 					{% for question in object_data['fairness']['questions'] %}
 						{% set average_score = object_data['fairness']['all_evaluations'][question['id']].get('average_score') %}
 						{% set comments = object_data['fairness']['all_evaluations'][question['id']].get('comments') %}
-						 <rect x="{{ ((loop.index-1) % 4)*w }}" y="{{ (((loop.index)/4)|round(0, 'ceil')-1)*w }}" width="{{w-2}}px" height="{{w-2}}px" fill="grey" data-value="{{ average_score }}" data-toggle="tooltip" data-placement="bottom" data-animation="false" data-html="true" title="<div class='fairness-tooltip'>{% if average_score >= -1 %}<div class='fairness-tooltip-section'><b>Score:</b> {{ average_score }}</div>{% endif %}<div class='fairness-tooltip-section'><b>{{ question.question_number }}.</b> {{ question.question }}</div>{% if comments %}<div class='fairness-tooltip-section'><b>Comments:</b> <ul class='fairness-comment-list'>{% for comment in comments %}<li>{{comment}}</li>{% endfor %}</ul></div>{% endif %}</div>"/>
+						 <rect x="{{ ((loop.index-1) % 3)*w }}" y="{{ (((loop.index)/3)|round(0, 'ceil')-1)*w }}" width="{{w-2}}px" height="{{w-2}}px" fill="grey" data-value="{{ average_score }}" data-toggle="tooltip" data-placement="bottom" data-animation="false" data-html="true" title="<div class='fairness-tooltip'>{% if average_score >= -1 %}<div class='fairness-tooltip-section'><b>Score:</b> {{ average_score }}</div>{% endif %}<div class='fairness-tooltip-section'><b>{{ question.question_number }}.</b> {{ question.question }}</div>{% if comments %}<div class='fairness-tooltip-section'><b>Comments:</b> <ul class='fairness-comment-list'>{% for comment in comments %}<li>{{comment}}</li>{% endfor %}</ul></div>{% endif %}</div>"/>
 					{% endfor %}
 				</svg>
 				<div id="fairness-evaluation-number">{{ object_data['fairness']['evaluations'] }} evaluation{% if object_data['fairness']['evaluations'] != 1 %}s{% endif %}</div>
@@ -307,21 +307,12 @@
     <script src="{{ url_for('static', filename='js/chosen.proto.min.js') }}"></script>
 	<script src="https://d3js.org/d3.v4.min.js"></script>
 	<script type="text/javascript">
-		$('.filter-button').click(function(evt){
-			$(evt.target).parents('.col-12').find('.search-options-wrapper').toggle();
-		});	
-		$('.search-option-dropdown').each(function(i, elem){
-			$(elem).chosen({width: '100%', allow_single_deselect: true});
-		});
-		$('.search-sort-dropdown').each(function(i, elem){
-			$(elem).chosen({width: '100%', "disable_search": true});
-		});
-		$('.object-search-form').change(function() {
-			this.submit();
-		});
+		// Tab
 		if (window.location.hash != "") {
 			$('a[href="' + window.location.hash + '"]').click()
 		};
+
+		// FAIR Insignia
 		color = d3.scaleLinear().domain([0, 1]).interpolate(d3.interpolateRgb).range([d3.rgb(255,0,0), d3.rgb(0,0,255)]);
 		$('#object-fairness-col rect').each(function(i, elem) {
 			if ($(elem).attr('data-value') === 'None') {
@@ -330,6 +321,8 @@
 				$(elem).attr('fill', color($(elem).attr('data-value')));
 			}
 		});
+
+		// FAIR Table
 		$('#fairness-table input[type="radio"]').click(function(evt) {
 			if ($(evt.target).val() === "yes-but") {
 				$(evt.target).parents('tr').find('.yes-but-comment').css('visibility', 'visible');
@@ -340,7 +333,15 @@
 		$('#fairness-table input[type="radio"][value="yes-but"]:checked').click();
 		$('#evaluate-button').click(function(evt) {
 			$('a[href="#fairness"]').click();
-		});	
+		});
+
+		// Search form
+		$('.search-option-dropdown').each(function(i, elem){
+			$(elem).chosen({width: '100%', allow_single_deselect: true});
+		});
+		$('.search-sort-dropdown').each(function(i, elem){
+			$(elem).chosen({width: '100%', "disable_search": true});
+		});
 		$('.landing-search-form').submit(function() {
 		    $(':input', this).filter(function() {
 		        return this.value.length == 0;
@@ -362,11 +363,18 @@
 		$('.landing-search-form').change(function(evt) {
 			$(evt.target).parents('.landing-search-form').submit();
 		});
+		$('.filter-button').click(function(evt){
+			$(evt.target).parents('.col-12').find('.search-options-wrapper').toggle();
+		});	
+
+		// Related Objects
 		$('#related-object-row').slick({
 			slidesToShow: 2,
 			arrows: true,
 			dots: true
 		});
+
+		// Submit FAIRness
 		function submitFairness() {
 		    $.ajax({
 		        url: '{{ url_for("upload_evaluation_api") }}',
@@ -377,11 +385,13 @@
 		        }
 		    });
 		};
+
+		// Switch tab 
+		{% if 'object_type' in request.args.keys() %}
+			{% set tab_id = request.args.get('object_type').replace('is', 'e')+'s' %}
+			$('a[href="#{{tab_id}}"]').click();$('#{{tab_id}} .filter-button').click();
+		{% endif %}
 	</script>
 
-	{% if 'object_type' in request.args.keys() %}
-		{% set tab_id = request.args.get('object_type').replace('is', 'e')+'s' %}
-		<script type="text/javascript">$('a[href="#{{tab_id}}"]').click();$('#{{tab_id}} .filter-button').click();</script>
-	{% endif %}
 
 {% endblock %}

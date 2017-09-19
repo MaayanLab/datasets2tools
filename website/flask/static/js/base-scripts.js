@@ -12,11 +12,22 @@ function main() {
 	}
 
 	$(document).ready(function(){
-	    $('[data-toggle="tooltip"]').tooltip(); 
+		$('[data-toggle="tooltip"]').tooltip(); 
 	});
 
 	$(function () {
-		  $('[data-toggle="popover"]').popover()
+		  $('[data-toggle="popover"]').popover({
+			html : true,
+			trigger : 'hover'
+		}).on('hide.bs.popover', function () {
+			if ($(".popover:hover").length) {
+			  return false;
+			}
+		}); 
+
+		$('body').on('mouseleave', '.popover', function(){
+			$('.popover').popover('hide');
+		});
 	});
 }
 

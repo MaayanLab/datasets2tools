@@ -248,6 +248,10 @@
 
 /* GEO */
 
+#maincontent, .rprt {
+	overflow: visible !important;
+}
+
 .d2t-geo#d2t-landing-wrapper {
 	width: 100%;
 	margin-top: 5px;

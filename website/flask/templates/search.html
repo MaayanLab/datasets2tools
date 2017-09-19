@@ -78,6 +78,7 @@
     <script src="{{ url_for('static', filename='js/chosen.jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/chosen.proto.min.js') }}"></script>
 	<script type="text/javascript">
+		// Filters
 		$('.filter-button').click(function(evt){
 			$(evt.target).parents('.col-12').find('#search-options-wrapper').toggle();
 		});	
@@ -87,6 +88,7 @@
 		$('.search-sort-dropdown').each(function(i, elem){
 			$(elem).chosen({width: '90%', "disable_search": true});
 		});
+		// Search form
 		$('#object-search-form').submit(function() {
 		    $(':input', this).filter(function() {
 		        return this.value.length == 0;
@@ -102,11 +104,13 @@
 			        return ['offset'].includes(this.name);
 			    }).prop('disabled', true);
 			}
-			console.log($(evt.target));
 			$(evt.target).parents('#object-search-form').submit();
 		});
+		// Activate filters
+		{% if 'sort_by' in request.args.keys() %}
+			$('.filter-button').click();
+		{% endif %}
 	</script>
-{% if 'sort_by' in request.args.keys() %}<script type="text/javascript">$('.filter-button').click();</script>{% endif %}
 {% endblock %}
 
 

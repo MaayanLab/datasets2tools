@@ -15,6 +15,7 @@ function main() {
 
 	// Add event listeners for interactivity
 	eventListener.main();
+	
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -360,6 +361,7 @@ var Interfaces = {
 					'dataset_accession': datasetAccession
 				},
 				success: function(data) {
+
 					// Load
 					var apiData = JSON.parse(data);
 
@@ -370,17 +372,18 @@ var Interfaces = {
 						analysisInterface = self.createLandingInterface(apiData, datasetAccession);
 					}
 
-					// Add
+					// Add interfaces
 					if (Object.keys(apiData).length) {
 						Page.addInterface(analysisInterface, parentDiv);
 					}
+
+					// Activate tooltips and datatables
+					$("[data-toggle='d2t-tooltip']").tooltip();
+					$("[data-dataset-accession='"+datasetAccession+"'] .d2t-datatable").DataTable({});
+
 				}
 			});
 		});
-
-		// Tables and tooltips
-		$('.d2t-datatable').DataTable({});
-		$("[data-toggle='d2t-tooltip']").tooltip();
 
 	}
 };
@@ -394,7 +397,7 @@ var Interfaces = {
 var eventListener = {
 
 	clickToolIcon: function() {
-		$('.d2t-tool-icon').click(function(evt) {
+		$(document).on('click', '.d2t-tool-icon', function(evt) {
 			console.log('asd');
 			// Get click info
 			datasetAccession = $(evt.target).parents('.d2t-wrapper').attr('data-dataset-accession');
@@ -412,7 +415,7 @@ var eventListener = {
 	},
 
 	clickBackArrow: function() {
-		$('.d2t-back-arrow').click(function(evt) {
+		$(document).on('click', '.d2t-back-arrow', function(evt) {
 			// Get click info
 			datasetAccession = $(evt.target).parents('.d2t-wrapper').attr('data-dataset-accession');
 			toolName = $(evt.target).attr('data-tool-name');
@@ -429,24 +432,26 @@ var eventListener = {
 	},
 
 	clickExpandIcon: function() {
-		$('.d2t-expand').click(function(evt) {
+		$(document).on('click', '.d2t-expand', function(evt) {
 			// Get click info
 			toolName = $(evt.target).attr('data-tool-name');
 
 			// Hide and show
-			$('#d2t-tool-table_wrapper').hide();
+			$('#d2t-tool-table').hide();
 			$('#'+toolName+'-wrapper').show();
 
 		});
 	},
 
 	clickLandingGoBack: function() {
-		$('.d2t-landing-go-back').click(function(evt) {
+		$(document).on('click', '.d2t-landing-go-back', function(evt) {
+			// Get click info
+			toolName = $(evt.target).attr('data-tool-name');
 
 			// Hide and show
-			$('#d2t-tool-table_wrapper').show();
+			$('#d2t-tool-table').show();
 			$('#'+toolName+'-wrapper').hide();
-			// $('.d2t-analysis-table-wrapper table')hide();
+			$('.d2t-analysis-table-wrapper').hide();
 
 		});
 	},

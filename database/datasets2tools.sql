@@ -25,6 +25,7 @@ CREATE TABLE dataset (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`repository_fk` INT DEFAULT 3,
 	`dataset_accession` VARCHAR(30) UNIQUE NOT NULL,
+	`internal_dataset_accession` CHAR(11) GENERATED ALWAYS AS(CONCAT('DDS', LPAD(id, 8, 0))),
 	`dataset_title` VARCHAR(255),
 	`dataset_description` TEXT,
 	`dataset_landing_url` TEXT,
@@ -54,9 +55,10 @@ CREATE TABLE dataset_keyword (
 CREATE TABLE tool (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
 	`tool_name` VARCHAR(100) UNIQUE NOT NULL,
+	`tool_accession` CHAR(11) GENERATED ALWAYS AS(CONCAT('DCT', LPAD(id, 8, 0))),
 	`tool_description` TEXT,
-	`tool_homepage_url` TEXT, # UNIQUE NOT NULL
-	`tool_icon_url` TEXT,
+	`tool_homepage_url` TEXT NOT NULL,#VARCHAR(255) UNIQUE NOT NULL,
+	`tool_icon_url` VARCHAR(255) DEFAULT 'static/icons/tool.png',
 	`display` BOOL DEFAULT TRUE
 );
 
@@ -114,8 +116,9 @@ CREATE TABLE article_metrics (
 
 CREATE TABLE contribution (
 	`id` INT AUTO_INCREMENT PRIMARY KEY,
-	`user_fk` INT NOT NULL,
+	`user_fk` INT DEFAULT NULL,
 	`date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`display` BOOL DEFAULT 0,
 	FOREIGN KEY (user_fk) REFERENCES user(id)
 );
 
@@ -127,7 +130,7 @@ CREATE TABLE canned_analysis (
 	`canned_analysis_title` VARCHAR(255),
 	`canned_analysis_description` TEXT,
 	`canned_analysis_url` VARCHAR(255) UNIQUE NOT NULL,
-	`canned_analysis_preview_url` TEXT,
+	`canned_analysis_preview_url` VARCHAR(255) DEFAULT 'static/icons/analysis_preview.png',
 	`contribution_fk` INT NOT NULL,
 	`date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (contribution_fk) REFERENCES contribution(id)
@@ -259,13 +262,6 @@ INSERT INTO question (question_number, question, object_type) VALUES
 	(7, "Source code is documented.", "tool"),
 	(8, "Pipelines that use the tool have been standardized and provide detailed usage guidelines.", "tool"),
 	(9, "A tutorial page is provided for the tool.", "tool"),
-	(10, "Example datasets are provided.", "tool"),
-	(11, "Licensing information is provided on the tool's landing page.", "tool"),
-	(12, "Information is provided describing how to cite the tool.", "tool"),
-	(13, "Version information is provided for the tool.", "tool"),
-	(14, "A paper about the tool has been published.", "tool"),
-	(15, "Video tutorials for the tool are available.", "tool"),
-	(16, "Contact information is provided for the originator(s) of the tool.", "tool"),
 	(1, "Standardized IDs are used to identify dataset.", "dataset"),
 	(2, "The dataset can be located on the host platform via free-text search and menu-driven decision tree search.", "dataset"),
 	(3, "The dataset is hosted in one or more well-used repositories, if relevant repositories exist.", "dataset"),
@@ -275,13 +271,6 @@ INSERT INTO question (question_number, question, object_type) VALUES
 	(7, "The dataset is available in a standard machine-accessible format (that is interoperable with popular analysis tools).", "dataset"),
 	(8, "The meta(data) are sufficiently complete to permit effective reuse.", "dataset"),
 	(9, "Metadata are linked to other relevant datasets, vocabularies and ontologies.", "dataset"),
-	(10, "A tutorial page is provided for the dataset to describe the format of the dataset.", "dataset"),
-	(11, "Information is provided describing how to cite the dataset.", "dataset"),
-	(12, "A description of the methods used to acquire the data is provided.", "dataset"),
-	(13, "Licensing information is provided on the dataset's landing page.", "dataset"),
-	(14, "Version information is provided on the dataset's landing page.", "dataset"),
-	(15, "Tools that can be used to analyze the dataset are listed on the dataset's landing page.", "dataset"),
-	(16, "Contact information is provided for the originator(s) of the dataset.", "dataset"),
 	(1, "The structure of the repository permits efficient discovery of data and metadata by end users.", "canned_analysis"),
 	(2, "The repository is available online.", "canned_analysis"),
 	(3, "The repository uses a standardized protocol to permit access by users.", "canned_analysis"),
@@ -290,12 +279,18 @@ INSERT INTO question (question_number, question, object_type) VALUES
 	(6, "The repository provides contact information for staff to enable users with questions or suggestions to interact with repository experts.", "canned_analysis"),
 	(7, "The repository is established on standard core infrastructure components including hardware, operating systems, and supporting software.", "canned_analysis"),
 	(8, "Tools that can be used to analyze each dataset are listed on the corresponding dataset pages.", "canned_analysis"),
-	(9, "The repository maintains licenses to manage data access and use.", "canned_analysis"),
-	(10, "The repository hosts data and metadata according to a set of defined criteria to ensure that the resources provided are consistent with the intent of the repository.", "canned_analysis"),
-	(11, "The repository provides sufficient detail about its data and metadata so that users are able to evaluate the quality of these resources.", "canned_analysis"),
-	(12, "Metadata are linked to other relevant datasets, vocabularies and ontologies.", "canned_analysis"),
-	(13, "The repository provides documentation for each resource to permit its complete and accurate citation.", "canned_analysis"),
-	(14, "Sufficient metadata are provided for each dataset to permit accurate and useful employment of the dataset.", "canned_analysis"),
-	(15, "A description of the methods used to acquire the data is provided.", "canned_analysis"),
-	(16, "Version information is provided for each resource, where available.", "canned_analysis");
+	(9, "The repository maintains licenses to manage data access and use.", "canned_analysis");
 
+# Terms
+INSERT INTO term (term_name) VALUES
+	('organism'),
+	('geneset'),
+	('direction');
+
+# Contribution
+INSERT INTO contribution (id) VALUES
+	(1);
+
+# Canned Analysis
+INSERT INTO canned_analysis (canned_analysis_title, canned_analysis_description, canned_analysis_url, contribution_fk) VALUES
+	('', '', '', 1);

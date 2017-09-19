@@ -44,9 +44,9 @@ class Datasets2Tools:
 		self.session = sessionmaker()
 		self.tables = tables
 
-#############################################
-########## 2. Search
-#############################################
+	#############################################
+	########## 2. Search
+	#############################################
 
 	def search(self, search_filters, search_options, get_related_objects=False, get_fairness=False, user_id=None):
 
@@ -62,9 +62,9 @@ class Datasets2Tools:
 		# Return
 		return search_results
 			
-#############################################
-########## 3. Upload Analyses
-#############################################
+	#############################################
+	########## 3. Upload Analyses
+	#############################################
 
 	def upload_analyses(self, analysis_file, user_id):
 
@@ -80,9 +80,9 @@ class Datasets2Tools:
 		# Return
 		return upload_results
 			
-#############################################
-########## 4. Upload Evaluation
-#############################################
+	#############################################
+	########## 4. Upload Evaluation
+	#############################################
 
 	def upload_evaluation(self, evaluation_scores):
 
@@ -93,10 +93,10 @@ class Datasets2Tools:
 		except:
 			self.session.rollback()
 			raise
-			
-#############################################
-########## 5. Update Database
-#############################################
+				
+	#############################################
+	########## 5. Update Database
+	#############################################
 
 	def update_database(self, file_directory):
 
@@ -136,9 +136,9 @@ class Search:
 		self.search_filters = self.get_search_filters(object_ids = object_ids, used_filters = search_filters.keys())
 		self.search_options = self.get_search_options(count = len(object_ids), sort_by = sort_by, offset = offset, page_size = page_size)
 
-#############################################
-########## 2. Get IDs
-#############################################
+	#############################################
+	########## 2. Get IDs
+	#############################################
 
 	def get_ids(self, search_filters, sort_by):
 
@@ -151,7 +151,7 @@ class Search:
 		elif self.object_type == 'tool':
 			query = query.outerjoin(self.tables['analysis_to_tool']).outerjoin(self.tables['canned_analysis']).outerjoin(self.tables['analysis_to_dataset']).outerjoin(self.tables['dataset']).outerjoin(self.tables['article']).filter(self.tables['tool'].columns['display'] == True)
 		elif self.object_type == 'canned_analysis':
-			query = query.join(self.tables['analysis_to_dataset']).join(self.tables['dataset']).join(self.tables['analysis_to_tool']).join(self.tables['tool'])
+			query = query.join(self.tables['analysis_to_dataset']).join(self.tables['dataset']).join(self.tables['analysis_to_tool']).join(self.tables['tool']).join(self.tables['contribution']).filter(self.tables['contribution'].columns['display'] == True)
 
 		# Text search
 		if 'q' in search_filters.keys():
@@ -218,9 +218,9 @@ class Search:
 		# Get query
 		return ids
 
-#############################################
-########## 3. Get Object Data
-#############################################
+	#############################################
+	########## 3. Get Object Data
+	#############################################
 
 	def get_object_data(self, object_id, get_related_objects, get_fairness, user_id):
 
@@ -258,6 +258,7 @@ class Search:
 
 			# Add analyses
 			object_data['analyses'] = self.session.query(func.count(self.tables['analysis_to_tool'].columns['tool_fk'])).filter(self.tables['analysis_to_tool'].columns['tool_fk'] == object_id).all()[0][0]
+			object_data['tool_icon_url'] = 'http://localhost:5000/datasets2tools/static/icons/tool.png'
 
 		# Canned Analysis
 		elif self.object_type == 'canned_analysis':
@@ -319,9 +320,9 @@ class Search:
 		# Return
 		return object_data
 
-#############################################
-########## 4. Get Search Filters
-#############################################
+	#############################################
+	########## 4. Get Search Filters
+	#############################################
 
 	def get_search_filters(self, object_ids, used_filters):
 
@@ -374,9 +375,9 @@ class Search:
 		# Return
 		return search_filters
 
-#############################################
-########## 5. Get Search Options
-#############################################
+	#############################################
+	########## 5. Get Search Options
+	#############################################
 
 	def get_search_options(self, count, sort_by, offset, page_size):
 
@@ -454,9 +455,9 @@ class UploadAnalyses:
 		else:
 			raise ValueError('Over the maximum allowed cap.')
 
-#############################################
-########## 2. Read Uploaded File
-#############################################
+	#############################################
+	########## 2. Read Uploaded File
+	#############################################
 
 	def read_analysis_file(self, uploaded_file):
 
@@ -475,9 +476,9 @@ class UploadAnalyses:
 		# Return
 		return canned_analysis_dataframe
 
-#############################################
-########## 3. Check Contributions
-#############################################
+	#############################################
+	########## 3. Check Contributions
+	#############################################
 
 	def check_contributions(self, nr_canned_analyses, user_id):
 
@@ -490,9 +491,9 @@ class UploadAnalyses:
 		# Return
 		return (max_contributions-nr_canned_analyses)>nr_contributions
 
-#############################################
-########## 4. Get Object IDs
-#############################################
+	#############################################
+	########## 4. Get Object IDs
+	#############################################
 
 	def get_object_ids(self, canned_analysis_dataframe, object_type, user_id):
 
@@ -518,9 +519,9 @@ class UploadAnalyses:
 
 		return canned_analysis_dataframe
 
-#############################################
-########## 5. Upload Object Relationships
-#############################################
+	#############################################
+	########## 5. Upload Object Relationships
+	#############################################
 
 	def upload_object_relationships(self, canned_analysis_dataframe):
 
@@ -528,9 +529,9 @@ class UploadAnalyses:
 		for object_type in ['dataset', 'tool']:
 			self.engine.execute(self.tables['analysis_to_'+object_type].insert().prefix_with('IGNORE'), canned_analysis_dataframe[['canned_analysis_fk', object_type+'_fk']].drop_duplicates().to_dict(orient='records'))
 
-#############################################
-########## 6. Upload Metadata
-#############################################
+	#############################################
+	########## 6. Upload Metadata
+	#############################################
 
 	def upload_metadata(self, canned_analysis_dataframe):
 
@@ -553,9 +554,9 @@ class UploadAnalyses:
 		# Upload
 		self.engine.execute(self.tables['canned_analysis_metadata'].insert().prefix_with('IGNORE'), metadata_dataframe.to_dict(orient='records'))
 
-#############################################
-########## 7. Upload Keywords
-#############################################
+	#############################################
+	########## 7. Upload Keywords
+	#############################################
 
 	def upload_keywords(self, canned_analysis_dataframe):
 
@@ -593,9 +594,9 @@ class UploadEvaluation:
 		upload_string = 'REPLACE INTO {object_type}_evaluation (question_fk, user_fk, {object_type}_fk, answer, comment) VALUES ('.format(**evaluation_info) + '), ('.join([', '.join([rowData[x] if x not in ['comment', 'answer'] else '"'+rowData[x].replace('"', '')+'"' for x in ['question_fk', 'user_fk', evaluation_info['object_type']+'_fk', 'answer', 'comment']]) for index, rowData in score_dataframe.iterrows()]) + ')'
 		engine.execute(upload_string)
 
-#############################################
-########## 2. Prepare Score Dataframe
-#############################################
+	#############################################
+	########## 2. Prepare Score Dataframe
+	#############################################
 
 	def prepare_score_dataframe(self, evaluation_scores, evaluation_info):
 
@@ -642,9 +643,9 @@ class UpdateDatabase:
 		# Upload canned analysis data
 		self.upload_canned_analysis_data(file_directory)
 
-#############################################
-########## 2. Upload
-#############################################
+	#############################################
+	########## 2. Upload
+	#############################################
 
 	def upload_table(self, dataframe, table_name, identifier=None):
 
@@ -664,9 +665,9 @@ class UpdateDatabase:
 			# Return 
 			return id_dataframe
 
-#############################################
-########## 3. Tool Data
-#############################################
+	#############################################
+	########## 3. Tool Data
+	#############################################
 
 	def upload_tool_data(self, file_directory):
 
@@ -692,14 +693,14 @@ class UpdateDatabase:
 		related_tool_dataframe = dataframes['related_tool'].merge(tool_id_dataframe, left_on='source_tool_name', right_on='tool_name').rename(columns={'tool_fk': 'source_tool_fk'}).merge(tool_id_dataframe, left_on='target_tool_name', right_on='tool_name').rename(columns={'tool_fk': 'target_tool_fk'})[['source_tool_fk', 'target_tool_fk', 'similarity']]
 		self.upload_table(dataframe = related_tool_dataframe, table_name = 'related_tool')
 
-#############################################
-########## 4. Dataset Data
-#############################################
+	#############################################
+	########## 4. Dataset Data
+	#############################################
 
 	def upload_dataset_data(self, file_directory):
 
 		# Read dataframes
-		dataframes = {x: pd.read_table(os.path.join(file_directory, x+'.txt')) for x in ['dataset', 'related_dataset', 'dataset_keyword', 'related_tool', 'tool_keyword']}
+		dataframes = {x: pd.read_table(os.path.join(file_directory, x+'.txt')).fillna('') for x in ['dataset', 'related_dataset', 'dataset_keyword', 'related_tool', 'tool_keyword']}
 
 		# Upload datasets
 		dataset_id_dataframe = self.upload_table(dataframe = dataframes['dataset'], table_name = 'dataset', identifier = 'dataset_accession')
@@ -713,9 +714,9 @@ class UpdateDatabase:
 		self.upload_table(dataframe = related_dataset_dataframe, table_name = 'related_dataset')
 
 
-#############################################
-########## 5. Canned Analysis Data
-#############################################
+	#############################################
+	########## 5. Canned Analysis Data
+	#############################################
 
 	def upload_canned_analysis_data(self, file_directory):
 

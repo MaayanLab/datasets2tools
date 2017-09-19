@@ -20,7 +20,6 @@
 		{% set image_colsize = 3 %}
 		{% set max_description_length = 150 %}
 		{% set doi = object_data.articles[0].doi if object_data.articles|length > 0 else None %}
-		{% set badges = [{'label': 'This tool has been used to generate '+object_data.analyses|string+' canned analyses.', 'icon': 'pie-chart', 'value': object_data.analyses}, {'label': 'Citations (PubMed)', 'icon': 'bookmark-o', 'value': object_data.citations if object_data.citations else 0}] %}
 	{% elif object_type == 'canned_analysis' %}
 		{% set card_title = object_data.canned_analysis_title %}
 		{% set card_source = object_data.username %}
@@ -47,10 +46,12 @@
 
 					{% if object_type == 'tool' %}
 						<div class="col-12">
-							<div class="row" style="border-top: 1px solid #eceeef;">
-								{% for badge in badges %}{% if badge.value %}<span class="metric-badge" data-toggle="tooltip" data-animation="false" data-html="true" data-placement="right" title="<span style='font-size: 8pt;text-align=left;'>{{ badge.label }}</span>" style="margin-top: auto; margin-bottom: auto;max-height: 23px;font-size: 9pt;background-color: #255FA7;color:	white;border-radius: 5px; padding: 3px 7px; cursor: pointer;font-weight: 300;margin-left: 7px;"><i class="fa fa-{{badge.icon}}" style="margin-right: 5px;"></i>{{badge.value}}</span>{% endif %} {% endfor %}
+							<div class="row tool-metrics" style="border-top: 1px solid #eceeef;">
+								{% if object_data.citations %}
+									<div class="pubmed-badge" data-container="body" data-toggle="popover" data-placement="right" data-animation="false" data-html="true" data-trigger="hover focus" data-template='<div class="popover pubmed-badge-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="Cited by <a href='https://www.ncbi.nlm.nih.gov/pubmed/?term={{doi.split('doi.org/')[01]}}' target='_blank'>{{object_data.citations}}</a> articles on <a href='https://www.ncbi.nlm.nih.gov/pubmed'>PubMed</a>"><img class="pubmed-icon" src="static/icons/pubmed.png"><div class="pubmed-badge-number">{{ object_data.citations if object_data.citations < 1000 else (object_data.citations/(1000|float))|float|round(2)|string+'k' }}</div></div>
+								{% endif %}
 								<div data-badge-popover="right" data-badge-type="4" data-doi="{{doi}}" data-hide-less-than="1" class="altmetric-embed" style="margin-left: 7px;padding-top: 3px;"></div>
-								{#<a href="https://plu.mx/plum/a/?doi={{doi}}" class="plumx-plum-print-popup" data-size="small" data-popup="right" data-hide-when-empty="true"></a>#}
+								<a href="https://plu.mx/plum/a/?doi={{doi}}" class="plumx-plum-print-popup" data-size="small" data-badge="true" data-popup="right" data-hide-when-empty="true"></a>
 								<div class="fairness-insignia" data-identifier="{{card_title}}" data-object-type="{{object_type}}" style="margin-top: auto;margin-bottom: auto;"></div>
 							</div>
 						</div>
