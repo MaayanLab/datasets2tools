@@ -177,6 +177,16 @@
 											{% endfor %}
 										</div>
 										<div class="info-card-publication-doi">DOI: <a href="{{ publication['doi'] }}">{{ publication['doi'] }}</a></div>
+										<div class="info-card-publication-doi landing-article-metrics">
+											<div class="row">
+												<div class="col-1">
+													Metrics:
+												</div>
+												<div class="pubmed-badge" data-container="body" data-toggle="popover" data-placement="right" data-animation="false" data-html="true" data-trigger="hover focus" data-template='<div class="popover pubmed-badge-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="Cited by <a href='https://www.ncbi.nlm.nih.gov/pubmed/?term={{publication['doi'].split('doi.org/')[01]}}' target='_blank'>{{object_data.citations}}</a> articles on <a href='https://www.ncbi.nlm.nih.gov/pubmed'>PubMed</a>"><img class="pubmed-icon" src="{{url_for('static_files', path='icons/pubmed.png')}}"><div class="pubmed-badge-number">{{ object_data.citations if object_data.citations < 1000 else (object_data.citations/(1000|float))|float|round(2)|string+'k' }}</div></div>
+												<div data-badge-popover="right" data-badge-type="4" data-doi="{{publication['doi']}}" data-hide-less-than="1" class="altmetric-embed" style="margin-left: 7px;padding-top: 3px;"></div>
+												<a href="https://plu.mx/plum/a/?doi={{publication['doi']}}" class="plumx-plum-print-popup" data-size="small" data-badge="true" data-popup="right" data-hide-when-empty="true"></a>
+											</div>
+										</div>
 									</div>
 								</div>
 							{% endfor %}

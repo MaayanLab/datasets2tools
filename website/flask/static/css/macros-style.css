@@ -71,17 +71,24 @@
 						display: block
 					}
 
+					.card-badges {
+						position: absolute;
+						right: 21px;
+						top: 15px;
+					}
+
 					.tool-metrics {
 						padding-top: 3px;
+						border-top: 1px solid #eceeef;
 					}
 
 						.altmetric-embed {
-							padding-left: 5px;
-							margin-top: 2px;
+							padding-left: 12px;
+							margin-top: 5px;
 						}
 
 						.PlumX-Popup {
-							margin-left: 10px;
+							margin-left: 8px;
 							margin-top: 3px;
 						}
 

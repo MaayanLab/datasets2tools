@@ -322,6 +322,7 @@
 									.info-card-publication-abstract-section-title {
 										font-weight: 600;
 										font-style: italic;
+										margin-top: 3px;
 									}
 
 									.info-card-publication-abstract-section-text {
@@ -337,6 +338,11 @@
 									font-style: normal;
 									font-weight: 400;
 								}
+
+							.landing-article-metrics .col-1 {
+								margin-top: auto;
+								margin-bottom: auto;
+							}
 
 				#related-object-info {
 

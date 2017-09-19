@@ -352,9 +352,11 @@ def fairness_insignia_api():
 	fairness_score = sum(score_dataframe['average_score'] > 0.5) if 'average_score' in score_dataframe else None
 
 	# Get result
-	result = {'fairness_score': fairness_score, 'questions': score_dataframe.to_dict(orient='records')}
+	print object_data
+	result = {'fairness_score': fairness_score, 'questions': score_dataframe.to_dict(orient='records'), 'evaluations': object_data['fairness']['evaluations']}
 
 	# Return result
+	print result
 	return json.dumps(result)
 
 #######################################################

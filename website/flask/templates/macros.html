@@ -1,4 +1,8 @@
 <!-- Object Cards -->
+<!-- {% macro display_fairness_insignia(object_data, object_type) %} -->
+<!-- {% endmacro %} -->
+
+<!-- Object Cards -->
 {% macro display_object_card(object_data, object_type) %}
 
 	{% if object_type == 'dataset' %}
@@ -43,16 +47,18 @@
 						{% if object_type == 'dataset' or object_type == 'canned_analysis' %} <a href="{{ card_source_url }}" class="card-source">{{ card_source }}</a> {% endif %}
 						<div class="card-description" data-toggle="tooltip" data-placement="bottom" data-animation="false" data-html="true" data-template='<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner card-description-tooltip"></div></div>' title="{{ card_description if card_description and card_description|length > max_description_length else ''}}">{{ card_description[:max_description_length]+'...' if card_description and card_description|length > max_description_length else card_description }}</div>
 					</div>
+					<div class="card-badges">
+						<div class="fairness-insignia" data-identifier="{{card_title}}" data-object-type="{{object_type}}"></div>
+					</div>
 
 					{% if object_type == 'tool' %}
 						<div class="col-12">
-							<div class="row tool-metrics" style="border-top: 1px solid #eceeef;">
+							<div class="row tool-metrics">
 								{% if object_data.citations %}
-									<div class="pubmed-badge" data-container="body" data-toggle="popover" data-placement="right" data-animation="false" data-html="true" data-trigger="hover focus" data-template='<div class="popover pubmed-badge-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="Cited by <a href='https://www.ncbi.nlm.nih.gov/pubmed/?term={{doi.split('doi.org/')[01]}}' target='_blank'>{{object_data.citations}}</a> articles on <a href='https://www.ncbi.nlm.nih.gov/pubmed'>PubMed</a>"><img class="pubmed-icon" src="static/icons/pubmed.png"><div class="pubmed-badge-number">{{ object_data.citations if object_data.citations < 1000 else (object_data.citations/(1000|float))|float|round(2)|string+'k' }}</div></div>
+									<div class="pubmed-badge" data-container="body" data-toggle="popover" data-placement="right" data-animation="false" data-html="true" data-trigger="hover focus" data-template='<div class="popover pubmed-badge-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="Cited by <a href='https://www.ncbi.nlm.nih.gov/pubmed/?term={{doi.split('doi.org/')[01]}}' target='_blank'>{{object_data.citations}}</a> articles on <a href='https://www.ncbi.nlm.nih.gov/pubmed'>PubMed</a>"><img class="pubmed-icon" src="{{url_for('static_files', path='icons/pubmed.png')}}"><div class="pubmed-badge-number">{{ object_data.citations if object_data.citations < 1000 else (object_data.citations/(1000|float))|float|round(1)|string+'k' }}</div></div>
 								{% endif %}
-								<div data-badge-popover="right" data-badge-type="4" data-doi="{{doi}}" data-hide-less-than="1" class="altmetric-embed" style="margin-left: 7px;padding-top: 3px;"></div>
+								<div data-badge-popover="right" data-badge-type="4" data-doi="{{doi}}" data-hide-less-than="1" class="altmetric-embed"></div>
 								<a href="https://plu.mx/plum/a/?doi={{doi}}" class="plumx-plum-print-popup" data-size="small" data-badge="true" data-popup="right" data-hide-when-empty="true"></a>
-								<div class="fairness-insignia" data-identifier="{{card_title}}" data-object-type="{{object_type}}" style="margin-top: auto;margin-bottom: auto;"></div>
 							</div>
 						</div>
 					{% endif %}
