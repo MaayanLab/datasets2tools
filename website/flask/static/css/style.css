@@ -7,7 +7,7 @@
 }
 
 	#homepage-header-row {
-		padding-top: 70px;
+		padding-top: 80px;
 	}
 
 		#d2t-title {
@@ -39,7 +39,7 @@
 		#homepage-search {
 			width: 700px;
 			padding-top: 40px;
-			padding-bottom: 50px;
+			/*padding-bottom: 50px;*/
 		}
 
 			#homepage-search input {
@@ -68,6 +68,46 @@
 				background-color: white;
 				color: grey;
 				cursor: pointer;
+			}
+
+		#homepage-statistics-row {
+			margin-top: 30px;
+			font-family: 'Montserrat', sans-serif;
+			font-size: 14pt;
+			font-weight: 100;
+		}
+
+			.homepage-statistics-number {
+				font-weight: 500;
+			}
+
+		#homepage-info-row {
+			margin-top: 50px;
+		}
+
+			.info-row-icon {
+				width: 130px;
+				font-size: 50pt;
+				border: 1px solid black;
+				padding: 30px;
+				border-radius: 150px;
+				cursor: pointer;
+			}
+
+				.info-row-icon:hover {
+					color: white;
+					background-color: #255FA7;
+				}
+
+			.info-row-title {
+				font-family: 'Montserrat', sans-serif;
+				padding-top: 10px;
+			}
+
+			.info-row-text {
+				font-family: 'Montserrat', sans-serif;
+				padding-top: 10px;
+				font-size: 10pt;
 			}
 
 /*************************/

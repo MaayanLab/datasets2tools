@@ -177,7 +177,8 @@ def page_not_found(e):
 
 @app.route(entry_point)
 def index():
-	return render_template('index.html')
+	homepage_data = Datasets2Tools.get_homepage_data()
+	return render_template('index.html', homepage_data=homepage_data)
 
 #############################################
 ########## 2. Search Page
@@ -240,6 +241,22 @@ def contribute():
 @app.route(entry_point+'/help')
 def help():
 	return render_template('help.html')
+
+#############################################
+########## 6. FAIR Page
+#############################################
+
+@app.route(entry_point+'/fair')
+def fair():
+	return render_template('fair.html')
+
+#############################################
+########## 7. API Page
+#############################################
+
+@app.route(entry_point+'/api')
+def api():
+	return render_template('api.html')
 
 #######################################################
 #######################################################

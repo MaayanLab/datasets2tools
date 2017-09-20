@@ -10,6 +10,7 @@
 							<img id="d2t-logo-large" src="{{url_for('static', filename='icons/datasets2tools-blue.png')}}">
 							<div>
 								<span>Datasets2Tools</span>
+								<hr width="100%" class="my-1">
 								<div id="d2t-subtitle">Discover Bioinformatics</div>
 							</div>
 						</div>
@@ -18,16 +19,49 @@
 				<div id="homepage-search" class="container">
 					<div class="row">
 						<div class="col-12">
-							<div class="form-inline">
+							<form class="form-inline" action="{{url_for('search')}}">
 								<input class="form-control" type="text" placeholder="Search for genes, diseases, technologies..." name="q">
 								<button class="btn" type="submit">
 									<i class="fa fa-search"></i>
 								</button>
-							</div>
+							</form>
+						</div>
+					</div>
+					<div id="homepage-info-row" class="row">
+						<div class="col-4">
+							<i class="fa fa-pie-chart info-row-icon"></i>
+							<div class="info-row-title"><span class="info-row-number">{{ homepage_data['canned_analysis'] }}</span>+<br>Analyses</div>
+							<div class="info-row-text">Find enrichment analyses, small molecule queries, interactive heatmaps, and many others</div>
+						</div>
+						<div class="col-4">
+							<i class="fa fa-database info-row-icon"></i>
+							<div class="info-row-title"><span class="info-row-number">{{ homepage_data['dataset'] }}</span>+<br>Datasets</div>
+							<div class="info-row-text">Find microarray, RNA-seq and proteomics datasets from major biomedical repositories</div>
+						</div>
+						<div class="col-4">
+							<i class="fa fa-cogs info-row-icon" style="padding-left: 25px;"></i>
+							<div class="info-row-title"><span class="info-row-number">{{ homepage_data['tool'] }}</span>+<br>Tools</div>
+							<div class="info-row-text">Find computational tools and databases spanning multiple technologies and disciplines</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
+{% endblock %}
+
+{% block footer %}
+	<script type="text/javascript">
+		$('.info-row-number').each(function () {
+			$(this).prop('Counter',0).animate({
+				Counter: $(this).text()
+			}, {
+				duration: 3000,
+				easing: 'swing',
+				step: function (now) {
+					$(this).text(Math.ceil(now));
+				}
+			});
+		});
+	</script>
 {% endblock %}

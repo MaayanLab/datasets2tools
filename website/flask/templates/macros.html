@@ -26,8 +26,8 @@
 		{% set doi = object_data.articles[0].doi if object_data.articles|length > 0 else None %}
 	{% elif object_type == 'canned_analysis' %}
 		{% set card_title = object_data.canned_analysis_title %}
-		{% set card_source = object_data.username %}
-		{% set card_source_url = '#' %}
+		{% set card_source = object_data.tool_name %}
+		{% set card_source_url = url_for('landing', object_type='tool', object_identifier=object_data.tool_name) %}
 		{% set card_description = object_data.canned_analysis_description %}
 		{% set card_icon_url = object_data.canned_analysis_preview_url if object_data.canned_analysis_preview_url else url_for('static', filename='icons/analysis.png')%}
 		{% set card_landing_url = url_for('landing', object_type=object_type, object_identifier=object_data.canned_analysis_accession) %}

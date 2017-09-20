@@ -107,6 +107,19 @@ class Datasets2Tools:
 		except:
 			self.session.rollback()
 			raise
+				
+	#############################################
+	########## 6. Get Homepage Data
+	#############################################
+
+	def get_homepage_data(self):
+
+		# Get data
+		homepage_data = {x: int(round(self.session.query(func.count(self.tables[x].columns['id'])).all()[0][0], -1)) for x in ['canned_analysis', 'tool', 'dataset']}
+		self.session.close()
+
+		# Return
+		return homepage_data
 
 #################################################################
 #################################################################
@@ -161,7 +174,7 @@ class Search:
 			elif self.object_type == 'tool':
 				query = query.filter(or_(self.tables['tool'].columns['tool_name'].like(q), self.tables['tool'].columns['tool_description'].like(q), self.tables['article'].columns['article_title'].like(q), self.tables['article'].columns['authors'].like(q), self.tables['article'].columns['abstract'].like(q)))
 			elif self.object_type == 'canned_analysis':
-				query = query.filter(or_(self.tables['canned_analysis'].columns['canned_analysis_accession'].like(q), self.tables['canned_analysis'].columns['canned_analysis_title'].like(q), self.tables['canned_analysis'].columns['canned_analysis_description'].like(q), self.tables['dataset'].columns['dataset_accession'].like(q), self.tables['tool'].columns['tool_name'].like(q), self.tables['dataset'].columns['dataset_title'].like(q),  self.tables['dataset'].columns['dataset_description'].like(q), ))
+				query = query.filter(or_(self.tables['canned_analysis'].columns['canned_analysis_accession'].like(q), self.tables['canned_analysis'].columns['canned_analysis_title'].like(q), self.tables['canned_analysis'].columns['canned_analysis_description'].like(q), self.tables['dataset'].columns['dataset_accession'].like(q), self.tables['tool'].columns['tool_name'].like(q), self.tables['dataset'].columns['dataset_title'].like(q) ))
 
 		# Keyword search
 		if 'keyword' in search_filters.keys():
@@ -269,7 +282,8 @@ class Search:
 
 			# Perform metadata query
 			canned_analysis_metadata_query = self.session.query(self.tables['canned_analysis_metadata'].columns['value'], self.tables['term'].columns['term_name']).join(self.tables['term']).filter(self.tables['canned_analysis_metadata'].columns['canned_analysis_fk'] == object_id).all()
-			object_data['metadata'] = pd.DataFrame([metadata_query_result._asdict() for metadata_query_result in canned_analysis_metadata_query]).set_index('term_name').to_dict()['value']
+			metadata_dataframe = pd.DataFrame([metadata_query_result._asdict() for metadata_query_result in canned_analysis_metadata_query])
+			object_data['metadata'] = metadata_dataframe.set_index('term_name').to_dict()['value'] if 'term_name' in metadata_dataframe.columns else {}
 			object_data['date'] = '{:%B %d, %Y}'.format(object_data['date'])
 
 		# Keywords

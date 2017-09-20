@@ -99,19 +99,20 @@
 		    }).prop('disabled', true);
 		});
 		$('#object-search-form').change(function(evt){
+			console.log($(evt.target));
 			if ( $(evt.target).parent().is('.search-tab-col, .form-inline') ) {
 			    $(':input', this).filter(function() {
-			        return !['q', 'object_type'].includes(this.name);
+			        return !['q', 'object_type'].includes(this.name); // remove everything except q and object type when changing tab
 			    }).prop('disabled', true);
-			} else if ( $(evt.target).parent().is('.page-size-col') ) {
+			} else if ( $(evt.target).parent().is('.page-size-col') | $(evt.target).hasClass('search-option-dropdown') ) {
 			    $(':input', this).filter(function() {
-			        return ['offset'].includes(this.name);
+			        return ['offset'].includes(this.name);  // remove offset when changing page size or adding tags
 			    }).prop('disabled', true);
 			}
 			$(evt.target).parents('#object-search-form').submit();
 		});
 		// Activate filters
-		{% if 'sort_by' in request.args.keys() %}
+		{% if request.args.get('object_type') == 'canned_analysis' %}
 			$('.filter-button').click();
 		{% endif %}
 	</script>
