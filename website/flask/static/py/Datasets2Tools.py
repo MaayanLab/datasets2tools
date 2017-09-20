@@ -258,7 +258,7 @@ class Search:
 
 			# Add analyses
 			object_data['analyses'] = self.session.query(func.count(self.tables['analysis_to_tool'].columns['tool_fk'])).filter(self.tables['analysis_to_tool'].columns['tool_fk'] == object_id).all()[0][0]
-			object_data['tool_icon_url'] = 'http://localhost:5000/datasets2tools/static/icons/tool.png'
+			object_data['tool_icon_url'] = 'http://localhost:5000/datasets2tools-dev/static/icons/tool.png'
 
 		# Canned Analysis
 		elif self.object_type == 'canned_analysis':

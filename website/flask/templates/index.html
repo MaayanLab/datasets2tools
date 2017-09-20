@@ -2,15 +2,29 @@
 
 {% block content %}
 	<div id="homepage-container" class="container-fluid text-center">
-		<div id="homepage-header" class="row">
+		<div id="homepage-header-row" class="row" style="background-image: url({{url_for('static', filename='images/header-background.png')}})">
 			<div class="col-12">
 				<div class="row">
-					<div id="d2t-title" class="col-12">
-						Datasets2Tools
+					<div class="col-12">
+						<div id="d2t-title">
+							<img id="d2t-logo-large" src="{{url_for('static', filename='icons/datasets2tools-blue.png')}}">
+							<div>
+								<span>Datasets2Tools</span>
+								<div id="d2t-subtitle">Discover Bioinformatics</div>
+							</div>
+						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-12">
+				<div id="homepage-search" class="container">
+					<div class="row">
+						<div class="col-12">
+							<div class="form-inline">
+								<input class="form-control" type="text" placeholder="Search for genes, diseases, technologies..." name="q">
+								<button class="btn" type="submit">
+									<i class="fa fa-search"></i>
+								</button>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

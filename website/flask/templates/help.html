@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div id="help-container" class="container">
+		<div id="help-index-wrapper" class="container-fluid">
+			<div id="help-index-title-row" class="row">
+				<div class="col-12 text-center">
+					<div class='help-index-title'>Help Center</div>
+				</div>
+			</div>
+			<div id="help-index-content-row" class="row">
+				<div class="col-4 help-index-col">
+					<a class='help-index-subtitle' href="#getting-started"><i class="fa fa-map"></i>Getting Started</a>
+					<hr width="100%" class="my-1">
+					<a class='help-index-section' href="#about-datasets2tools">About Datasets2Tools</a>
+					<a class='help-index-section' href="#canned-analysis">The Canned Analysis</a>
+					<a class='help-index-section' href="#fair-principles">The FAIR Principles</a>
+				</div>
+				<div class="col-4 help-index-col">
+					<a class='help-index-subtitle' href="#search"><i class="fa fa-search"></i>Search</a>
+					<hr width="100%" class="my-1">
+					<a class='help-index-section' href="#analysis-search">Analysis Search</a>
+					<a class='help-index-section' href="#tool-search">Tool Search</a>
+					<a class='help-index-section' href="#dataset-search">Dataset Search</a>
+				</div>
+				<div class="col-4 help-index-col">
+					<a class='help-index-subtitle' href="#landing-pages"><i class="fa fa-info-circle"></i>Landing Pages</a>
+					<hr width="100%" class="my-1">
+					<a class='help-index-section' href="#analysis-pages">Analysis Pages</a>
+					<a class='help-index-section' href="#tool-pages">Tool Pages</a>
+					<a class='help-index-section' href="#dataset-pages">Dataset Pages</a>
+				</div>
+				<div class="col-4 help-index-col">
+					<a class='help-index-subtitle' href="#fair-evaluations"><i class="fa fa-certificate"></i>FAIR Evaluations</a>
+					<hr width="100%" class="my-1">
+					<a class='help-index-section' href="#evaluating-objects">Evaluating Objects</a>
+					<a class='help-index-section' href="#modifying-evaluations">Modifying Evaluations</a>
+					<a class='help-index-section' href="#viewing-results">Viewing Results</a>
+				</div>
+				<div class="col-4 help-index-col">
+					<a class='help-index-subtitle' href="#contribution"><i class="fa fa-upload"></i>Contribute</a>
+					<hr width="100%" class="my-1">
+					<a class='help-index-section' href="#how-to-contribute">How to contribute</a>
+					<a class='help-index-section' href="#viewing-contributions">Viewing contributions</a>
+					<a class='help-index-section' href="#modifying-contributions">Modifying contributions</a>
+				</div>
+				<div class="col-4 help-index-col">
+					<a class='help-index-subtitle' href="#"><i class="fa fa-chrome"></i>Chrome Extension</a>
+					<hr width="100%" class="my-1">
+					<a class='help-index-section' href="#installing-chrome-extension">Installing the Chrome Extension</a>
+					<a class='help-index-section' href="#installing-chrome-extension">What does the Chrome Extension do?</a>
+					<a class='help-index-section' href="#using-chrome-extension">Using the Chrome Extension</a>
+				</div>
+			</div>
+		</div>
+		<div id="help-content-row" class="row">
+			<div class="col-12">
+				<div id="getting-started" class='help-content-title'><i class="fa fa-map"></i>Getting Started<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="100%" class="my-1">
+				<div id="about-datasets2tools" class='help-content-subtitle'>About Datasets2Tools</div><hr width="35%" align="left" class="my-1">
+				<div class="text-center"><img src="{{ url_for('static', filename='images/datasets2tools-workflow.png') }}"></div>
+				<div class="help-content-text">Datasets2Tools is a platform for the discovery and evaluation of biomedical digital objects.  Datasets2Tools indexes over 30,000 bioinformatics analyses, over 6,000 biological datasets and over 6,000 computational tools.  Users can find relevant objects by using the search interface, the Google Chrome extension and the Application Programming Interface (API). Several metrics are integrated in the search results to help users find the most relevant results.  These include PubMed citations PlumX metrics, Altmetric Attention Scores, and the results of FAIR evaluations by the crowd. </div>
+				<div id="canned-analysis" class='help-content-subtitle'>The Canned Analysis</div><hr width="35%" align="left" class="my-1">
+				<div class="text-center"><img src="{{ url_for('static', filename='images/canned-analysis-workflow.png') }}"></div>
+				<div class="help-content-text">The Canned Analysis is a new type of digital object designed to store the results of bioinformatics analyses.  It is designed to index such objects in a findable, accessible, interoperable and reusable manner.  Canned analyses are defined by three key elements: references to the datasets and tools used to generate it, text annotations, and metadata. </div>
+				<div id="fair-principles" class='help-content-subtitle'>The FAIR Principles</div><hr width="35%" align="left" class="my-1">
+				<div class="help-content-text">The FAIR Principles are a set of high-level principles which describe characteristics which digital objects should have to promote findable, accessible, interoperable and reusable data management.</div>
+				<div id="search" class='help-content-title'><i class="fa fa-search"></i>Search<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="100%" class="my-1">
+				<div id="analysis-search" class='help-content-subtitle'>Analysis Search</div><hr width="35%" align="left" class="my-1">
+				<div class="help-content-text">Description</div>
+				<div id="tool-search" class='help-content-subtitle'>Tool Search</div><hr width="35%" align="left" class="my-1">
+				<div class="help-content-text">Description</div>
+				<div id="dataset-search" class='help-content-subtitle'>Dataset Search</div><hr width="35%" align="left" class="my-1">
+				<div class="help-content-text">Description</div>
+				<div id="landing-pages" class='help-content-title'><i class="fa fa-info-circle"></i>Landing Pages<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="100%" class="my-1">
+				<div id="analysis-pages" class='help-content-subtitle'>Analysis Pages</div><hr width="35%" align="left" class="my-1">
+				<div class="help-content-text">Description</div>
+				<div id="tool-pages" class='help-content-subtitle'>Tool Pages</div><hr width="35%" align="left" class="my-1">
+				<div class="help-content-text">Description</div>
+				<div id="dataset-pages" class='help-content-subtitle'>Dataset Pages</div><hr width="35%" align="left" class="my-1">
+				<div class="help-content-text">Description</div>
+				<div id="fair-evaluations" class='help-content-title'><i class="fa fa-certificate"></i>FAIR Evaluations<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="100%" class="my-1">
+				<div id="evaluating-objects" class='help-content-subtitle'>Evaluating Objects</div><hr width="35%" align="left" class="my-1">
+				<div class="help-content-text">Description</div>
+				<div id="modifying-evaluations" class='help-content-subtitle'>Modifying Evaluations</div><hr width="35%" align="left" class="my-1">
+				<div class="help-content-text">Description</div>
+				<div id="viewing-results" class='help-content-subtitle'>Viewing Results</div><hr width="35%" align="left" class="my-1">
+				<div class="help-content-text">Description</div>
+				<div id="contribute" class='help-content-title'><i class="fa fa-upload"></i>Contribute<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="100%" class="my-1">
+				<div id="how-to-contribute" class='help-content-subtitle'>How to contribute</div><hr width="35%" align="left" class="my-1">
+				<div class="help-content-text">Description</div>
+				<div id="viewing-contributions" class='help-content-subtitle'>Viewing contributions</div><hr width="35%" align="left" class="my-1">
+				<div class="help-content-text">Description</div>
+				<div id="modifying-contributions" class='help-content-subtitle'>Modifying contributions</div><hr width="35%" align="left" class="my-1">
+				<div class="help-content-text">Description</div>
+				<div id="chrome-extension" class='help-content-title'><i class="fa fa-chrome"></i>Chrome Extension<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="100%" class="my-1">
+				<div id="installing-chrome-extension" class='help-content-subtitle'>Installing the Chrome Extension</div><hr width="35%" align="left" class="my-1">
+				<div class="help-content-text">Description</div>
+				<div id="using-chrome-extension" class='help-content-subtitle'>Using the Chrome Extension</div><hr width="35%" align="left" class="my-1">
+				<div class="help-content-text">Description</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block footer %}
+<script type="text/javascript">
+	$('.help-navigate-top').click(function(evt){
+	    $("html, body").animate({
+	            scrollTop: 0
+	        }, 300);
+	        return false;
+    });
+</script>
+{% endblock %}

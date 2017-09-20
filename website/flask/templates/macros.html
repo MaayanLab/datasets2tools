@@ -89,7 +89,7 @@
 		<div class="col-6 text-left offset-col">
 			{% if search_options.offset['values']|length > 1 %}
 				{% for offset in search_options.offset['values'] %}
-					{% if loop.index > 3 %}<span class='offset-dots'>...</span>{% endif %}
+					{% if loop.index > 3 or (loop.index == 3 and search_options.offset['values'][2]>(search_options.offset['values'][1]+1)) %}<span class='offset-dots'>...</span>{% endif %}
 					<input type="radio" class="search-navigation-radio" name="offset" id="{{object_type}}-offset-{{offset}}" value="{{offset}}"{{ ' checked' if offset == search_options.offset.selected }}>
 					<label for="{{object_type}}-offset-{{offset}}" class="search-navigation-number">{{offset}}</label>
 				{% endfor %}
