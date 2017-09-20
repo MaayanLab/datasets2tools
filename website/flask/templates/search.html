@@ -39,14 +39,16 @@
 								{{ search_data.search_options.count }} search result{{ 's' if search_data.search_options.count > 1 else '' }}
 							</div>
 							<div class="col-6 text-right">
-								<a class="filter-button">Filters&nbsp&nbsp</a>
+								{% if object_type == 'canned_analysis' %}
+									<a class="filter-button">Filters&nbsp&nbsp</a>
+								{% endif %}
 							</div>
 						</div> <!-- #search-filters-row -->
 
 						<div id="search-options-wrapper">
 							<hr width="95%">
 							<div id="search-options-row" class="row">
-								{{ macros.display_filters(search_filters = search_data.search_filters, sort_by = search_data.search_options.sort_by) }}
+								{{ macros.display_filters(search_filters = search_data.search_filters) }}
 							</div> <!-- #search-options-row -->
 						</div>
 

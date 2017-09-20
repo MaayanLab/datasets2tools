@@ -151,7 +151,7 @@ class Search:
 		elif self.object_type == 'tool':
 			query = query.outerjoin(self.tables['analysis_to_tool']).outerjoin(self.tables['canned_analysis']).outerjoin(self.tables['analysis_to_dataset']).outerjoin(self.tables['dataset']).outerjoin(self.tables['article']).filter(self.tables['tool'].columns['display'] == True)
 		elif self.object_type == 'canned_analysis':
-			query = query.join(self.tables['analysis_to_dataset']).join(self.tables['dataset']).join(self.tables['analysis_to_tool']).join(self.tables['tool']).join(self.tables['contribution']).filter(self.tables['contribution'].columns['display'] == True)
+			query = query.join(self.tables['analysis_to_dataset']).join(self.tables['dataset']).join(self.tables['analysis_to_tool']).join(self.tables['tool']).join(self.tables['contribution'])#.filter(self.tables['contribution'].columns['display'] == 1)
 
 		# Text search
 		if 'q' in search_filters.keys():
@@ -358,7 +358,6 @@ class Search:
 
 			# Perform metadata query
 			metadata_query = self.session.query(self.tables['term'].columns['term_name'], self.tables['canned_analysis_metadata'].columns['value']).join(self.tables['canned_analysis_metadata']).filter(self.tables['canned_analysis_metadata'].columns['canned_analysis_fk'].in_(object_ids)).distinct().all()
-			
 
 			# Add metadata
 			if len(metadata_query) > 0:
@@ -392,6 +391,7 @@ class Search:
 
 		# Get offsets
 		search_options['offset'] = {'values': [x for x in set(offset_options) if x > 0 and x <= max_pages], 'selected': offset}
+		search_options['offset']['values'].sort()
 
 		# Default options
 		search_options['sort_by'] = {'values': [{'label': 'Relevance', 'value': 'relevance'}, {'label': 'Date (newest)', 'value': 'newest'}], 'selected': sort_by}

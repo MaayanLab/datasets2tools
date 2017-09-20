@@ -14,31 +14,44 @@
 			<div class="col-12">
 				<p id="contribute-title">Contribute</p>
 				<hr width="100%" align="left" class="my-2">
-				<p id="contribute-text">The form below allows you to upload your own analyses to Datasets2Tools.</p>
+				<p id="contribute-text">The form below allows to upload your own analyses to Datasets2Tools, increasing their findability and accessibility.<br><br>To upload your analyses:</p>
 			</div>
 		</div>
 
 		<div id="contribute-instructions-row" class="row">
 			<div class="col-12">
 				<ol id="contribute-instructions-list">
-					<li><button id="download-form-button" clas="btn btn-primary">Download</button> a template of the form to fill in your analysis as an Excel spreadsheet.</li>
-					<li>Fill in the information as explained below.</li>
-					<li>Upload the form by dragging it below.</li>
+					<li><a id="download-form-button" href="{{ url_for('static', filename='forms/analysis_submission_form.xlsx') }}" download>Download</a> a template of our form.</li>
+					<li>For each analysis, fill in the following information:</li>
+						<ul id="contribute-field-list">
+							<li><span class='contribute-field-name'>Analysis Title.</span> A brief title describing the contents of the analysis.<ul class='contribute-field-example'><li>Example: Enrichment analysis of genes upregulated in prostate cancer</li></ul></li>
+							<li><span class='contribute-field-name'>Analysis Description.</span> A description explaining the contents and methods of the analysis.<ul class='contribute-field-example'><li>Example: An enrichment analysis was performed on the top 500 most overexpressed genes in human prostate cancer samples, compared to healthy tissue controls.</li></ul></li>
+							<li><span class='contribute-field-name'>Analysis URL.</span> Link to a webpage containing the results of the analysis.<ul class='contribute-field-example'><li>Example: <a href="http://amp.pharm.mssm.edu/Enrichr/enrich?dataset=2oujz">http://amp.pharm.mssm.edu/Enrichr/enrich?dataset=2oujz</a></li></ul></li>
+							<li><span class='contribute-field-name'>Datasets.</span> A comma-separated list of datasets used to generate the analysis.<ul class='contribute-field-example'><li>Example: GSE30017, GSE82693</li></ul></li>
+							<li><span class='contribute-field-name'>Tools.</span> A comma-separated list of tools used to generate the analysis. Names are case sensitive.<ul class='contribute-field-example'><li>Example: Enrichr</li></ul></li>
+							<li><span class='contribute-field-name'>Keywords.</span> A comma-separated list of keywords to tag the analysis.<ul class='contribute-field-example'><li>Example: enrichment, upregulated, prostate cancer.</li></ul></li>
+							<li><span class='contribute-field-name'>Metadata.</span> A list of tag-value pairs describing specific metadata elements of the analysis.  Can be bullet-point list, JSON, or colon/semicolon-separated.<ul class='contribute-field-example'><li>Example: organism: human; geneset: upregulated; disease: prostate cancer;.</li></ul></li>
+						</ul>
+					{% if current_user.is_authenticated %}
+					<li><b>Upload</b> the form by dragging it below.</li>
+					{% else %}
+					<li><button id="sign-in" type="button" class="btn" data-toggle="modal" data-target="#login-modal">Sign In</button> to upload the form.</li>
+					{% endif %}
 				</ol>
 			</div>
 		</div>
-
+		{% if current_user.is_authenticated %}
 		<div id="dropzone-row" class="row">
 			<div class="col-12">
 				<form action="{{ url_for('upload_analysis_api') }}" class="dropzone" id="myDropzone" method="POST" enctype="multipart/form-data">
 				</form>
 			</div>
 		</div>
+		{% endif %}
 	</div>
 
 {% endblock %}
 
 
 {% block footer %}
-
 {% endblock %}

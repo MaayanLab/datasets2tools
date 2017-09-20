@@ -17,7 +17,7 @@
 ########## 1. Load libraries
 #############################################
 ##### 1. Flask modules #####
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -233,6 +233,14 @@ def landing(object_type, object_identifier):
 def contribute():
 	return render_template('contribute.html')
 
+#############################################
+########## 5. Help Page
+#############################################
+
+@app.route(entry_point+'/help')
+def help():
+	return render_template('help.html')
+
 #######################################################
 #######################################################
 ########## 3. APIs
@@ -356,7 +364,6 @@ def fairness_insignia_api():
 	result = {'fairness_score': fairness_score, 'questions': score_dataframe.to_dict(orient='records'), 'evaluations': object_data['fairness']['evaluations']}
 
 	# Return result
-	print result
 	return json.dumps(result)
 
 #######################################################

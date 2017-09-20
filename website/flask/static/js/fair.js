@@ -27,15 +27,17 @@ $('.fairness-insignia').each(function(i, elem) {
                             .append($("<span>")
                                         .html(fairness_data['fairness_score'])
                                         .css('position', 'absolute')
-                                        .css('font-size', '10pt')
+                                        .css('font-size', '9pt')
                                         .css('font-weight', '300')
+                                        .css('width', '23px')
+                                        .css('text-align', 'center')
                                         .css('top', '4px')
-                                        .css('left', '7px')
+                                        .css('left', '0px')
                                         .css('color', 'white'));
 
                 // Add popover
                 questionColor = d3.scaleLinear().domain([0, 1]).interpolate(d3.interpolateRgb).range([d3.rgb(255,0,0), d3.rgb(0,0,255)]);
-                $popoverContent = $('<div>').append($('<div>').html(fairness_data['fairness_score']+' out of 9 questions were answered positively by the majority of evaluators.').css('font-size', '9pt').css('margin-bottom', '5px')).append($('<ol>').css('font-weight', '500').css('padding-left', '10px').css('margin-bottom', '0px').css('font-size', '9pt'));
+                $popoverContent = $('<div>').append($('<div>').html(fairness_data['fairness_score']+' out of 9 questions were answered positively by the majority of evaluators.').css('font-size', '9pt').css('margin-bottom', '5px')).append($('<ol>').css('font-weight', '500').css('padding-left', '15px').css('margin-bottom', '0px').css('font-size', '9pt'));
                 $.each(fairness_data['questions'], function(index, question){ $($popoverContent).find('ol').append($('<li>').append($('<span>').css('font-weight', '300').html(question['question'])).append($('<span>').css('padding-left', '5px').css('color', questionColor(question['average_score'])).html('('+Math.round(question['average_score']*100)+'% yes)'))) });
                 $badge.attr('data-content', $popoverContent.html());
 

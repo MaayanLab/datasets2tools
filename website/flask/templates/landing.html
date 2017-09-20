@@ -202,7 +202,7 @@
 						<div class="info-card-title">Metadata</div>
 						<table class="info-card-table">
 							{% for key, value in object_data['metadata'].iteritems() %}
-								<tr><td>{{ key.title() }}</td><td>{{ value }}</td></tr>
+								<tr><td>{{ key.replace('_', ' ').title() }}</td><td>{{ value }}</td></tr>
 							{% endfor %}
 						</table>
 					</div> <!-- #metadata-info -->
@@ -316,6 +316,7 @@
     <script src="{{ url_for('static', filename='js/chosen.jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/chosen.proto.min.js') }}"></script>
 	<script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="{{ url_for('static', filename='js/fair.js') }}"></script>
 	<script type="text/javascript">
 		// Tab
 		if (window.location.hash != "") {

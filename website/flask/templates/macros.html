@@ -70,16 +70,7 @@
 {% endmacro %}
 
 <!-- Filters -->
-{% macro display_filters(search_filters, sort_by) %}
-	<div class="col-4">
-		<div class="search-option-label">Sort by</div>
-		<select data-placeholder="Select..." name="sort_by" class="search-sort-dropdown">
-			<option></option>
-			{% for value in sort_by['values'] %}
-				<option value="{{ value.value }}"{{ ' selected' if value.value == sort_by['selected'] else '' }}>{{ value.label }}</option>
-			{% endfor %}
-		</select>
-	</div>
+{% macro display_filters(search_filters) %}
 	{% for filters in search_filters %}
 		<div class="col-4">
 			<div class="search-option-label">{{ filters.label.title().replace('_', ' ') }}</div>
@@ -98,6 +89,7 @@
 		<div class="col-6 text-left offset-col">
 			{% if search_options.offset['values']|length > 1 %}
 				{% for offset in search_options.offset['values'] %}
+					{% if loop.index > 3 %}<span class='offset-dots'>...</span>{% endif %}
 					<input type="radio" class="search-navigation-radio" name="offset" id="{{object_type}}-offset-{{offset}}" value="{{offset}}"{{ ' checked' if offset == search_options.offset.selected }}>
 					<label for="{{object_type}}-offset-{{offset}}" class="search-navigation-number">{{offset}}</label>
 				{% endfor %}
@@ -133,14 +125,16 @@
 									</button>
 								</div>
 							</div>
-							<div class="col-6 text-right">
-								<a class="filter-button">Filters&nbsp&nbsp</a>
-							</div>
+							{% if object_type =='canned_analysis' %}
+								<div class="col-6 text-right">
+									<a class="filter-button">Filters&nbsp&nbsp</a>
+								</div>
+							{% endif %}
 						</div>
 						<div class="search-options-wrapper">
 							<hr width="100%">
 							<div class="row search-options-row">
-								{{ display_filters(search_filters = search_data.search_filters, sort_by = search_data.search_options.sort_by) }}
+								{{ display_filters(search_filters = search_data.search_filters) }}
 							</div>
 						</div>
 					</div>
