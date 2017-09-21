@@ -1,6 +1,6 @@
 $('.fairness-insignia').each(function(i, elem) {
     $.ajax({
-        url: "http://localhost:5000/datasets2tools/api/fairness_insignia",
+        url: "http://localhost:5000/datasets2tools-dev/api/fairness_insignia",
         data: {
             object_type: $(elem).attr('data-object-type'),
             object_identifier: $(elem).attr('data-identifier')

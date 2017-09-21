@@ -165,6 +165,14 @@ def logout():
 def page_not_found(e):
 	return render_template('404.html'), 404
 
+#############################################
+########## 6. Internal Server Found
+#############################################
+
+@app.errorhandler(500)
+def internal_server_error(e):
+	return render_template('500.html'), 500
+
 #######################################################
 #######################################################
 ########## 2. Page Routes
@@ -223,6 +231,7 @@ def landing(object_type, object_identifier):
 				associated_search_options.update({x: parameters.pop(x, default_search_options[x]) for x in associated_search_options.keys()})
 				associated_search_filters.update(parameters)
 			associated_objects[associated_object_type] = Datasets2Tools.search(search_filters = associated_search_filters, search_options = associated_search_options, get_related_objects=False, get_fairness=False)
+	print associated_objects
 	# Return template
 	return render_template('landing.html', object_data=object_data, object_type=object_type, associated_objects=associated_objects)
 
@@ -364,24 +373,29 @@ def update_api():
 @app.route(entry_point+'/api/fairness_insignia', methods=['GET', 'POST'])
 def fairness_insignia_api():
 
-	# Get object type
-	object_type = request.args.get('object_type')
+	try:
 
-	# Get search options
-	insignia_search_options = default_search_options.copy()
-	insignia_search_options.update({'object_type': object_type})
+		# Get object type
+		object_type = request.args.get('object_type')
 
-	# Get evaluation score
-	object_data = Datasets2Tools.search(search_filters = {object_identifier_columns[object_type]: request.args.get('object_identifier')}, search_options = insignia_search_options, get_fairness=True).search_results[0]
-	score_dataframe = pd.DataFrame(object_data['fairness']['questions']).set_index('id').merge(pd.DataFrame(object_data['fairness']['all_evaluations']).T, left_index=True, right_index=True)
-	fairness_score = sum(score_dataframe['average_score'] > 0.5) if 'average_score' in score_dataframe else None
+		# Get search options
+		insignia_search_options = default_search_options.copy()
+		insignia_search_options.update({'object_type': object_type})
 
-	# Get result
-	print object_data
-	result = {'fairness_score': fairness_score, 'questions': score_dataframe.to_dict(orient='records'), 'evaluations': object_data['fairness']['evaluations']}
+		# Get evaluation score
+		object_data = Datasets2Tools.search(search_filters = {object_identifier_columns[object_type]: request.args.get('object_identifier')}, search_options = insignia_search_options, get_fairness=True).search_results[0]
+		score_dataframe = pd.DataFrame(object_data['fairness']['questions']).set_index('id').merge(pd.DataFrame(object_data['fairness']['all_evaluations']).T, left_index=True, right_index=True)
+		fairness_score = sum(score_dataframe['average_score'] > 0.5) if 'average_score' in score_dataframe else None
 
-	# Return result
-	return json.dumps(result)
+		# Get result
+		result = {'fairness_score': fairness_score, 'questions': score_dataframe.to_dict(orient='records'), 'evaluations': object_data['fairness']['evaluations']}
+
+	except:
+		
+		result = {}
+
+		# Return result
+		return json.dumps(result)
 
 #######################################################
 #######################################################

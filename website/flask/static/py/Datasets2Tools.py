@@ -115,7 +115,7 @@ class Datasets2Tools:
 	def get_homepage_data(self):
 
 		# Get data
-		homepage_data = {x: int(round(self.session.query(func.count(self.tables[x].columns['id'])).all()[0][0], -1)) for x in ['canned_analysis', 'tool', 'dataset']}
+		homepage_data = {x: int(round(self.session.query(func.count(self.tables[x].columns['id'])).all()[0][0], -2)) for x in ['canned_analysis', 'tool', 'dataset']}
 		self.session.close()
 
 		# Return
@@ -383,7 +383,7 @@ class Search:
 					})
 
 		# Filter filters (so meta)
-		search_filters = [x for x in search_filters if x['label'] not in ['pert_ids', 'ctrl_ids', 'creeds_id', 'curator', 'chdir_norm', 'pubchem_cid', 'drugbank_id', 'smiles'] and (len(x['values']) > 1 or x['label'] in used_filters+['dataset_accession', 'tool_name'])]
+		search_filters = [x for x in search_filters if x['label'] not in ['pert_ids', 'ctrl_ids', 'creeds_id', 'curator', 'chdir_norm', 'pubchem_cid', 'drugbank_id', 'smiles', 'umls_cui', 'do_id', 'top_genes'] and (len(x['values']) > 1 or x['label'] in used_filters+['dataset_accession', 'tool_name'])]
 
 		# Return
 		return search_filters

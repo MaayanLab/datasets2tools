@@ -18,7 +18,7 @@
 	{% elif object_type == 'tool' %}
 		{% set card_title = object_data.tool_name %}
 		{% set card_description = object_data.tool_description %}
-		{% set card_icon_url = object_data.tool_icon_url if object_data.tool_icon_url else url_for('static', filename='icons/tool.png') %}
+		{% set card_icon_url = object_data.tool_icon_url %}
 		{% set card_landing_url = url_for('landing', object_type=object_type, object_identifier=object_data.tool_name) %}
 		{% set card_colsize = 'col-6' %}
 		{% set image_colsize = 3 %}
@@ -54,11 +54,15 @@
 					{% if object_type == 'tool' %}
 						<div class="col-12">
 							<div class="row tool-metrics">
-								{% if object_data.citations %}
-									<div class="pubmed-badge" data-container="body" data-toggle="popover" data-placement="right" data-animation="false" data-html="true" data-trigger="hover focus" data-template='<div class="popover pubmed-badge-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="Cited by <a href='https://www.ncbi.nlm.nih.gov/pubmed/?term={{doi.split('doi.org/')[01]}}' target='_blank'>{{object_data.citations}}</a> articles on <a href='https://www.ncbi.nlm.nih.gov/pubmed'>PubMed</a>"><img class="pubmed-icon" src="{{url_for('static_files', path='icons/pubmed.png')}}"><div class="pubmed-badge-number">{{ object_data.citations if object_data.citations < 1000 else (object_data.citations/(1000|float))|float|round(1)|string+'k' }}</div></div>
+								{% if doi %}
+									{% if object_data.citations %}
+										<div class="pubmed-badge" data-container="body" data-toggle="popover" data-placement="right" data-animation="false" data-html="true" data-trigger="hover focus" data-template='<div class="popover pubmed-badge-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="Cited by <a href='https://www.ncbi.nlm.nih.gov/pubmed/?term={{doi.split('doi.org/')[01]}}' target='_blank'>{{object_data.citations}}</a> articles on <a href='https://www.ncbi.nlm.nih.gov/pubmed'>PubMed</a>"><img class="pubmed-icon" src="{{url_for('static_files', path='icons/pubmed.png')}}"><div class="pubmed-badge-number">{{ object_data.citations if object_data.citations < 1000 else (object_data.citations/(1000|float))|float|round(1)|string+'k' }}</div></div>
+									{% endif %}
+									<div data-badge-popover="right" data-badge-type="4" data-doi="{{doi}}" data-hide-less-than="1" class="altmetric-embed"></div>
+									<a href="https://plu.mx/plum/a/?doi={{doi}}" class="plumx-plum-print-popup" data-size="small" data-badge="true" data-popup="right" data-hide-when-empty="true"></a>
+								{% else %}
+									<span class='no-metrics'>No metrics available.</span>
 								{% endif %}
-								<div data-badge-popover="right" data-badge-type="4" data-doi="{{doi}}" data-hide-less-than="1" class="altmetric-embed"></div>
-								<a href="https://plu.mx/plum/a/?doi={{doi}}" class="plumx-plum-print-popup" data-size="small" data-badge="true" data-popup="right" data-hide-when-empty="true"></a>
 							</div>
 						</div>
 					{% endif %}

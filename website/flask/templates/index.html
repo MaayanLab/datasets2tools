@@ -11,7 +11,7 @@
 							<div>
 								<span>Datasets2Tools</span>
 								<hr width="100%" class="my-1">
-								<div id="d2t-subtitle">Discover Bioinformatics</div>
+								<div id="d2t-subtitle">Bioinformatics Index</div>
 							</div>
 						</div>
 					</div>
@@ -29,17 +29,17 @@
 					</div>
 					<div id="homepage-info-row" class="row">
 						<div class="col-4">
-							<i class="fa fa-pie-chart info-row-icon"></i>
+							<a href="{{url_for('search', object_type='canned_analysis')}}"><i class="fa fa-pie-chart info-row-icon"></i></a>
 							<div class="info-row-title"><span class="info-row-number">{{ homepage_data['canned_analysis'] }}</span>+<br>Analyses</div>
 							<div class="info-row-text">Find enrichment analyses, small molecule queries, interactive heatmaps, and many others</div>
 						</div>
 						<div class="col-4">
-							<i class="fa fa-database info-row-icon"></i>
+							<a href="{{url_for('search', object_type='dataset')}}"><i class="fa fa-database info-row-icon"></i></a>
 							<div class="info-row-title"><span class="info-row-number">{{ homepage_data['dataset'] }}</span>+<br>Datasets</div>
 							<div class="info-row-text">Find microarray, RNA-seq and proteomics datasets from major biomedical repositories</div>
 						</div>
 						<div class="col-4">
-							<i class="fa fa-cogs info-row-icon" style="padding-left: 25px;"></i>
+							<a href="{{url_for('search', object_type='tool')}}"><i class="fa fa-cogs info-row-icon" style="padding-left: 25px;"></i></a>
 							<div class="info-row-title"><span class="info-row-number">{{ homepage_data['tool'] }}</span>+<br>Tools</div>
 							<div class="info-row-text">Find computational tools and databases spanning multiple technologies and disciplines</div>
 						</div>
@@ -56,7 +56,7 @@
 			$(this).prop('Counter',0).animate({
 				Counter: $(this).text()
 			}, {
-				duration: 3000,
+				duration: 2000,
 				easing: 'swing',
 				step: function (now) {
 					$(this).text(Math.ceil(now));

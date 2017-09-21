@@ -92,6 +92,8 @@
 				padding: 30px;
 				border-radius: 150px;
 				cursor: pointer;
+				color: black;
+				text-decoration: none !important;
 			}
 
 				.info-row-icon:hover {
@@ -335,6 +337,10 @@
 								width: 100%;
 							}
 
+							.info-card-table-metadata-value {
+								word-break: break-all;
+							}
+
 					.keyword {
 						background-color: #255FA7;
 						color: white;
@@ -475,6 +481,10 @@
 							
 								#related-object-row .slick-dots li button:before {
 									/*font-size: 9pt;*/
+								}
+
+								.col-6.card-col.slick-slide.slick-cloned.slick-active {
+									height: 155px !important;
 								}
 
 		#datasets {
@@ -910,7 +920,7 @@
 			}
 
 			.search-tab:hover {
-				background-color: #f9f9f9;
+				/*background-color: #f9f9f9;*/
 				color: #a1a1a1;
 			}
 

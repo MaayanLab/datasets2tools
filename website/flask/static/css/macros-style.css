@@ -139,7 +139,7 @@
 									position: absolute;
 									width: 0; 
 									height: 0; 
-									top: 18px;
+									top: 18px;ƒ
 									border-width: 5px;
 									border-style: solid;
 									border-top-color: transparent;
@@ -165,6 +165,13 @@
 								.pubmed-badge-popover.popover.bs-tether-element-attached-left::before, .popover.popover-right::before {
 									border-right-color: black;
 								}
+
+						.no-metrics {
+							font-size: 9pt;
+							font-weight: 300;
+							text-align: center;
+							margin: auto;
+						}
 
 					.card-description {
 						font-size: 8pt;

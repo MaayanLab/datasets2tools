@@ -360,7 +360,7 @@ def getRelatedDatasets(infile, outfile):
 	dataset_dataframe = pd.read_table(infile)
 
 	# Get processed text
-	processed_texts = [P.process_text(x) for x in dataset_dataframe['dataset_title']+dataset_dataframe['dataset_description']]
+	processed_texts = [P.process_text(x) if not isinstance(x, float) else " " for x in dataset_dataframe['dataset_title']+dataset_dataframe['dataset_description']]
 
 	# Get similarity and keywords
 	dataset_similarity_dataframe, dataset_keyword_dataframe = P.extract_text_similarity_and_keywords(processed_texts, labels=dataset_dataframe['dataset_accession'], identifier='dataset_accession')
