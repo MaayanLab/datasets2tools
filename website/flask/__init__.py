@@ -394,8 +394,8 @@ def fairness_insignia_api():
 		
 		result = {}
 
-		# Return result
-		return json.dumps(result)
+	# Return result
+	return json.dumps(result)
 
 #######################################################
 #######################################################

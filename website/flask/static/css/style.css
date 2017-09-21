@@ -814,13 +814,17 @@
 		padding-bottom: 15px;
 	}
 
+		#help-content-row a {
+			color: black;
+		}
 
-	#help-content-row a {
-		color: black;
-	}
+		
+		#help-content-row b {
+			font-weight: 500;
+		}
 
 		#help-content-row .help-content-title:not(:first-child) {
-			margin-top: 50px;
+			margin-top: 10px;
 		}
 
 		.help-content-title {
@@ -854,11 +858,49 @@
 			padding-top: 5px;
 			padding-bottom: 10px;
 			font-weight: 300;
-			margin-bottom: 25px;
+			/*margin-bottom: 15px;*/
 			text-align: justify;
 			padding-left: 10px;
 			padding-right: 10px;
 		}
+
+			.help-content-text a {
+				text-decoration: underline;
+				color: darkblue !important;
+			}
+
+		.help-image-wrapper {
+			margin-bottom: 15px;
+		}
+
+			.help-image-wrapper img {
+				max-width: 100%;
+			}
+
+		.help-content-caption {
+			font-size: 10pt;
+			padding-top: 5px;
+			padding-bottom: 10px;
+			font-weight: 500;
+			padding-left: 10px;
+			padding-right: 10px;
+		}
+
+			.help-list {
+				margin-top: 15px;
+			}
+
+				.help-list > li {
+					margin-bottom: 15px;
+				}
+
+				.help-list > li > ul {
+					margin-top: 5px;
+				}
+
+					.help-list > li > ul > li{
+						margin-top: 3px;
+					}
 
 /*************************/
 /** SEARCH

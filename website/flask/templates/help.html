@@ -14,28 +14,28 @@
 					<hr width="100%" class="my-1">
 					<a class='help-index-section' href="#about-datasets2tools">About Datasets2Tools</a>
 					<a class='help-index-section' href="#canned-analysis">The Canned Analysis</a>
-					<a class='help-index-section' href="#fair-principles">The FAIR Principles</a>
+					<a class='help-index-section' href="#canned-analysis-examples">Canned Analysis Examples</a>
 				</div>
 				<div class="col-4 help-index-col">
 					<a class='help-index-subtitle' href="#search"><i class="fa fa-search"></i>Search</a>
 					<hr width="100%" class="my-1">
 					<a class='help-index-section' href="#analysis-search">Analysis Search</a>
-					<a class='help-index-section' href="#tool-search">Tool Search</a>
 					<a class='help-index-section' href="#dataset-search">Dataset Search</a>
+					<a class='help-index-section' href="#tool-search">Tool Search</a>
 				</div>
 				<div class="col-4 help-index-col">
 					<a class='help-index-subtitle' href="#landing-pages"><i class="fa fa-info-circle"></i>Landing Pages</a>
 					<hr width="100%" class="my-1">
 					<a class='help-index-section' href="#analysis-pages">Analysis Pages</a>
-					<a class='help-index-section' href="#tool-pages">Tool Pages</a>
 					<a class='help-index-section' href="#dataset-pages">Dataset Pages</a>
+					<a class='help-index-section' href="#tool-pages">Tool Pages</a>
 				</div>
 				<div class="col-4 help-index-col">
 					<a class='help-index-subtitle' href="#fair-evaluations"><i class="fa fa-certificate"></i>FAIR Evaluations</a>
 					<hr width="100%" class="my-1">
-					<a class='help-index-section' href="#evaluating-objects">Evaluating Objects</a>
-					<a class='help-index-section' href="#modifying-evaluations">Modifying Evaluations</a>
-					<a class='help-index-section' href="#viewing-results">Viewing Results</a>
+					<a class='help-index-section' href="#evaluating-objects">FAIR Principles</a>
+					<a class='help-index-section' href="#modifying-evaluations">Evaluating Objects</a>
+					<a class='help-index-section' href="#fairness-insignia">FAIRness Insignia</a>
 				</div>
 				<div class="col-4 help-index-col">
 					<a class='help-index-subtitle' href="#contribution"><i class="fa fa-upload"></i>Contribute</a>
@@ -56,46 +56,152 @@
 		<div id="help-content-row" class="row">
 			<div class="col-12">
 				<div id="getting-started" class='help-content-title'><i class="fa fa-map"></i>Getting Started<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="100%" class="my-1">
-				<div id="about-datasets2tools" class='help-content-subtitle'>About Datasets2Tools</div><hr width="35%" align="left" class="my-1">
-				<div class="text-center"><img src="{{ url_for('static', filename='images/datasets2tools-workflow.png') }}"></div>
-				<div class="help-content-text">Datasets2Tools is a platform for the discovery and evaluation of biomedical digital objects.  Datasets2Tools indexes over 30,000 bioinformatics analyses, over 6,000 biological datasets and over 6,000 computational tools.  Users can find relevant objects by using the search interface, the Google Chrome extension and the Application Programming Interface (API). Several metrics are integrated in the search results to help users find the most relevant results.  These include PubMed citations PlumX metrics, Altmetric Attention Scores, and the results of FAIR evaluations by the crowd. </div>
-				<div id="canned-analysis" class='help-content-subtitle'>The Canned Analysis</div><hr width="35%" align="left" class="my-1">
-				<div class="text-center"><img src="{{ url_for('static', filename='images/canned-analysis-workflow.png') }}"></div>
-				<div class="help-content-text">The Canned Analysis is a new type of digital object designed to store the results of bioinformatics analyses.  It is designed to index such objects in a findable, accessible, interoperable and reusable manner.  Canned analyses are defined by three key elements: references to the datasets and tools used to generate it, text annotations, and metadata. </div>
-				<div id="fair-principles" class='help-content-subtitle'>The FAIR Principles</div><hr width="35%" align="left" class="my-1">
-				<div class="help-content-text">The FAIR Principles are a set of high-level principles which describe characteristics which digital objects should have to promote findable, accessible, interoperable and reusable data management.</div>
+				<div id="about-datasets2tools" class='help-content-subtitle'>About Datasets2Tools<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
+				<div class="text-center help-image-wrapper"><img src="{{ url_for('static', filename='images/datasets2tools-workflow.png') }}"></div>
+				<div class="help-content-caption">1. Schematic overview of the Datasets2Tools pipeline.</div>
+				<div class="help-content-text"><b>Datasets2Tools</b> is a platform for the discovery and evaluation of biomedical digital objects.  It indexes over 30,000 bioinformatics analyses, over 6,000 biological datasets and over 4,000 computational tools.  These include a wide variety of enrichment analyses, gene interaction networks, interactive data visualizations; datasets and computational tools spanning technologies such as microarray, RNA-seq, proteomics, and many others. Users can search these objects by using the interactive search interfaces, the Google Chrome extension, and an API.</div>	
+				<div id="canned-analysis" class='help-content-subtitle'>The Canned Analysis<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
+				<div class="text-center help-image-wrapper" style="margin-top: 20px;"><img src="{{ url_for('static', filename='images/canned-analysis-diagram.png') }}"></div>
+				<div class="help-content-caption">2. Structure of the canned analyses digital object.</div>
+				<div class="help-content-text">The <b>canned analysis</b> is a new type of digital object designed to store the results of bioinformatics analyses in a findable, accessible, interoperable and reusable manner.  It is defined by three sets of features:
+					<ul class='help-list'>
+						<li><b>Core elements</b>:
+							<ul>
+								<li><i>Analysis Title</i>, a brief description of the analysis.</li>
+								<li><i>Analysis Description</i>, a longer explanation of the analysis aims and methods.</li>
+								<li><i>Analysis URL</i>, a link to an external webpage which stores the results of the analysis.</li>
+							</ul>
+						</li>
+						<li><b>Associated objects</b>:
+							<ul>
+								<li><i>Dataset(s)</i> used to generate the analysis, specified by accession.</li>
+								<li><i>Tools(s)</i> used to analyze the data, specified by name.</li>
+							</ul>
+						</li>
+						<li><b>Annotations</b>:
+							<ul>
+								<li><i>Keywords</i>, an unstructured set of tags related to the analysis.</li>
+								<li><i>Metadata Tags</i>, a structured set of key-value pairs related to the analysis.</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+				<div id="canned-analysis-examples" class='help-content-subtitle'>Canned Analysis Examples<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
+				<div class="text-center help-image-wrapper"><img src="{{ url_for('static', filename='images/canned-analysis-examples.png') }}" style="border: 1px solid #c2c2c2;border-radius: 3px;padding: 5px 15px;background-color: white;margin-top: 5px;"></div>
+				<div class="help-content-caption">3. Example of analyses which can be generated from an individual RNA-seq dataset.</div>
+				<div class="help-content-text">The canned analysis is suitable to store information about a wide variety of bioinformatics analyses, for example:
+				<ul class='help-list'>
+					<li><b>Interactive visualizations</b> of different types of data, including transcriptomics, proteomics and genomics (e.g. <a href="{{ url_for('landing', object_type='canned_analysis', object_identifier='DCA00000037') }}">DCA00000037</a>).</li>
+					<li><b>Enrichment analyses</b> of genes upregulated and downregulated in diseases, small molecule perturbations, gene knockdown experiments (e.g. <a href="{{ url_for('landing', object_type='canned_analysis', object_identifier='DCA00059591') }}">DCA00059591</a>, <a href="{{ url_for('landing', object_type='canned_analysis', object_identifier='DCA00059592') }}">DCA00059591</a>).</li>
+					<li><b>Interaction networks</b> of genesets (e.g. <a href="{{ url_for('landing', object_type='canned_analysis', object_identifier='DCA00033271') }}">DCA00033271</a>, <a href="{{ url_for('landing', object_type='canned_analysis', object_identifier='DCA00033272') }}">DCA00033272</a>).</li>
+					<li><b>Signature queries</b> to identify small molecules which mimic or reverse gene expression signatures of diseases, small molecule perturbations, gene knockdown experiments. (e.g. <a href="{{ url_for('landing', object_type='canned_analysis', object_identifier='DCA00009676') }}">DCA00009676</a>, <a href="{{ url_for('landing', object_type='canned_analysis', object_identifier='DCA00009677') }}">DCA00009677</a>).</li>
+				</ul>
+				</div>
 				<div id="search" class='help-content-title'><i class="fa fa-search"></i>Search<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="100%" class="my-1">
-				<div id="analysis-search" class='help-content-subtitle'>Analysis Search</div><hr width="35%" align="left" class="my-1">
-				<div class="help-content-text">Description</div>
-				<div id="tool-search" class='help-content-subtitle'>Tool Search</div><hr width="35%" align="left" class="my-1">
-				<div class="help-content-text">Description</div>
-				<div id="dataset-search" class='help-content-subtitle'>Dataset Search</div><hr width="35%" align="left" class="my-1">
-				<div class="help-content-text">Description</div>
+				<div id="analysis-search" class='help-content-subtitle'>Analysis Search<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
+				<div class="text-center help-image-wrapper"><img src="{{ url_for('static', filename='images/analysis-search.png') }}" style="margin-bottom: -30px;"></div>
+				<div class="help-content-caption">4. Screenshot of the analysis search interface.</div>
+				<div class="help-content-text">The analysis search interface allows to search canned analyses using text-based search and a variety of filtering options:
+					<ul class='help-list'>
+						<li>The <b>search bar</b> performs a text-based query on the canned analysis title, description, and the datasets and tools associated to it.</li>
+						<li>The <b>Dataset Accession</b> filter allows to filter canned analyses generated by the desired dataset.</li>
+						<li>The <b>Tool</b> filter allows to filter canned analyses generated using the desired tool.</li>
+						<li>The additional <b>metadata filters</b> allow to filter analyses based on various metadata tags, such as the direction of the geneset or the organism.</li>
+					</ul>
+				</div>
+				<div class="text-center help-image-wrapper"><img src="{{ url_for('static', filename='images/analysis-card.png') }}" style="background-color: white;border: 1px solid #c2c2c2; border-radius: 3px; padding: 5px 10px;"></div>
+				<div class="help-content-caption">5. Overview of the canned analysis card.</div>
+				<div class="help-content-text">The canned analysis card displays summary information about the analysis, including its title, description, and name of the tool(s) used to generate it. More information on the FAIRness Insignia is available <a href="#fairness-insignia">here</a>.</div>
+				<div id="dataset-search" class='help-content-subtitle'>Dataset Search<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
+				<div class="text-center help-image-wrapper"><img src="{{ url_for('static', filename='images/dataset-search.png') }}" style="margin-bottom: -30px;"></div>
+				<div class="help-content-caption">6. Screenshot of the dataset search interface.</div>
+				<div class="help-content-text">The dataset search interface allows to search canned analyses using text-based search and sort them by a variety of metrics:
+					<ul class='help-list'>
+						<li>The <b>search bar</b> performs a text-based query on the dataset title, description, and the repository of origin.</li>
+						<li>The <b>sorting</b> options allow to sort datasets by the number of associated analyses and the results of FAIR evaluations.</li>
+					</ul>
+				</div>
+				<div class="text-center help-image-wrapper"><img src="{{ url_for('static', filename='images/dataset-card.png') }}" style="background-color: white;border: 1px solid #c2c2c2; border-radius: 3px; padding: 5px 10px;"></div>
+				<div class="help-content-caption">7. Overview of the dataset card.</div>
+				<div class="help-content-text">The dataset card displays summary information about the dataset, including its title, description, and number of analyses it has been used to generate. More information on the FAIRness Insignia is available <a href="#fairness-insignia">here</a>.</div>
+				<div id="tool-search" class='help-content-subtitle'>Tool Search<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
+				<div class="text-center help-image-wrapper"><img src="{{ url_for('static', filename='images/tool-search.png') }}" style="margin-bottom: -30px;"></div>
+				<div class="help-content-text">The tool search interface allows to search tools using text-based search and a variety of sorting options:
+					<ul class='help-list'>
+						<li>The <b>search bar</b> performs a text-based query on the tool name, its description, and the title, abstract and authors of the publications associated to it.</li>
+						<li>The <b>sorting</b> options allow to sort tools by the number of associated analyses, the results of FAIR evaluations, and several metrics related to the publications associated to it, such as number of citations, Altmetric Attention Scores and PlumX Metrics.</li>
+					</ul>
+				</div>
+				<div class="text-center help-image-wrapper"><img src="{{ url_for('static', filename='images/tool-card.png') }}" style="background-color: white;border: 1px solid #c2c2c2; border-radius: 3px; padding: 5px 10px;"></div>
+				<div class="help-content-caption">8. Overview of the tool card.</div>
+				<div class="help-content-text">The tool card displays summary information about the tool and the publications associated to it.
+					<ul class='help-list'>
+						<li>The <b>name</b> and <b>description</b> of the tool. </li>
+						<li>The <b>number of citations</b> from PubMed. </li>
+						<li>The <b>Altmetric Attention Score</b> and badge. By hovering over it, the user can reveal detailed information about the metrics of the publications associated to the tool. </li>
+						<li>The <b>PlumX Metrics</b> badge. By hovering over it, the user can reveal detailed information about the metrics of the publications associated to the tool. </li>
+						<li>The <b>FAIR Insignia</b>.  More information available <a href="#fairness-insignia">here</a>. </li>
+					</ul>
+				</div>
 				<div id="landing-pages" class='help-content-title'><i class="fa fa-info-circle"></i>Landing Pages<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="100%" class="my-1">
-				<div id="analysis-pages" class='help-content-subtitle'>Analysis Pages</div><hr width="35%" align="left" class="my-1">
-				<div class="help-content-text">Description</div>
-				<div id="tool-pages" class='help-content-subtitle'>Tool Pages</div><hr width="35%" align="left" class="my-1">
-				<div class="help-content-text">Description</div>
-				<div id="dataset-pages" class='help-content-subtitle'>Dataset Pages</div><hr width="35%" align="left" class="my-1">
-				<div class="help-content-text">Description</div>
+				<div id="analysis-pages" class='help-content-subtitle'>Analysis Pages<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
+				<div class="text-center help-image-wrapper"><img src="{{ url_for('static', filename='images/analysis-landing.png') }}" style="margin-bottom: -20px;"></div>
+				<div class="help-content-caption">9. Canned analysis landing page.</div>
+				<div class="help-content-text">The canned analysis landing pages are divided in the following sections:
+					<ul class='help-list'>
+						<li>The <b>Overview</b> tab, which contains general information about the analysis, the annotations associated to it, and similar canned analyses. </li>
+						<li>The <b>Datasets</b> tab, which displays the datasets used to generate the analysis. </li>
+						<li>The <b>Tools</b> tab, which displays the tools used to analyze the data. </li>
+						<li>The <b>FAIR Metrics</b> tab, which contains the FAIR evaluation form (more information <a href="#">here</a>). The evaluation form is only available to registered users. </li>
+					</ul>
+				</div>
+				<div id="dataset-pages" class='help-content-subtitle'>Dataset Pages<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
+				<div class="text-center help-image-wrapper"><img src="{{ url_for('static', filename='images/dataset-landing.png') }}" style="margin-bottom: -20px;"></div>
+				<div class="help-content-caption">9. Dataset landing page.</div>
+				<div class="help-content-text">The dataset landing pages are divided in the following sections:
+					<ul class='help-list'>
+						<li>The <b>Overview</b> tab, which contains general information about the dataset, its repository, and similar datasets. </li>
+						<li>The <b>Tools</b> tab, which displays the tools which have been used to generate canned analyses using the data. </li>
+						<li>The <b>Analyses</b> tab, which displays the canned analyses generated using the dataset. </li>
+						<li>The <b>FAIR Metrics</b> tab, which contains the FAIR evaluation form (more information <a href="#">here</a>). The evaluation form is only available to registered users. </li>
+					</ul>
+				</div>
+				<div id="tool-pages" class='help-content-subtitle'>Tool Pages<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
+				<div class="text-center help-image-wrapper"><img src="{{ url_for('static', filename='images/tool-landing.png') }}" style="margin-bottom: -20px;"></div>
+				<div class="help-content-caption">10. Tool landing page.</div>
+				<div class="help-content-text">The tool landing pages are divided in the following sections:
+					<ul class='help-list'>
+						<li>The <b>Overview</b> tab, which contains general information about the analysis, the publications to it, and similar tools. </li>
+						<li>The <b>Datasets</b> tab, which displays the datasets which have been analyzed by the tool to generate canned analyses. </li>
+						<li>The <b>Analyses</b> tab, which displays the canned analyses generated using the tool. </li>
+						<li>The <b>FAIR Metrics</b> tab, which contains the FAIR evaluation form (more information <a href="#">here</a>). The evaluation form is only available to registered users. </li>
+					</ul>
+				</div>
 				<div id="fair-evaluations" class='help-content-title'><i class="fa fa-certificate"></i>FAIR Evaluations<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="100%" class="my-1">
-				<div id="evaluating-objects" class='help-content-subtitle'>Evaluating Objects</div><hr width="35%" align="left" class="my-1">
-				<div class="help-content-text">Description</div>
-				<div id="modifying-evaluations" class='help-content-subtitle'>Modifying Evaluations</div><hr width="35%" align="left" class="my-1">
-				<div class="help-content-text">Description</div>
-				<div id="viewing-results" class='help-content-subtitle'>Viewing Results</div><hr width="35%" align="left" class="my-1">
-				<div class="help-content-text">Description</div>
+				<div id="evaluating-objects" class='help-content-subtitle'>FAIR Principles<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
+				<div class="help-content-text">The FAIR Principles are a concise set of high-level principles describing the characteristics that digital objects should possess in order to be findable, accessible, interoperable and reusable.  These principles have been described in the following publication by Wilkinson et al., <a href="https://www.nature.com/articles/sdata201618">https://www.nature.com/articles/sdata201618</a>.</div>
+				<div id="modifying-evaluations" class='help-content-subtitle'>Evaluating Objects<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
+				<div class="text-center help-image-wrapper"><img src="{{ url_for('static', filename='images/evaluation-form.png') }}" style="margin-bottom: -20px;"></div>
+				<div class="help-content-caption">11. Canned analysis evaluation form.</div>
+				<div class="help-content-text">The FAIRness evaluation forms allow users to evaluate digital objects by answering a set of nine yes/no questions which describe properties related to the object's findability, accessibility, interoperability and reusability.  Canned analyses, datasets and tools each have a different set of questions which are designed to address properties specific to each object type. </div>
+				<div id="fairness-insignia" class='help-content-subtitle'>FAIRness Insignia<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
+				<div class="text-center help-image-wrapper"><img src="{{ url_for('static', filename='images/expanded-insignia.png') }}" style="margin-bottom: -20px;"></div>
+				<div class="help-content-caption">12. Expanded evaluation insignia.</div>
+				<div class="help-content-text">The expanded evaluation insignia displays a summary of the FAIR evaluations as a grid. It is available on the landing pages of analyses, datasets and tools.  Each grid square corresponds to one question, and the color represents the scores associated to each question.  The color ranges from blue (100% positive answers) to red (100% negative answers).  Users can visualize the question and browse the scores by hovering over each grid element.</div>
+				<div class="text-center help-image-wrapper"><img src="{{ url_for('static', filename='images/compact-insignia.png') }}" style="margin-bottom: -20px;"></div>
+				<div class="help-content-caption">13. Compact evaluation insignia.</div>
+				<div class="help-content-text">The compact insignia displays a summary of the FAIR evaluations as a round badge.  It represents the number of questions to which the majority of users have answered positively, and ranges from 0 to 9.  It is available on the search results pages of analyses, datasets and tools.  By hovering over the badge, users can visualize the results of evaluations for individual questions.</div>
 				<div id="contribute" class='help-content-title'><i class="fa fa-upload"></i>Contribute<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="100%" class="my-1">
-				<div id="how-to-contribute" class='help-content-subtitle'>How to contribute</div><hr width="35%" align="left" class="my-1">
+				<div id="how-to-contribute" class='help-content-subtitle'>How to contribute<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
+				<div class="help-content-text">Users can contribute to the Datasets2Tools database by uploading their analyses from the <a href="{{ url_for('contribute') }}"> Contribute </a> page.  Contributions are made by uploading an Excel sheet which contains information about canned analyses in each row.  A template of the Excel sheet can be downloaded <a href="{{ url_for('static', filename='forms/analysis_submission_form.xlsx') }}" download>here</a>.</div>
+				<div id="viewing-contributions" class='help-content-subtitle'>Viewing contributions<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
 				<div class="help-content-text">Description</div>
-				<div id="viewing-contributions" class='help-content-subtitle'>Viewing contributions</div><hr width="35%" align="left" class="my-1">
-				<div class="help-content-text">Description</div>
-				<div id="modifying-contributions" class='help-content-subtitle'>Modifying contributions</div><hr width="35%" align="left" class="my-1">
+				<div id="modifying-contributions" class='help-content-subtitle'>Modifying contributions<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
 				<div class="help-content-text">Description</div>
 				<div id="chrome-extension" class='help-content-title'><i class="fa fa-chrome"></i>Chrome Extension<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="100%" class="my-1">
-				<div id="installing-chrome-extension" class='help-content-subtitle'>Installing the Chrome Extension</div><hr width="35%" align="left" class="my-1">
+				<div id="installing-chrome-extension" class='help-content-subtitle'>Installing the Chrome Extension<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
 				<div class="help-content-text">Description</div>
-				<div id="using-chrome-extension" class='help-content-subtitle'>Using the Chrome Extension</div><hr width="35%" align="left" class="my-1">
+				<div id="using-chrome-extension" class='help-content-subtitle'>Using the Chrome Extension<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
 				<div class="help-content-text">Description</div>
 			</div>
 		</div>
@@ -107,6 +213,13 @@
 	$('.help-navigate-top').click(function(evt){
 	    $("html, body").animate({
 	            scrollTop: 0
+	        }, 300);
+	        return false;
+    });
+    $('#help-index-wrapper a').click(function(evt){
+    	evt.preventDefault();
+	    $("html, body").animate({
+	            scrollTop: $($(evt.target).attr('href')).offset().top
 	        }, 300);
 	        return false;
     });
