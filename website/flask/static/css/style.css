@@ -113,6 +113,21 @@
 			}
 
 /*************************/
+/** API 
+/*************************/
+
+#jupyter-manual-container {
+	max-width: 1200px;
+	height: 100%;
+}
+
+	#jupyter-manual {
+		width: 100%;
+		height: 7700px;
+		border: 1px solid #c2c2c2;
+	}
+
+/*************************/
 /** GENERAL LANDING 
 /*************************/
 
