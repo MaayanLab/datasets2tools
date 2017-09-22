@@ -32,7 +32,7 @@ $('.fairness-insignia').each(function(i, elem) {
                                         .css('width', '23px')
                                         .css('text-align', 'center')
                                         .css('top', '4px')
-                                        .css('left', '0px')
+                                        .css('right', '0px')
                                         .css('color', 'white'));
 
                 // Add popover

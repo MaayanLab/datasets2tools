@@ -70,6 +70,14 @@
 				cursor: pointer;
 			}
 
+			#search-example-row {
+				text-align: left;
+				font-size: 10pt;
+				margin-top: 10px;
+				padding-left: 5px;
+				font-weight: 300;
+			}
+
 		#homepage-statistics-row {
 			margin-top: 30px;
 			font-family: 'Montserrat', sans-serif;
@@ -82,7 +90,7 @@
 			}
 
 		#homepage-info-row {
-			margin-top: 50px;
+			margin-top: 40px;
 		}
 
 			.info-row-icon {

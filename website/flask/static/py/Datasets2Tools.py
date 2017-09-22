@@ -170,7 +170,7 @@ class Search:
 		if 'q' in search_filters.keys():
 			q = '%'+search_filters.pop('q')+'%'
 			if self.object_type == 'dataset':
-				query = query.filter(or_(self.tables['dataset'].columns['dataset_accession'].like(q), self.tables['dataset'].columns['dataset_title'].like(q), self.tables['dataset'].columns['dataset_description'].like(q)))
+				query = query.filter(or_(self.tables['dataset'].columns['dataset_accession'].like(q), self.tables['dataset'].columns['dataset_title'].like(q))) #, self.tables['dataset'].columns['dataset_description'].like(q)
 			elif self.object_type == 'tool':
 				query = query.filter(or_(self.tables['tool'].columns['tool_name'].like(q), self.tables['tool'].columns['tool_description'].like(q), self.tables['article'].columns['article_title'].like(q), self.tables['article'].columns['authors'].like(q), self.tables['article'].columns['abstract'].like(q)))
 			elif self.object_type == 'canned_analysis':
@@ -204,6 +204,7 @@ class Search:
 		# Sort by relevance
 		if sort_by == 'relevance':
 			if self.object_type == 'dataset':
+				query = query.group_by(self.tables['dataset'].columns['dataset_accession']).order_by(func.count(self.tables['analysis_to_dataset'].columns['dataset_fk']).desc())
 				pass
 			elif self.object_type == 'tool':
 				query = query.outerjoin(self.tables['article_metrics']).group_by(self.tables['tool'].columns['tool_name']).order_by(func.count(self.tables['analysis_to_tool'].columns['tool_fk']).desc(), self.tables['article_metrics'].columns['attention_score'].desc())
@@ -268,10 +269,11 @@ class Search:
 			# Convert article abstracts
 			for i in range(len(object_data['articles'])):
 				object_data['articles'][i]['abstract'] = json.loads(object_data['articles'][i]['abstract'])
+				object_data['articles'][i]['date'] = '{:%B %Y}'.format(object_data['articles'][i]['date'])
 
 			# Add analyses
 			object_data['analyses'] = self.session.query(func.count(self.tables['analysis_to_tool'].columns['tool_fk'])).filter(self.tables['analysis_to_tool'].columns['tool_fk'] == object_id).all()[0][0]
-			object_data['tool_icon_url'] = 'http://localhost:5000/datasets2tools-dev/static/icons/tool.png'
+
 
 		# Canned Analysis
 		elif self.object_type == 'canned_analysis':

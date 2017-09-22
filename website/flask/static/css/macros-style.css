@@ -23,11 +23,9 @@
 		    border-bottom-color: rgb(208, 209, 213);
 		    border-left-color: rgb(223, 224, 228);
 		    border-radius: .2rem;
-		    height: 100%;
 		}
 
 			.card-wrapper-row {
-				height: 100%;
 			}
 
 				.card-icon-col {
@@ -53,12 +51,6 @@
 						margin-bottom: 0px;
 						/*word-break: break-all;*/
 					}
-
-						.tool-card .card-title {
-							padding-right: 50px;
-							padding-bottom: 5px;
-						}
-
 						.card-title:hover {
 							color: darkblue;
 						}
@@ -67,111 +59,74 @@
 						font-size: 8pt;
 						margin-top: 3px;
 						margin-bottom: 5px;
-						color: darkblue;
 						display: block
 					}
+
+						.card-source a {
+							color: darkblue;
+						}
 
 					.card-badges {
 						position: absolute;
 						right: 21px;
 						top: 15px;
+						display: flex;
 					}
 
-					.tool-metrics {
-						padding-top: 3px;
-						border-top: 1px solid #eceeef;
-					}
-
-						.altmetric-embed {
-							padding-left: 12px;
-							margin-top: 5px;
-						}
-
-						.PlumX-Popup {
-							margin-left: 8px;
-							margin-top: 3px;
-						}
-
-							.PlumX-Popup .ppp-container.ppp-badge>a {
-								font-size: 11px !important;
-							}
-
-						.pubmed-badge {
+						.analysis-badge {
 							display: table;
-							margin-top: 7px;
-							margin-left: 14px;
-							cursor: pointer;
+							padding-top: 5px;
+							padding-right: 5px;
 						}
 
-							.pubmed-icon {
+							.analysis-badge-icon {
+								color: darkblue;
 								display: table-cell;
 								vertical-align: middle;
-								height: 22px;
-								margin-right: 5px;
 							}
 
-							.pubmed-badge-number {
-								display: table-cell;
-								vertical-align: middle;
-								font-size: 9px;
-								border: 1px solid #c2c2c2;
-								padding: 0px 4px;
-								border-radius: 2px;
-							}
-								
-								.pubmed-badge-number::before {
-									content: '';
-									position: absolute;
-									width: 0; 
-									height: 0; 
-									top: 18px;
-									border-width: 5px;
-									border-style: solid;
-									border-top-color: transparent;
-									border-bottom-color: transparent;
-									border-left-color: transparent;
-									border-right-color: #c2c2c2;
-									left: 71px;
-								}
-
-								.pubmed-badge-number::after {
-									content: '';
-									position: absolute;
-									width: 0; 
-									height: 0; 
-									top: 18px;ƒ
-									border-width: 5px;
-									border-style: solid;
-									border-top-color: transparent;
-									border-bottom-color: transparent;
-									border-left-color: transparent;
-									border-right-color: white;
-									left: 72px;
-								}
-
-							.pubmed-badge-popover {
-								background-color: white;
-								border: 1px solid black;
-								color: black;
-								border-radius: 3px;
-								font-size: 12px;
-								opacity: 1;
+							.analysis-badge-number {
+								font-size: 8pt;
+								border: 1px solid #e6e6e6;
+							    border: 1px solid #c2c2c2;
+							    padding: 0px 4px;
+							    border-radius: 3px;
+							    display: table;
+							    vertical-align: middle;
+							    margin-left: 5px;
+							    margin-bottom: 1px;
 							}
 
-								.pubmed-badge-popover .popover-content {
-									padding: 7px 10px;
-								}
-
-								.pubmed-badge-popover.popover.bs-tether-element-attached-left::before, .popover.popover-right::before {
-									border-right-color: black;
-								}
-
-						.no-metrics {
-							font-size: 9pt;
-							font-weight: 300;
-							text-align: center;
-							margin: auto;
+						.analysis-badge-number::before, .analysis-badge-number::after {
+							content: '';
+							position: absolute;
+							width: 0; 
+							height: 0; 
+							top: 9px;
+							border-width: 5px;
+							border-style: solid;
+							border-top-color: transparent;
+							border-bottom-color: transparent;
+							border-left-color: transparent;
 						}
+
+						.analysis-badge-number::before {
+							border-right-color: #c2c2c2;
+							left: 12px;
+						}
+
+						.analysis-badge-number::after {
+							border-right-color: white;
+							left: 13px;
+						}
+
+						.analysis-badge-popover {
+							font-size: 8pt;
+							max-width: 500px;
+						}
+
+							.analysis-badge-popover .popover-content {
+							}
 
 					.card-description {
 						font-size: 8pt;
@@ -194,6 +149,157 @@
 						bottom: 0rem;
 						font-size: 10pt;
 					}
+
+/*************************/
+/** TOOL CARDS 
+/*************************/
+
+	.tool-card {
+		height: 160px;
+	}
+
+		.tool-card .card-title {
+		    width: 140px;
+		    white-space: nowrap;
+		    overflow: hidden;
+		    text-overflow: ellipsis;
+		}
+
+		.tool-card .card-icon {
+			width: 85%;
+		}
+
+		.tool-card .card-description {
+			height: 55px;
+		}
+
+		.tool-metrics {
+			height: 50px;
+		}
+
+		.tool-metrics-row {
+			padding-top: 3px;
+			border-top: 1px solid #eceeef;
+			height: 50px;
+		}
+
+			.tool-metrics-row .col-12 {
+				padding: 0px;
+			}
+
+			.tool-metrics-wrapper {
+				display: flex;
+			}
+
+				.altmetric-embed {
+					padding-left: 12px;
+					margin-top: 5px;
+				}
+
+				.PlumX-Popup {
+					margin-left: 8px;
+					margin-top: 3px;
+				}
+
+					.PlumX-Popup .ppp-container.ppp-badge>a {
+						font-size: 11px !important;
+					}
+
+				.pubmed-badge {
+					display: table;
+					margin-top: 7px;
+					margin-left: 14px;
+					cursor: pointer;
+				}
+
+					.pubmed-icon {
+						display: table-cell;
+						vertical-align: middle;
+						height: 22px;
+						margin-right: 5px;
+					}
+
+					.pubmed-badge-number {
+						display: table-cell;
+						vertical-align: middle;
+						font-size: 9px;
+						border: 1px solid #c2c2c2;
+						padding: 0px 4px;
+						border-radius: 2px;
+					}
+						
+						.pubmed-badge-number::before, .pubmed-badge-number::after {
+							content: '';
+							position: absolute;
+							width: 0; 
+							height: 0; 
+							top: 14px;
+							border-width: 5px;
+							border-style: solid;
+							border-top-color: transparent;
+							border-bottom-color: transparent;
+							border-left-color: transparent;
+						}
+
+						.pubmed-badge-number::before {
+							border-right-color: #c2c2c2;
+							left: 71px;
+						}
+
+						.pubmed-badge-number::after {
+							border-right-color: white;
+							left: 72px;
+						}
+
+					.pubmed-badge-popover {
+						background-color: white;
+						border: 1px solid black;
+						color: black;
+						border-radius: 3px;
+						font-size: 12px;
+						opacity: 1;
+					}
+
+						.pubmed-badge-popover .popover-conten {
+							padding: 7px 10px;
+						}
+
+						.pubmed-badge-popover.popover.bs-tether-element-attached-left::before, .popover.popover-right::before {
+							border-right-color: black;
+						}
+
+				.no-metrics {
+					font-size: 9pt;
+					font-weight: 300;
+					text-align: center;
+					margin: auto;
+					padding-top: 7px;
+				}
+
+/*************************/
+/** DATASET CARDS 
+/*************************/
+
+.dataset-card {
+	/*height: 130px;*/
+}
+
+	.dataset-card .card-description {
+		height: 70px;
+	}
+
+/*************************/
+/** DATASET CARDS 
+/*************************/
+
+.canned_analysis-card {
+	height: 150px;
+}
+
+	.canned_analysis-card .card-description {
+		height: 50px;
+		color: #737373;
+	}
 
 /*************************/
 /** FILTERS 

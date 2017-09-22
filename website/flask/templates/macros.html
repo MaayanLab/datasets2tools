@@ -8,14 +8,12 @@
 	{% if object_type == 'dataset' %}
 		{% set card_title = object_data.dataset_accession %}
 		{% set card_identifier = object_data.dataset_accession %}
-		{% set card_source = 'Gene Expression Omnibus' %}
-		{% set card_source_url = object_data.repository_homepage_url %}
 		{% set card_description = object_data.dataset_title %}
 		{% set card_icon_url = url_for('static', filename='icons/gene.png') %}
 		{% set card_landing_url = url_for('landing', object_type=object_type, object_identifier=object_data.dataset_accession) %}
 		{% set card_colsize = 'col-6' %}
 		{% set image_colsize = 4 %}
-		{% set max_description_length  = 100 %}
+		{% set max_description_length  = 150 %}
 	{% elif object_type == 'tool' %}
 		{% set card_title = object_data.tool_name %}
 		{% set card_identifier = object_data.tool_name %}
@@ -23,8 +21,8 @@
 		{% set card_icon_url = object_data.tool_icon_url %}
 		{% set card_landing_url = url_for('landing', object_type=object_type, object_identifier=object_data.tool_name) %}
 		{% set card_colsize = 'col-6' %}
-		{% set image_colsize = 3 %}
-		{% set max_description_length = 150 %}
+		{% set image_colsize = 4 %}
+		{% set max_description_length = 120 %}
 		{% set doi = object_data.articles[0].doi if object_data.articles|length > 0 else None %}
 	{% elif object_type == 'canned_analysis' %}
 		{% set card_title = object_data.canned_analysis_title %}
@@ -36,7 +34,7 @@
 		{% set card_landing_url = url_for('landing', object_type=object_type, object_identifier=object_data.canned_analysis_accession) %}
 		{% set card_colsize = 'col-6' %}
 		{% set image_colsize = 5 %}
-		{% set max_description_length = 100 %}
+		{% set max_description_length = 120 %}
 	{% endif %}
 
 		<div class="{{ card_colsize }} card-col">
@@ -47,16 +45,28 @@
 					</div>
 					<div class="col-{{ 12-image_colsize }} card-info-col">
 						<a class="card-title" href="{{ card_landing_url }}">{{ card_title }}</a>
-						{% if object_type == 'dataset' or object_type == 'canned_analysis' %} <a href="{{ card_source_url }}" class="card-source">{{ card_source }}</a> {% endif %}
+						<div class="card-source">
+							{% if object_type == 'canned_analysis' %}
+								<a href="{{ url_for('landing', object_type='tool', object_identifier=object_data.tool_name) }}">{{ object_data.tool_name }}</a>
+							{% elif object_type == 'dataset' %}
+								<a href="{{ object_data.repository_homepage_url }}">{{ object_data.repository_name }}</a>
+							{% elif object_type == 'tool' %}
+								<div>{{ 'Published '+object_data.articles[0].date.split('-')[0] if object_data.articles|length > 0 else 'No publication available' }}</div>
+							{% endif %}
+						</div>
+						<!-- {% if object_type == 'dataset' or object_type == 'canned_analysis' %} <a href="{{ card_source_url }}" class="card-source">{{ card_source }}</a> {% endif %} -->
 						<div class="card-description" data-toggle="tooltip" data-placement="right" data-animation="false" data-html="true" data-template='<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner card-description-tooltip"></div></div>' title="{{ card_description if card_description and card_description|length > max_description_length else ''}}">{{ card_description[:max_description_length]+'...' if card_description and card_description|length > max_description_length else card_description }}</div>
 					</div>
 					<div class="card-badges">
+						{% if object_type != 'canned_analysis' and object_data.analyses > 0 %}<div class="analysis-badge" data-container="body" data-toggle="popover" data-placement="right" data-animation="false" data-html="true" data-trigger="hover focus" data-template='<div class="popover analysis-badge-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="This {{ object_type }} has been used to generate <a href='{{ url_for('landing', object_type=object_type, object_identifier=card_identifier) }}#canned_analyses'>{{object_data.analyses}} analys{% if object_data.analyses > 1 %}e{% else %}i{% endif %}s</a>."><i class="fa fa-pie-chart analysis-badge-icon"></i><span class="analysis-badge-number">{{object_data.analyses}}</span></div>{% endif %}
 						<div class="fairness-insignia" data-identifier="{{card_identifier}}" data-object-type="{{object_type}}"></div>
 					</div>
+				</div>
 
-					{% if object_type == 'tool' %}
+				{% if object_type == 'tool' %}
+					<div class="row tool-metrics-row">
 						<div class="col-12">
-							<div class="row tool-metrics">
+							<div class="tool-metrics-wrapper">
 								{% if doi %}
 									{% if object_data.citations %}
 										<div class="pubmed-badge" data-container="body" data-toggle="popover" data-placement="right" data-animation="false" data-html="true" data-trigger="hover focus" data-template='<div class="popover pubmed-badge-popover" role="tooltip"><div class="popover-arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>' data-content="Cited by <a href='https://www.ncbi.nlm.nih.gov/pubmed/?term={{doi.split('doi.org/')[01]}}' target='_blank'>{{object_data.citations}}</a> articles on <a href='https://www.ncbi.nlm.nih.gov/pubmed'>PubMed</a>"><img class="pubmed-icon" src="{{url_for('static_files', path='icons/pubmed.png')}}"><div class="pubmed-badge-number">{{ object_data.citations if object_data.citations < 1000 else (object_data.citations/(1000|float))|float|round(1)|string+'k' }}</div></div>
@@ -68,9 +78,8 @@
 								{% endif %}
 							</div>
 						</div>
-					{% endif %}
-
-				</div>
+					</div>
+				{% endif %}
 			</div>
 		</div>
 

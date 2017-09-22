@@ -122,7 +122,7 @@ var Page = {
 													.append($('<i>', {'class': 'fa fa-chevron-up'}))
 													.append(' Canned Analyses'))))
 										.append($('<div>', {'id': 'collapse-dataset-d2t', 'class': 'panel-collapse collapse in', 'role': 'tabpanel', 'aria-labelledby': 'heading-dataset-d2t'})
-											.html($('<div>', {'class': 'panel-body d2t-landing-wrapper'})
+											.html($('<div>', {'class': 'panel-body d2t-landing-wrapper d2t-datamed'})
 												.html(analysisInterface)))));
 
 			} else if (Page.isGeoSeriesLanding()) {
@@ -257,7 +257,7 @@ var Interfaces = {
 	createLandingInterface: function(apiData, datasetAccession) {
 		
 		// Get tool table
-		$toolTable = $('<table>', {'id': 'd2t-tool-table', 'class': 'd2t-datatable'})
+		$toolTable = $('<table>', {'class': 'd2t-tool-table table-striped'})
 						.append($('<thead>')
 							.html($('<tr>')
 								.append($('<th>').html('Tool'))
@@ -268,14 +268,16 @@ var Interfaces = {
 		$.each(apiData, function(toolName, toolData) {
 			$toolTable.find('tbody')
 				.append($('<tr>')
-					.append($('<td>')
-						.append($('<img>', {'src': 'https://pbs.twimg.com/profile_images/745655614081220610/GA9jRnsf.jpg', 'class': 'd2t-tool-icon'}))
-						.append($('<div>', {'class': 'd2t-tool-table-tool-name'})
-							.html(toolName)))
-					.append($('<td>')
+					.append($('<td>', {'class': 'tool-table-tool-col'})
+						.append($('<div>', {'class': 'd2t-tool-table-tool-col-wrapper'})
+							.append($('<img>', {'src': 'https://pbs.twimg.com/profile_images/745655614081220610/GA9jRnsf.jpg', 'class': 'd2t-tool-icon'}))
+							.append($('<div>', {'class': 'd2t-tool-table-tool-name'})
+								.html(toolName))))
+					.append($('<td>', {'class': 'tool-table-description-col'})
 						.html(toolData['tool_description']))
-					.append($('<td>')
-						.append(toolData['canned_analyses'].length)
+					.append($('<td>', {'class': 'tool-table-number-col'})
+						.append($('<span>')
+							.html(toolData['canned_analyses'].length))
 						.append($('<i>', {'class': 'fa fa-plus-square-o d2t-expand', 'data-tool-name': toolName}))))
 		});
 
@@ -335,7 +337,7 @@ var Interfaces = {
 
 
 		// Return
-		return $('<div>')
+		return $('<div>', {'data-dataset-accession': datasetAccession})
 					.append($toolTable)
 					.append($analysisTables);
 	},
@@ -437,7 +439,7 @@ var eventListener = {
 			toolName = $(evt.target).attr('data-tool-name');
 
 			// Hide and show
-			$('#d2t-tool-table').hide();
+			$('.d2t-tool-table').hide();
 			$('#'+toolName+'-wrapper').show();
 
 		});
@@ -449,7 +451,7 @@ var eventListener = {
 			toolName = $(evt.target).attr('data-tool-name');
 
 			// Hide and show
-			$('#d2t-tool-table').show();
+			$('.d2t-tool-table').show();
 			$('#'+toolName+'-wrapper').hide();
 			$('.d2t-analysis-table-wrapper').hide();
 

@@ -27,6 +27,11 @@
 							</form>
 						</div>
 					</div>
+					<div id="search-example-row" class="row">
+						<div class="col-12">
+							<div>Example: <a href="{{ url_for('search', object_type='canned_analysis', geneset='upregulated', tool_name='GeneMANIA') }}">networks of genes upregulated in prostate cancer</a>, <a href="{{ url_for('search', object_type='dataset', q='diabetes') }}">diabetes datasets</a>, <a href="{{ url_for('search', object_type='tool', q='enrichment', geneset='upregulated') }}">enrichment analysis tools</a></div>
+						</div>
+					</div>
 					<div id="homepage-info-row" class="row">
 						<div class="col-4">
 							<a href="{{url_for('search', object_type='canned_analysis')}}"><i class="fa fa-pie-chart info-row-icon"></i></a>

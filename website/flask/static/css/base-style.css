@@ -26,6 +26,10 @@ html {
 	padding: 7px 0px;
 }
 
+	#navbar .container {
+		width: 800px;
+	}
+
 	#d2t-logo {
 		height: 27px;
 	}
@@ -64,10 +68,14 @@ html {
 			cursor: pointer;
 		}
 
-	.nav-link {
-		margin-right: 15px;
-		font-weight: 500;
+	#navbar .navbar-nav {
+		margin-left: auto;
 	}
+
+		.nav-link {
+			margin-right: 15px;
+			font-weight: 500;
+		}
 
 	#sign-in {
 		background-color: #255FA7;
