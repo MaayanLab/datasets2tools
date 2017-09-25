@@ -69,14 +69,12 @@
 			}
 
 		.d2t-tool-icon-outer-wrapper {
-			display: table;
 			height: 100%;
 			padding-left: 10px;
 		}
 
 			.d2t-tool-icon-inner-wrapper {
-				display: table-cell;
-				vertical-align: middle;
+				display: flex;
 			}
 
 				.d2t-tool-icon {
@@ -87,6 +85,9 @@
 					border-radius: 3px;
 					padding: 1px;
 					cursor: pointer;
+					margin-top: 6px;
+					/*display: table-cell;*/
+					/*vertical-align: middle;*/
 				}
 
 				.d2t-tool-icon-tooltip {
@@ -226,7 +227,7 @@
 				}
 
 		.tool-table-description-col {
-
+			padding-left: 7px !important;
 		}
 
 		.tool-table-number-col {
@@ -306,8 +307,19 @@
 	text-align: left;
 }
 
+	.d2t-gds [data-dataset-accession] {
+		width: 800px;
+		margin: auto;
+		border: 1px solid #c2c2c2;
+		border-radius: 3px;
+	}
+
+	.d2t-gds .dataTables_wrapper {
+		padding: 5px 10px;
+	}
+
 	.d2t-gds table {
-	    width: 55%;
+	    width: 100%;
 		border-spacing: 0px;
 	    border-collapse: collapse;
 	    border: 1px solid #c2c2c2;
@@ -318,6 +330,10 @@
 		    font-size: 9pt;
 		    font-weight: 600;
 		    color: #555;
+		}
+
+		.d2t-gds table td {
+		    font-size: 8pt;
 		}
 
 		/*.d2t-gds .tool-table-tool-col {*/

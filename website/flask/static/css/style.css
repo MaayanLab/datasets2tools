@@ -463,6 +463,10 @@
 									font-weight: 400;
 								}
 
+								.info-card-publication-doi .pubmed-badge-number::before, .pubmed-badge-number::after {
+									display: none;
+								}
+
 							.landing-article-metrics .col-1 {
 								margin-top: auto;
 								margin-bottom: auto;

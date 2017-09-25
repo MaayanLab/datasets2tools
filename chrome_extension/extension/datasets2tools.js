@@ -177,12 +177,12 @@ var Interfaces = {
 		$toolbar = $('<div>', {'class': 'd2t-toolbar'})
 						.append($('<div>', {'class': 'd2t-logo-wrapper'})
 							.html($('<a>', {'href': '#'})
-								.html($('<img>', {'class': 'd2t-logo', 'src': 'https://pbs.twimg.com/profile_images/745655614081220610/GA9jRnsf.jpg'}))))
+								.html($('<img>', {'class': 'd2t-logo', 'src': 'http://amp.pharm.mssm.edu/datasets2tools-dev/static/icons/datasets2tools-blue.png'}))))
 						.append($('<div>', {'class': 'd2t-tool-icon-outer-wrapper'})
 							.html($('<div>', {'class': 'd2t-tool-icon-inner-wrapper'})));
 
 		$.each(apiData, function(toolName, toolData) { $toolbar.find('.d2t-tool-icon-inner-wrapper')
-														.append($('<img>', {'class': 'd2t-tool-icon', 'src': 'https://pbs.twimg.com/profile_images/745655614081220610/GA9jRnsf.jpg', 'data-tool-name': toolName, 'data-toggle': "d2t-tooltip", 'data-placement': "top", 'data-html': "true", 'data-original-title': "<div class='d2t-tool-icon-tooltip'><div class='d2t-tool-icon-tooltip-name'>"+toolName+"</div><div class='d2t-tool-icon-tooltip-count'>"+toolData['canned_analyses'].length+" analyses</div><div class='d2t-tool-icon-tooltip-description'>"+toolData['tool_description']+"</div></div>"}))});
+														.append($('<img>', {'class': 'd2t-tool-icon', 'src': toolData['tool_icon_url'], 'data-tool-name': toolName, 'data-toggle': "d2t-tooltip", 'data-placement': "top", 'data-html': "true", 'data-original-title': "<div class='d2t-tool-icon-tooltip'><div class='d2t-tool-icon-tooltip-name'>"+toolName+"</div><div class='d2t-tool-icon-tooltip-count'>"+toolData['canned_analyses'].length+" analyses</div><div class='d2t-tool-icon-tooltip-description'>"+toolData['tool_description']+"</div></div>"}))});
 
 		// Get tool info
 		$toolinfo = $('<div>', {'class': 'd2t-tool-info-wrapper'})
@@ -192,7 +192,7 @@ var Interfaces = {
 		$.each(apiData, function(toolName, toolData) { $toolinfo.append($('<div>', {'id': datasetAccession+'-'+toolName+'-info', 'class': 'd2t-tool-info'})
 																			.append($('<div>', {'class': 'd2t-tool-icon-outer-wrapper'})
 																				.html($('<div>', {'class': 'd2t-tool-icon-inner-wrapper'})
-																					.html($('<img>', {'class': 'd2t-tool-icon', 'src': 'https://pbs.twimg.com/profile_images/745655614081220610/GA9jRnsf.jpg'}))))
+																					.html($('<img>', {'class': 'd2t-tool-icon', 'src': toolData['tool_icon_url']}))))
 																			.append($('<div>', {'class': 'd2t-tool-info-text-wrapper'})
 																				.append($('<div>', {'class': 'd2t-tool-info-tool-name'})
 																					.html(toolName))
@@ -219,7 +219,7 @@ var Interfaces = {
 						.append($('<tr>')
 							.append($('<td>', {'class': 'd2t-link-col'})
 								.html($('<a>', {'href': analysisData['canned_analysis_url']})
-									.html($('<img>', {'class': 'd2t-link-icon', 'src': 'https://pbs.twimg.com/profile_images/745655614081220610/GA9jRnsf.jpg'}))))
+									.html($('<img>', {'class': 'd2t-link-icon', 'src': toolData['tool_icon_url']}))))
 							.append($('<td>', {'class': 'd2t-description-col'})
 								.html($('<span>', {'data-toggle': "d2t-tooltip", 'data-placement': "top", 'data-html': "true", 'data-original-title': "<div class='d2t-canned-analysis-description-tooltip'>"+analysisData['canned_analysis_description']+""})
 									.html(analysisData['canned_analysis_title'])))
@@ -270,7 +270,7 @@ var Interfaces = {
 				.append($('<tr>')
 					.append($('<td>', {'class': 'tool-table-tool-col'})
 						.append($('<div>', {'class': 'd2t-tool-table-tool-col-wrapper'})
-							.append($('<img>', {'src': 'https://pbs.twimg.com/profile_images/745655614081220610/GA9jRnsf.jpg', 'class': 'd2t-tool-icon'}))
+							.append($('<img>', {'src': toolData['tool_icon_url'], 'class': 'd2t-tool-icon'}))
 							.append($('<div>', {'class': 'd2t-tool-table-tool-name'})
 								.html(toolName))))
 					.append($('<td>', {'class': 'tool-table-description-col'})
@@ -290,7 +290,7 @@ var Interfaces = {
 				.append($('<div>', {'class': 'd2t-landing-go-back'})
 					.html('<< Go Back'))
 				.append($('<div>', {'class': 'd2t-landing-tool-info'})
-				.append($('<img>', {'class': 'd2t-landing-tool-info-icon', 'src': 'https://pbs.twimg.com/profile_images/745655614081220610/GA9jRnsf.jpg'}))
+				.append($('<img>', {'class': 'd2t-landing-tool-info-icon', 'src': toolData['tool_icon_url']}))
 				.append($('<div>', {'class': 'd2t-landing-tool-info-text'})
 					.append($('<div>', {'class': 'd2t-landing-tool-info-title'}).
 						html(toolName))

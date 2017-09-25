@@ -48,11 +48,11 @@ class Datasets2Tools:
 	########## 2. Search
 	#############################################
 
-	def search(self, search_filters, search_options, get_related_objects=False, get_fairness=False, user_id=None):
+	def search(self, search_filters, search_options, get_related_objects=False, get_fairness=False, user_id=None, api=False):
 
 		# Try
 		try:
-			search_results = Search(self.engine, self.session, self.tables, search_filters, search_options, get_related_objects, get_fairness, user_id)
+			search_results = Search(self.engine, self.session, self.tables, search_filters, search_options, get_related_objects, get_fairness, user_id, api)
 			self.session.commit()
 		except:
 			search_results = None
@@ -133,7 +133,7 @@ class Datasets2Tools:
 
 class Search:
 
-	def __init__(self, engine, session, tables, search_filters, search_options, get_related_objects, get_fairness, user_id):
+	def __init__(self, engine, session, tables, search_filters, search_options, get_related_objects, get_fairness, user_id, api):
 
 		# Save query data
 		self.engine, self.session, self.tables, self.object_type, sort_by, offset, page_size = engine, session, tables, search_options['object_type'], search_options['sort_by'], int(search_options['offset']), int(search_options['page_size'] )
@@ -145,7 +145,7 @@ class Search:
 		filtered_ids = object_ids[(offset-1)*page_size:offset*page_size] if page_size and offset else object_ids
 
 		# Get search results
-		self.search_results = [self.get_object_data(object_id = object_id, get_related_objects = get_related_objects, get_fairness = get_fairness, user_id = user_id) for object_id in filtered_ids]
+		self.search_results = [self.get_object_data(object_id = object_id, get_related_objects = get_related_objects, get_fairness = get_fairness, user_id = user_id, api = api) for object_id in filtered_ids]
 		self.search_filters = self.get_search_filters(object_ids = object_ids, used_filters = search_filters.keys())
 		self.search_options = self.get_search_options(count = len(object_ids), sort_by = sort_by, offset = offset, page_size = page_size)
 
@@ -236,7 +236,7 @@ class Search:
 	########## 3. Get Object Data
 	#############################################
 
-	def get_object_data(self, object_id, get_related_objects, get_fairness, user_id):
+	def get_object_data(self, object_id, get_related_objects, get_fairness, user_id, api):
 
 		# Dataset
 		if self.object_type == 'dataset':
@@ -247,6 +247,10 @@ class Search:
 
 			# Add analyses
 			object_data['analyses'] = self.session.query(func.count(self.tables['analysis_to_dataset'].columns['dataset_fk'])).filter(self.tables['analysis_to_dataset'].columns['dataset_fk'] == object_id).all()[0][0]
+
+			# Remove extra
+			if api:
+				object_data = {x: object_data[x] for x in ['dataset_accession', 'dataset_title', 'dataset_description', 'dataset_landing_url', 'repository_name', 'analyses']}
 
 		# Tool
 		elif self.object_type == 'tool':
@@ -274,6 +278,9 @@ class Search:
 			# Add analyses
 			object_data['analyses'] = self.session.query(func.count(self.tables['analysis_to_tool'].columns['tool_fk'])).filter(self.tables['analysis_to_tool'].columns['tool_fk'] == object_id).all()[0][0]
 
+			# Remove extra
+			if api:
+				object_data = {x: object_data[x] for x in ['tool_name', 'tool_title', 'tool_accession', 'publications']}
 
 		# Canned Analysis
 		elif self.object_type == 'canned_analysis':
