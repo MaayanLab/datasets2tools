@@ -515,7 +515,7 @@ class UploadAnalyses:
 
 		# Split datasets and tools
 		for column in ['dataset_accession', 'tool_name']:
-			canned_analysis_dataframe[column] = [x.split(',') for x in canned_analysis_dataframe[column]]
+			canned_analysis_dataframe[column] = [[y.strip() for y in x.split(',')] for x in canned_analysis_dataframe[column]]
 			unstacked_dataframe = canned_analysis_dataframe.set_index('canned_analysis_url')[column].apply(pd.Series).stack().reset_index(level=-1, drop=True).reset_index().rename(columns={0: column})
 			canned_analysis_dataframe = canned_analysis_dataframe.drop(column, axis=1).merge(unstacked_dataframe, on='canned_analysis_url', how='inner')
 

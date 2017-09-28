@@ -41,20 +41,20 @@
 					<a class='help-index-subtitle' href="#contribution"><i class="fa fa-upload"></i>Contribute</a>
 					<hr width="100%" class="my-1">
 					<a class='help-index-section' href="#how-to-contribute">How to contribute</a>
-					<a class='help-index-section' href="#viewing-contributions">Viewing contributions</a>
-					<a class='help-index-section' href="#modifying-contributions">Modifying contributions</a>
+					<!-- <a class='help-index-section' href="#viewing-contributions">Viewing contributions</a> -->
+					<!-- <a class='help-index-section' href="#modifying-contributions">Modifying contributions</a> -->
 				</div>
 				<div class="col-4 help-index-col">
 					<a class='help-index-subtitle' href="#"><i class="fa fa-chrome"></i>Chrome Extension</a>
 					<hr width="100%" class="my-1">
+					<a class='help-index-section' href="#what-does-extension-do">What does the Chrome Extension do?</a>
 					<a class='help-index-section' href="#installing-chrome-extension">Installing the Chrome Extension</a>
-					<a class='help-index-section' href="#installing-chrome-extension">What does the Chrome Extension do?</a>
-					<a class='help-index-section' href="#using-chrome-extension">Using the Chrome Extension</a>
 				</div>
 			</div>
 		</div>
 		<div id="help-content-row" class="row">
 			<div class="col-12">
+				<!-- Getting Started -->
 				<div id="getting-started" class='help-content-title'><i class="fa fa-map"></i>Getting Started<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="100%" class="my-1">
 				<div id="about-datasets2tools" class='help-content-subtitle'>About Datasets2Tools<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
 				<div class="text-center help-image-wrapper"><img src="{{ url_for('static', filename='images/help/datasets2tools-workflow.png') }}"></div>
@@ -97,6 +97,8 @@
 					<li><b>Signature queries</b> to identify small molecules which mimic or reverse gene expression signatures of diseases, small molecule perturbations, gene knockdown experiments. (e.g. <a href="{{ url_for('landing', object_type='canned_analysis', object_identifier='DCA00009676') }}">DCA00009676</a>, <a href="{{ url_for('landing', object_type='canned_analysis', object_identifier='DCA00009677') }}">DCA00009677</a>).</li>
 				</ul>
 				</div>
+
+				<!-- Search -->
 				<div id="search" class='help-content-title'><i class="fa fa-search"></i>Search<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="100%" class="my-1">
 				<div id="analysis-search" class='help-content-subtitle'>Analysis Search<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
 				<div class="text-center help-image-wrapper"><img src="{{ url_for('static', filename='images/help/analysis-search.png') }}" style="margin-bottom: -30px;"></div>
@@ -143,6 +145,8 @@
 						<li>The <b>FAIR Insignia</b>.  More information available <a href="#fairness-insignia">here</a>. </li>
 					</ul>
 				</div>
+
+				<!-- Landing Pages -->
 				<div id="landing-pages" class='help-content-title'><i class="fa fa-info-circle"></i>Landing Pages<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="100%" class="my-1">
 				<div id="analysis-pages" class='help-content-subtitle'>Analysis Pages<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
 				<div class="text-center help-image-wrapper"><img src="{{ url_for('static', filename='images/help/analysis-landing.png') }}" style="margin-bottom: -20px;"></div>
@@ -177,6 +181,8 @@
 						<li>The <b>FAIR Metrics</b> tab, which contains the FAIR evaluation form (more information <a href="#">here</a>). The evaluation form is only available to registered users. </li>
 					</ul>
 				</div>
+
+				<!-- FAIR Evaluations -->
 				<div id="fair-evaluations" class='help-content-title'><i class="fa fa-certificate"></i>FAIR Evaluations<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="100%" class="my-1">
 				<div id="evaluating-objects" class='help-content-subtitle'>FAIR Principles<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
 				<div class="help-content-text">The FAIR Principles are a concise set of high-level principles describing the characteristics that digital objects should possess in order to be findable, accessible, interoperable and reusable.  These principles have been described in the following publication by Wilkinson et al., <a href="https://www.nature.com/articles/sdata201618">https://www.nature.com/articles/sdata201618</a>.</div>
@@ -191,20 +197,22 @@
 				<div class="text-center help-image-wrapper"><img src="{{ url_for('static', filename='images/help/compact-insignia.png') }}" style="margin-bottom: -20px;"></div>
 				<div class="help-content-caption">13. Compact evaluation insignia.</div>
 				<div class="help-content-text">The compact insignia displays a summary of the FAIR evaluations as a round badge.  It represents the number of questions to which the majority of users have answered positively, and ranges from 0 to 9.  It is available on the search results pages of analyses, datasets and tools.  By hovering over the badge, users can visualize the results of evaluations for individual questions.</div>
+				
+				<!-- Contribute -->
 				<div id="contribute" class='help-content-title'><i class="fa fa-upload"></i>Contribute<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="100%" class="my-1">
 				<div id="how-to-contribute" class='help-content-subtitle'>How to contribute<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
 				<div class="help-content-text">Users can contribute to the Datasets2Tools database by uploading their analyses from the <a href="{{ url_for('contribute') }}"> Contribute </a> page.  Contributions are made by uploading an Excel sheet which contains information about canned analyses in each row.  A template of the Excel sheet can be downloaded <a href="{{ url_for('static', filename='forms/analysis_submission_form.xlsx') }}" download>here</a>.</div>
-				<div id="viewing-contributions" class='help-content-subtitle'>Viewing contributions<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
-				<div class="help-content-text">Description</div>
-				<div id="modifying-contributions" class='help-content-subtitle'>Modifying contributions<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
-				<div class="help-content-text">Description</div>
+				
+				<!-- Chrome Extension -->
 				<div id="chrome-extension" class='help-content-title'><i class="fa fa-chrome"></i>Chrome Extension<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="100%" class="my-1">
+				<div id="what-does-extension-do" class='help-content-subtitle'>What does the Chrome Extension do?<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
+				<div class="text-center help-image-wrapper"><img src="{{ url_for('static', filename='images/help/extension-geo-search.png') }}" style="margin-bottom: 0px;"></div>
+				<div class="help-content-caption">13. Screenshot of the Chrome Extension on a GEO Search page (<a href="https://www.ncbi.nlm.nih.gov/gds/?term=Breast+adenocarcinoma+MCF-7+cell+line+response+to+27-Hydroxycholesterol+and+estradiol" target="_blank">link</a>).</div>
+				<div class="help-content-text">The Datasets2Tools Chrome Extension enriches websites of two biomedical data repositores, the Gene Expression Omnibus and DataMed, by adding interfaces containing links to analyses run on the datasets indexed by these resources.  These links are added by the search results and on the dataset landing pages of each dataset for which Datasets2Tools has indexed at least one canned analysis.  This helps users extract information more efficiently when interfacing with these repositories.</div>
 				<div id="installing-chrome-extension" class='help-content-subtitle'>Installing the Chrome Extension<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
 				<div class="text-center help-image-wrapper"><img src="{{ url_for('static', filename='images/help/chrome-web-store.png') }}" style="margin-bottom: -20px;"></div>
-				<div class="help-content-caption">13. Screenshot of the Datasets2Tools page on the Chrome Web Store (<a href="https://chrome.google.com/webstore/detail/datasets2tools/fbamphimpljabaailcaidmeegpcpkdel" target="_blank">link</a>).</div>
-				<div class="help-content-text">Description</div>
-				<div id="using-chrome-extension" class='help-content-subtitle'>Using the Chrome Extension<i class="fa fa-angle-double-up help-navigate-top"></i></div><hr width="35%" align="left" class="my-1">
-				<div class="help-content-text">Description</div>
+				<div class="help-content-caption">14. Screenshot of the Datasets2Tools page on the Chrome Web Store (<a href="https://chrome.google.com/webstore/detail/datasets2tools/fbamphimpljabaailcaidmeegpcpkdel" target="_blank">link</a>).</div>
+				<div class="help-content-text">The Datasets2Tools Chrome Extension can be installed for free on the Chrome Web store at the following link: <a href="https://chrome.google.com/webstore/detail/datasets2tools/fbamphimpljabaailcaidmeegpcpkdel" target="_blank">https://chrome.google.com/webstore/detail/datasets2tools/fbamphimpljabaailcaidmeegpcpkdel</a>.  The extension can be only installed by users of the Google Chrome web browser.</div>
 			</div>
 		</div>
 	</div>
