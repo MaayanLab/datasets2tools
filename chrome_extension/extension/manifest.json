@@ -1,6 +1,6 @@
 {
 	"name": "Datasets2Tools",
-	"version": "1.0",
+	"version": "1.2",
 	"description": "Ma'ayan Lab",
 	
 	"icons":{
@@ -22,6 +22,7 @@
 				"css/font-awesome.css",
 				"css/bootstrap.css",
 				"css/jquery.dataTables.min.css",
+				"css/jquery.dynatable.css",
 				"css/datasets2tools.css"
 			],
 
@@ -29,6 +30,7 @@
 				"js/jquery.js",
 				"js/bootstrap.min.js",
 				"js/jquery.dataTables.min.js",
+				"js/jquery.dynatable.js",
 				"datasets2tools.js"
 			]
 		}

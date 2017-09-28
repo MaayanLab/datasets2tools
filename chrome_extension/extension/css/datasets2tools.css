@@ -6,32 +6,27 @@
     font-style: normal;
 }
 
+.dynatable-active-page {
+	background-color: #f3f4f3;
+}
+
 .tooltip-inner {
 	max-width: 1000px !important;
 }
 
-.d2t-table-wrapper .dataTables_wrapper {
+.d2t-individual-table-wrapper {
 	display: none;
-	padding-top: 0px;
+	padding-top: 5px;
 	padding-bottom: 5px;
-	margin: 0 auto;
 }
 
-	.d2t-table-wrapper .dataTables_length, .d2t-table-wrapper .dataTables_filter, .d2t-landing-wrapper .dataTables_length, .d2t-landing-wrapper .dataTables_filter {
-		display: none;
-	}
+.dynatable-record-count {
+	margin-top: 3px;
+}
 
-	.d2t-table-wrapper .dataTables_info {
-		padding-left: 10px;
-		padding-top: 10px;
-		font-size: 9pt;
-	}
-
-	.d2t-table-wrapper .paginate_button {
-		font-size: 9pt;
-		padding: 0.3em 0.7em !important;
-	}
-
+.dynatable-per-page {
+	margin-left: 10px;
+}
 
 /* Search */
 
@@ -79,6 +74,7 @@
 
 				.d2t-tool-icon {
 					height: 30px;
+					width: 30px;
 					margin-right: 13px;
 					border: 1px solid rgb(208, 209, 213);
 					box-shadow: 0 2px 4px rgba(0,0,0,.1);
@@ -152,6 +148,10 @@
 		display: none;
 	}
 
+		.d2t-datatable {
+			width: 100%;
+		}
+
 			.d2t-datatable th {
 				padding: 5px 7px !important;
 			}
@@ -216,7 +216,7 @@
 				display: table;
 			}
 
-				.d2t-tool-icon {
+				.d2t-landing-wrapper .d2t-tool-icon {
 					display: table-cell;
 					vertical-align: middle;
 				}
@@ -308,10 +308,7 @@
 }
 
 	.d2t-gds [data-dataset-accession] {
-		width: 800px;
-		margin: auto;
-		border: 1px solid #c2c2c2;
-		border-radius: 3px;
+		width: 900px;
 	}
 
 	.d2t-gds .dataTables_wrapper {
@@ -322,7 +319,6 @@
 	    width: 100%;
 		border-spacing: 0px;
 	    border-collapse: collapse;
-	    border: 1px solid #c2c2c2;
 	}
 
 		.d2t-gds table th {
@@ -334,6 +330,28 @@
 
 		.d2t-gds table td {
 		    font-size: 8pt;
+		}
+
+		.d2t-gse {
+		    margin-top: 15px;
+		}
+
+		.d2t-gds .d2t-tool-table .d2t-tool-icon {
+			margin-top: 0px !important;
+		}
+
+		.d2t-gds .d2t-tool-table .tool-table-description-col {
+			padding-left: 15px !important;
+		}
+
+		.d2t-gds .d2t-tool-table .tool-table-number-col {
+			padding-left: 35px !important;
+			padding-right: 35px !important;
+			font-size: 9pt !important;
+		}
+
+		.d2t-gds .d2t-tool-table .tool-table-number-col i {
+			margin-left: 3px;
 		}
 
 		/*.d2t-gds .tool-table-tool-col {*/
@@ -368,5 +386,264 @@
 
 			.d2t-datamed table td {
 				border: none;
-				font-size: 10pt !important;
+				font-size: 9pt !important;
 			}
+
+	.d2t-datamed .d2t-tool-icon {
+		margin-top: 8px;
+	}
+
+.d2t-datamed .d2t-tool-table .d2t-tool-icon {
+    margin-top: 6px;
+    margin-bottom: 6px;
+    height: 35px;
+    width: 35px;
+}
+
+.d2t-datamed .d2t-tool-table .d2t-tool-table-tool-name {
+    font-size: 10pt;
+}
+
+.d2t-datamed .tool-table-description-col {
+    font-size: 10pt !important;
+    padding-left: 15px !important;
+}
+
+.d2t-datamed .tool-table-number-col {
+    font-size: 11pt !important;
+    padding: 0px 30px !important;
+}
+
+.d2t-datamed .tool-table-number-col i {
+    margin-left: 5px;
+}
+
+.d2t-gse.d2t-landing-wrapper th {
+    color: black;
+    padding: 7px;
+}
+
+.d2t-gse.d2t-landing-wrapper .d2t-tool-table {
+    border-collapse: collapse;
+}
+
+
+.d2t-gse.d2t-landing-wrapper .d2t-tool-table th {
+    padding: 3px;
+    color: black;
+}
+
+
+.d2t-gse .d2t-tool-table-tool-name {
+    font-size: 9pt;
+}
+
+.d2t-gse .tool-table-number-col {
+    font-size: 9pt !important;
+    padding-left: 35px !important;
+    padding-right: 35px !important;
+}
+
+
+.d2t-gse .tool-table-number-col i {
+    font-size: 10pt !important;
+}
+
+.d2t-gse .d2t-tool-table tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+.d2t-gse .d2t-tool-table th {
+    text-align: center;
+}
+
+.d2t-gse.d2t-landing-wrapper {
+    width: 100% !important;
+}
+
+.d2t-landing-tool-info-icon {
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    border: 1px solid #c2c2c2;
+	border-radius: .2rem;
+	padding: 3px;
+}
+
+.d2t-landing-tool-info {
+    margin-top: -5px;
+}
+
+.d2t-landing-tool-info-title {
+    margin-bottom: 7px;
+    font-size: 10pt;
+}
+
+
+.d2t-datamed .d2t-landing-tool-info-icon {
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    border: 1px solid #c2c2c2;
+	border-radius: .2rem;
+	padding: 3px;
+	height: 50px;
+}
+
+.d2t-datamed .d2t-landing-tool-info {
+    margin-top: -5px;
+}
+
+.d2t-datamed .d2t-landing-tool-info-title {
+    margin-bottom: 5px;
+    font-size: 11pt;
+}
+
+.dynatable-sort-header {
+	color: black !important;
+}
+
+.d2t-datamed.d2t-landing-wrapper .d2t-link-icon {
+	height: 25px;
+}
+
+
+
+
+.d2t-datamed.d2t-landing-wrapper .d2t-link-icon {
+	height: 30px;
+    padding: 3px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	box-shadow: 0 2px 4px rgba(0,0,0,.1);
+	border: 1px solid #c2c2c2;
+	border-radius: 2px;
+}
+
+.dynatable-search {
+    margin-right: 10px;
+}
+
+.dynatable-record-count {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+
+.d2t-datamed.d2t-landing-wrapper .d2t-link-icon {
+	height: 30px;
+    padding: 3px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	box-shadow: 0 2px 4px rgba(0,0,0,.1);
+	border: 1px solid #c2c2c2;
+	border-radius: 2px;
+}
+
+.dynatable-search {
+    margin-right: 10px;
+}
+
+.dynatable-record-count {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.d2t-datamed.d2t-landing-wrapper .d2t-analysis-title {
+    font-size: 10pt;
+}
+
+.d2t-datamed.d2t-landing-wrapper .d2t-metadata-icon {
+    font-size: 13pt;
+}
+
+.d2t-datamed.d2t-landing-wrapper .d2t-canned-analysis-description-tooltip {
+    font-size: 10pt;
+}
+
+
+.d2t-gds.d2t-landing-wrapper .d2t-link-icon {
+	height: 20px;
+	padding: 2px;
+	margin-top: 7px;
+	margin-bottom: 7px;
+	box-shadow: 0 2px 4px rgba(0,0,0,.1);
+	border: 1px solid #c2c2c2;
+	border-radius: 2px;
+}
+
+.d2t-gds.d2t-landing-wrapper .d2t-analysis-title {
+	font-size: 9pt;
+}
+
+.d2t-gds.d2t-landing-wrapper .d2t-metadata-icon {
+    font-size: 11pt;
+}
+
+.d2t-gds.d2t-landing-wrapper .d2t-canned-analysis-description-tooltip {
+    font-size: 10pt;
+}
+
+.d2t-gse.d2t-landing-wrapper .d2t-link-icon {
+    height: 25px;
+    padding: 2px;
+    border: 1px solid #c2c2c2;
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    border-radius: 2px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.d2t-gse.d2t-landing-wrapper table td {
+	/*text-align: center;*/
+}
+
+.d2t-gse.d2t-landing-wrapper .d2t-analysis-title {
+	font-size: 9pt;
+	text-align: center;
+}
+
+.d2t-gse.d2t-landing-wrapper .d2t-metadata-icon {
+    font-size: 11pt;
+}
+
+.d2t-gse.d2t-landing-wrapper .d2t-canned-analysis-description-tooltip {
+    font-size: 10pt;
+}
+
+.d2t-gse .dynatable-search input {
+	background-color: white;
+}
+
+
+.d2t-datamed .d2t-table-wrapper .d2t-link-icon {
+  height: 25px;
+  padding: 1px;
+  border: 1px solid #c2c2c2;
+  border-radius: 2px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.d2t-datamed .d2t-table-wrapper .d2t-metadata-icon {
+    font-size: 12pt;
+}
+
+.d2t-geo .d2t-datatable, .d2t-geo .dynatable-pagination-links {
+	margin: 0px;
+}
+
+.d2t-geo .d2t-datatable {
+	margin-bottom: 5px;
+}
+
+
+.d2t-geo .d2t-table-wrapper .d2t-link-icon {
+  height: 20px;
+  padding: 1px;
+  border: 1px solid #c2c2c2;
+  border-radius: 2px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+
+.d2t-geo .d2t-table-wrapper .d2t-analysis-title {
+  padding: 5px 10px;
+}

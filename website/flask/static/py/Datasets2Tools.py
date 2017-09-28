@@ -170,7 +170,7 @@ class Search:
 		if 'q' in search_filters.keys():
 			q = '%'+search_filters.pop('q')+'%'
 			if self.object_type == 'dataset':
-				query = query.filter(or_(self.tables['dataset'].columns['dataset_accession'].like(q), self.tables['dataset'].columns['dataset_title'].like(q))) #, self.tables['dataset'].columns['dataset_description'].like(q)
+				query = query.filter(or_(self.tables['dataset'].columns['dataset_accession'].like(q), self.tables['dataset'].columns['dataset_title'].like(q)), self.tables['dataset'].columns['dataset_description'].like(q))
 			elif self.object_type == 'tool':
 				query = query.filter(or_(self.tables['tool'].columns['tool_name'].like(q), self.tables['tool'].columns['tool_description'].like(q), self.tables['article'].columns['article_title'].like(q), self.tables['article'].columns['authors'].like(q), self.tables['article'].columns['abstract'].like(q)))
 			elif self.object_type == 'canned_analysis':
@@ -280,7 +280,11 @@ class Search:
 
 			# Remove extra
 			if api:
-				object_data = {x: object_data[x] for x in ['tool_name', 'tool_title', 'tool_accession', 'publications']}
+				# Get article data
+				article_query = self.session.query(self.tables['article'].columns['doi']).filter(self.tables['article'].columns['tool_fk'] == object_id).all()
+				object_data['articles'] = [x[0] for x in article_query]
+
+				object_data = {x: object_data[x] for x in ['tool_name', 'tool_description', 'tool_accession', 'articles', 'analyses']}
 
 		# Canned Analysis
 		elif self.object_type == 'canned_analysis':
@@ -295,16 +299,25 @@ class Search:
 			object_data['metadata'] = metadata_dataframe.set_index('term_name').to_dict()['value'] if 'term_name' in metadata_dataframe.columns else {}
 			object_data['date'] = '{:%B %d, %Y}'.format(object_data['date'])
 
+			# Get associated objects
+			object_data['datasets'] = [x[0] for x in self.session.query(self.tables['dataset'].columns['dataset_accession']).join(self.tables['analysis_to_dataset']).filter(self.tables['analysis_to_dataset'].columns['canned_analysis_fk'] == object_id).all()]
+			object_data['tools'] = [x[0] for x in self.session.query(self.tables['tool'].columns['tool_name']).join(self.tables['analysis_to_tool']).filter(self.tables['analysis_to_tool'].columns['canned_analysis_fk'] == object_id).all()]
+
+			# Remove extra
+			if api:
+				object_data = {x: object_data[x] for x in ['canned_analysis_accession', 'canned_analysis_title', 'canned_analysis_url', 'canned_analysis_description', 'metadata', 'date', 'datasets', 'tools']}
+
+
 		# Keywords
-		keyword_query = self.session.query(self.tables[self.object_type+'_keyword'].columns['keyword']).filter(self.tables[self.object_type+'_keyword'].columns[self.object_type+'_fk'] == object_id).all()
-		object_data['keywords'] = [x[0] for x in keyword_query]
+		# keyword_query = self.session.query(self.tables[self.object_type+'_keyword'].columns['keyword']).filter(self.tables[self.object_type+'_keyword'].columns[self.object_type+'_fk'] == object_id).all()
+		# object_data['keywords'] = [x[0] for x in keyword_query]
 
 		# Get related objects
 		if get_related_objects:
 
 			# Perform related object query
 			related_object_query = self.session.query(self.tables['related_'+self.object_type].columns['_'.join(['target', self.object_type,'fk'])]).filter(self.tables['related_'+self.object_type].columns['_'.join(['source', self.object_type,'fk'])] == object_id)
-			object_data['related_objects'] = [self.get_object_data(x[0], get_related_objects=False, get_fairness=False, user_id=None) for x in related_object_query.all()]
+			object_data['related_objects'] = [self.get_object_data(x[0], get_related_objects=False, get_fairness=False, user_id=None, api=False) for x in related_object_query.all()]
 
 		# Get FAIRness
 		if get_fairness:
@@ -338,7 +351,8 @@ class Search:
 			object_data['fairness']['evaluations'] = nr_evaluations
 
 		# Add ID
-		object_data['id'] = object_id
+		if not api:
+			object_data['id'] = object_id
 
 		# Return
 		return object_data
@@ -485,10 +499,19 @@ class UploadAnalyses:
 	def read_analysis_file(self, uploaded_file):
 
 		# Read table
-		canned_analysis_dataframe = pd.read_table(uploaded_file)
+		canned_analysis_dataframe = pd.read_excel(uploaded_file)
+		print canned_analysis_dataframe
+
+		# Fix columns
+		rename_dict = {'Analysis Title': 'canned_analysis_title', 'Analysis Description': 'canned_analysis_description', 'Analysis URL': 'canned_analysis_url', 'Datasets': 'dataset_accession', 'Tools': 'tool_name', 'Keywords': 'keywords', 'Metadata': 'metadata', 'Preview URL': 'canned_analysis_preview_url'}
+		canned_analysis_dataframe.columns = canned_analysis_dataframe.loc[0]
+		canned_analysis_dataframe = canned_analysis_dataframe.drop(0).rename(columns=rename_dict)[rename_dict.values()].fillna('')
+		
+		# Read keywords
+		canned_analysis_dataframe['keywords'] = [x.split('\n') for x in canned_analysis_dataframe['keywords']]
 
 		# Read metadata
-		canned_analysis_dataframe['metadata'] = [json.loads(x) for x in canned_analysis_dataframe['metadata']]		
+		canned_analysis_dataframe['metadata'] = [{y.split(':')[0]: y.split(':')[1] for y in x.split('\n')} if len(x) else {} for x in canned_analysis_dataframe['metadata']]
 
 		# Split datasets and tools
 		for column in ['dataset_accession', 'tool_name']:

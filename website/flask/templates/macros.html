@@ -9,7 +9,7 @@
 		{% set card_title = object_data.dataset_accession %}
 		{% set card_identifier = object_data.dataset_accession %}
 		{% set card_description = object_data.dataset_title %}
-		{% set card_icon_url = url_for('static', filename='icons/gene.png') %}
+		{% set card_icon_url = url_for('static', filename='icons/'+object_data.dataset_type+'.png') if object_data.dataset_type else url_for('static', filename='icons/dataset.png') %}
 		{% set card_landing_url = url_for('landing', object_type=object_type, object_identifier=object_data.dataset_accession) %}
 		{% set card_colsize = 'col-6' %}
 		{% set image_colsize = 4 %}

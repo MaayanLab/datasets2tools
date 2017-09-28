@@ -26,9 +26,10 @@ CREATE TABLE dataset (
 	`repository_fk` INT DEFAULT 3,
 	`dataset_accession` VARCHAR(30) UNIQUE NOT NULL,
 	`internal_dataset_accession` CHAR(11) GENERATED ALWAYS AS(CONCAT('DDS', LPAD(id, 8, 0))),
-	`dataset_title` VARCHAR(255),
+	`dataset_title` TEXT,
 	`dataset_description` TEXT,
 	`dataset_landing_url` TEXT,
+	`dataset_type` VARCHAR(50),
 	FOREIGN KEY (repository_fk) REFERENCES repository(id)
 );
 

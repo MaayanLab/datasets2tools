@@ -39,7 +39,7 @@ from Datasets2Tools import Datasets2Tools
 ########## 2. App Setup
 #############################################
 ##### 1. Flask App #####
-entry_point = '/datasets2tools-dev'
+entry_point = '/datasets2tools'
 app = Flask(__name__, static_url_path=os.path.join(entry_point, 'static'))
 dropzone = Dropzone(app)
 
@@ -325,7 +325,7 @@ def search_api():
 	search_options = {x: search_filters.pop(x, default_search_options[x]) for x in default_search_options.keys()}
 
 	# Perform search
-	results = Datasets2Tools.search(search_filters = search_filters, search_options = search_options)
+	results = Datasets2Tools.search(search_filters = search_filters, search_options = search_options, api=True)
 
 	# Return
 	return json.dumps(results.search_results)
@@ -340,8 +340,12 @@ def chrome_extension_api():
 	# Get dataset accession
 	dataset_accession = request.args.get('dataset_accession')
 
+	# Get search options
+	search_options = default_search_options.copy()
+	search_options.update({'page_size': 1000})
+
 	# Perform search
-	results = Datasets2Tools.search(search_filters = {'dataset_accession': dataset_accession}, search_options = default_search_options)
+	results = Datasets2Tools.search(search_filters = {'dataset_accession': dataset_accession}, search_options = search_options)
 
 	# Get data
 	if len(results.search_results):

@@ -16,7 +16,7 @@
 		<div id="object-overview" class="row">
 			<div id="object-icon-col" class="{{ 'col-2' if object_type == 'tool' else 'col-3' }}">
 				{% if object_type == 'dataset' %}
-					{% set image_url = url_for('static', filename='icons/gene.png') %}
+					{% set image_url = url_for('static', filename='icons/'+object_data.dataset_type+'.png') if object_data.dataset_type else url_for('static', filename='icons/dataset.png') %}
 				{% elif object_type == 'tool' %}
 					{% set image_url = object_data.tool_icon_url if object_data.tool_icon_url else url_for('static', filename='icons/tool.png') %}
 				{% elif object_type == 'canned_analysis' %}
@@ -39,7 +39,7 @@
 				<div class="row">
 					<div id="object-subtype" class="col-12">
 						{% if object_type == 'dataset' %}
-							Dataset
+							{{object_data.dataset_type.title()}} Dataset
 						{% elif object_type == 'tool' %}
 							Computational Tool
 						{% elif object_type == 'canned_analysis' %}
@@ -52,15 +52,15 @@
 				<div class="row">
 					<div class="col-12">
 						{% if object_type == 'dataset' %}
-							<a href="{{ object_data.dataset_landing_url }}">
+							<a href="{{ object_data.dataset_landing_url }}" target="_blank">
 								<button class="btn">View</button>
 							</a>
 						{% elif object_type == 'tool' %}
-							<a href="{{ object_data.tool_homepage_url }}">
-								<button class="btn">View</button>
+							<a href="{{ object_data.tool_homepage_url }}" target="_blank">
+								<button class="btn">Homepage</button>
 							</a>
 						{% elif object_type == 'canned_analysis' %}
-							<a href="{{ object_data.canned_analysis_url }}">
+							<a href="{{ object_data.canned_analysis_url }}" target="_blank">
 								<button class="btn">View</button>
 							</a>
 						{% endif %}
@@ -399,11 +399,6 @@
 		    });
 		};
 
-		// Switch tab 
-		{% if 'object_type' in request.args.keys() %}
-			{% set tab_id = request.args.get('object_type').replace('is', 'e')+'s' %}
-			$('a[href="#{{tab_id}}"]').click();$('#{{tab_id}} .filter-button').click();
-		{% endif %}
 	</script>
 
 

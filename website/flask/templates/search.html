@@ -111,10 +111,6 @@
 			}
 			$(evt.target).parents('#object-search-form').submit();
 		});
-		// Activate filters
-		{% if request.args.get('object_type') == 'canned_analysis' %}
-			$('.filter-button').click();
-		{% endif %}
 	</script>
 {% endblock %}
 
