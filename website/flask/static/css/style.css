@@ -215,6 +215,10 @@
 		#object-fairness-col {
 			border-left: 1px solid #c2c2c2
 		}
+
+			#object-fairness-wrapper {
+				margin: auto;
+			}
 			
 			#fairness-label {
 				font-size: 9pt;

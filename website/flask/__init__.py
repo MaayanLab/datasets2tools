@@ -267,6 +267,14 @@ def fair():
 def api():
 	return render_template('api.html')
 
+#############################################
+########## 8. ARCHS4 Analysis
+#############################################
+
+@app.route(entry_point+'/analysis/archs4')
+def archs4():
+	return render_template('archs4.html')
+
 #######################################################
 #######################################################
 ########## 3. APIs

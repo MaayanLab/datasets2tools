@@ -160,7 +160,7 @@ class Search:
 
 		# Expand query
 		if self.object_type == 'dataset':
-			query = query.outerjoin(self.tables['analysis_to_dataset']).outerjoin(self.tables['canned_analysis']).outerjoin(self.tables['analysis_to_tool']).outerjoin(self.tables['tool'])
+			query = query.outerjoin(self.tables['analysis_to_dataset']).outerjoin(self.tables['canned_analysis']).outerjoin(self.tables['analysis_to_tool']).outerjoin(self.tables['tool'])#.filter(self.tables['dataset'].columns['repository_fk'] == 2)
 		elif self.object_type == 'tool':
 			query = query.outerjoin(self.tables['analysis_to_tool']).outerjoin(self.tables['canned_analysis']).outerjoin(self.tables['analysis_to_dataset']).outerjoin(self.tables['dataset']).outerjoin(self.tables['article']).filter(self.tables['tool'].columns['display'] == True)
 		elif self.object_type == 'canned_analysis':
@@ -170,7 +170,7 @@ class Search:
 		if 'q' in search_filters.keys():
 			q = '%'+search_filters.pop('q')+'%'
 			if self.object_type == 'dataset':
-				query = query.filter(or_(self.tables['dataset'].columns['dataset_accession'].like(q), self.tables['dataset'].columns['dataset_title'].like(q)), self.tables['dataset'].columns['dataset_description'].like(q))
+				query = query.filter(or_(self.tables['dataset'].columns['dataset_accession'].like(q), self.tables['dataset'].columns['dataset_title'].like(q), self.tables['dataset'].columns['dataset_description'].like(q)))
 			elif self.object_type == 'tool':
 				query = query.filter(or_(self.tables['tool'].columns['tool_name'].like(q), self.tables['tool'].columns['tool_description'].like(q), self.tables['article'].columns['article_title'].like(q), self.tables['article'].columns['authors'].like(q), self.tables['article'].columns['abstract'].like(q)))
 			elif self.object_type == 'canned_analysis':

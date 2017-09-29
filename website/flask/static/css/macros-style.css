@@ -291,15 +291,19 @@
 /*************************/
 /** CANNED ANALYSIS CARDS 
 /*************************/
-/*
+
 .canned_analysis-card {
-	height: 150px;
+	/*height: 150px;*/
 }
 
+	.canned-analysis-card .card-icon {
+		/*height: 30px;*/
+	}
+
 	.canned_analysis-card .card-description {
-		height: 50px;
-		color: #737373;
-	}*/
+		/*height: px;*/
+		/*color: #737373;*/
+	}
 
 /*************************/
 /** FILTERS 

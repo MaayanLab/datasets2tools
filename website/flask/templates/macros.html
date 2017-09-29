@@ -18,7 +18,7 @@
 		{% set card_title = object_data.tool_name %}
 		{% set card_identifier = object_data.tool_name %}
 		{% set card_description = object_data.tool_description %}
-		{% set card_icon_url = object_data.tool_icon_url %}
+		{% set card_icon_url = object_data.tool_icon_url if object_data.tool_icon_url else url_for('static', filename='icons/tool.png') %}
 		{% set card_landing_url = url_for('landing', object_type=object_type, object_identifier=object_data.tool_name) %}
 		{% set card_colsize = 'col-6' %}
 		{% set image_colsize = 4 %}
