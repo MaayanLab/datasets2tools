@@ -1,10 +1,54 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-	<title>ARCHS4</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>ARCHS4</title>
+
+    <link rel="shortcut icon" href="{{ url_for('static', filename='icons/tool_icons/archs4.png') }}"  type="image/x-icon">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='clustergrammer/lib/css/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='clustergrammer/lib/css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='clustergrammer/custom.css') }}">
+
 </head>
+
 <body>
 
+  <div id='container-id-1'>
+      <h1 class='wait_message'>Please wait ...</h1>
+  </div>
+
+
+  <!-- Required JS Libraries -->
+  <script src="{{ url_for('static', filename='clustergrammer/lib/js/d3.js') }}"></script>
+  <script src="{{ url_for('static', filename='clustergrammer/lib/js/jquery-1.11.2.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='clustergrammer/lib/js/underscore-min.js') }}"></script>
+  <script src="{{ url_for('static', filename='clustergrammer/lib/js/bootstrap.min.js') }}"></script>
+
+  <!-- Clustergrammer JS -->
+  <script src="{{ url_for('static', filename='clustergrammer/clustergrammer.js') }}"></script>
+
+  <!-- optional modules -->
+  <script src="{{ url_for('static', filename='clustergrammer/js/Enrichrgram.js') }}"></script>
+  <script src="{{ url_for('static', filename='clustergrammer/js/hzome_functions.js') }}"></script>
+  <script src="{{ url_for('static', filename='clustergrammer/js/send_to_Enrichr.js') }}"></script>
+
+  <!-- make clustergram -->
+  <script src="{{ url_for('static', filename='clustergrammer/js/load_clustergram.js') }}"></script>
+
+  <script type="text/javascript">
+      
+      make_clust('https://s3.amazonaws.com/mssm-seq-series-json/{{request.args.get("q")}}.json');
+
+  </script>
 
 </body>
+
 </html>

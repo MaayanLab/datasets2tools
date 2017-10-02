@@ -319,6 +319,8 @@ def getArticleMetrics(infile, outfile):
 ########## 1. Annotate Datasets
 #############################################
 
+@follows(getRelatedTools)
+
 @originate('results/dataset.txt')
 
 def annotateDatasets(outfile):
@@ -396,6 +398,8 @@ def getRelatedDatasets(infile, outfile):
 #############################################
 ########## 1. Canned Analysis Similarity
 #############################################
+
+@follows(getRelatedDatasets)
 
 @originate('results/related_canned_analysis.txt')
 
