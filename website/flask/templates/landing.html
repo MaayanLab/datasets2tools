@@ -324,7 +324,7 @@
 	<script type="text/javascript">
 		// Tab
 		if (window.location.hash != "") {
-			$('a[href="' + window.location.hash + '"]').click()
+			$('a[href="' + window.location.hash + '"]').click();
 		};
 
 		// FAIR Insignia
@@ -400,6 +400,11 @@
 		        }
 		    });
 		};
+
+		{% if 'object_type' in request.args.keys() %}
+			var object_type = "{{request.args.get('object_type').replace('is', 'e')+'s'}}";
+			$('a[href="#' + object_type + '"]').click();
+		 {% endif %}
 
 	</script>
 
