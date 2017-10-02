@@ -28,7 +28,7 @@ from sqlalchemy.orm import sessionmaker
 
 ##### 2. Python modules #####
 import pandas as pd
-import os, json, random, sys
+import os, json, random, sys, urllib2
 from StringIO import StringIO
 
 ##### 3. Custom modules #####
@@ -274,6 +274,11 @@ def api():
 @app.route(entry_point+'/analysis/archs4')
 def archs4():
 	return render_template('archs4.html')
+
+@app.route(entry_point+'/api/archs4')
+def archs4_api():
+	data = urllib2.urlopen('https://s3.amazonaws.com/mssm-seq-series-json/'+request.args.get("q")+'.json').read()
+	return data
 
 #######################################################
 #######################################################

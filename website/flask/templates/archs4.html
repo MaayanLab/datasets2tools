@@ -45,7 +45,7 @@
 
   <script type="text/javascript">
       
-      make_clust('https://s3.amazonaws.com/mssm-seq-series-json/{{request.args.get("q")}}.json');
+      make_clust(window.location.href.replace('analysis', 'api'));
 
   </script>
 
