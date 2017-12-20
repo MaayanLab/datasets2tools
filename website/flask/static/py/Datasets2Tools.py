@@ -394,6 +394,7 @@ class Search:
 			object_data['id'] = object_id
 
 		# Return
+		print(object_data)
 		return object_data
 
 	#############################################

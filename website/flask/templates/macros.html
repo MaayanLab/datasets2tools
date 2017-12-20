@@ -47,7 +47,9 @@
 						<a class="card-title" href="{{ card_landing_url }}">{{ card_title }}</a>
 						<div class="card-source">
 							{% if object_type == 'canned_analysis' %}
-								<a href="{{ url_for('landing', object_type='tool', object_identifier=object_data.tool_name) }}">{{ object_data.tool_name }}</a>
+								{% for tool in object_data.tools %}
+									<a href="{{ url_for('landing', object_type='tool', object_identifier=tool) }}">{{ tool }}</a>{{ ', ' if loop.index < object_data.tools|length else '' }}
+								{% endfor %}
 							{% elif object_type == 'dataset' %}
 								<a href="{{ object_data.repository_homepage_url }}">{{ object_data.repository_name }}</a>
 							{% elif object_type == 'tool' %}
