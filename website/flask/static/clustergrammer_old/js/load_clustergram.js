@@ -6,9 +6,9 @@ var hzome = ini_hzome();
 
 var about_string = 'Zoom, scroll, and click buttons to interact with the clustergram. <a href="http://amp.pharm.mssm.edu/clustergrammer/help"> <i class="fa fa-question-circle" aria-hidden="true"></i> </a>';
 
-function make_clust(inst_network){
-
-    d3.json(inst_network, function(network_data){
+function make_clust(network){
+  // network = "https://s3.amazonaws.com/mssm-seq-series-json/GSE30017_GPL11154.json";
+    d3.json(network, function(network_data){
 
       // define arguments object
       var args = {

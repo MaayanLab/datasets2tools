@@ -368,6 +368,19 @@
 								word-break: break-all;
 							}
 
+							.info-card-table-metadata-separator {
+								padding: 5px 10px;
+								font-size: 10pt;
+								font-weight: 600;
+								border-top: 1px solid #c2c2c2;
+								border-bottom: 1px solid #c2c2c2;
+								background-color: #f9f9f9;
+							}
+
+								#parameter-info div:nth-child(2) {
+									border-top: none;
+								}
+
 					.keyword {
 						background-color: #255FA7;
 						color: white;

@@ -201,15 +201,29 @@
 				<!-- 						  -->
 				<!-- Canned Analysis Metadata -->
 				<!-- 						  -->
-				{% if object_type == 'canned_analysis' and object_data['metadata']|length > 0 %}
-					<div id="metadata-info" class="info-card">
-						<div class="info-card-title">Metadata</div>
-						<table class="info-card-table">
-							{% for key, value in object_data['metadata'].iteritems() %}
-								<tr><td>{{ key.replace('_', ' ').title() }}</td><td class="info-card-table-metadata-value">{{ value }}</td></tr>
-							{% endfor %}
-						</table>
-					</div> <!-- #metadata-info -->
+				{% if object_type == 'canned_analysis' and object_data['metadata_v2']|length > 0 %}
+					{% if 'general' in object_data['metadata_v2'].keys()  %}
+						<div id="metadata-info" class="info-card">
+							<div class="info-card-title">Metadata</div>
+							<table class="info-card-table">
+								{% for metadata_dict in object_data['metadata_v2'].pop('general') %}
+									<tr><td>{{ metadata_dict['term_display_name'] }}</td><td class="info-card-table-metadata-value">{{ metadata_dict['value'] }}</td></tr>
+								{% endfor %}
+							</table>
+						</div> <!-- #metadata-info -->
+					{% endif %}
+					{% if object_data['metadata_v2']|length > 0 %}
+						{% for key, metadata_dict_list in object_data['metadata_v2'].iteritems() %}
+							<div id="metadata-info" class="info-card">
+								<div class="info-card-title">{{ key }} parameters</div>
+								<table class="info-card-table">
+									{% for metadata_dict in metadata_dict_list %}
+										<tr><td>{{ metadata_dict['term_display_name'] }}</td><td class="info-card-table-metadata-value">{{ metadata_dict['value'] }}</td></tr>
+									{% endfor %}
+								</table>
+							</div> <!-- #metadata-info -->
+						{% endfor %}
+					{% endif %}
 				{% endif %}
 
 				<!-- 				 -->

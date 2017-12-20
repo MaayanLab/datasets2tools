@@ -41,8 +41,8 @@ class Datasets2Tools:
 		
 		# Save engine and tables
 		self.engine = engine
-		self.session = sessionmaker()
 		self.tables = tables
+		self.sessionmaker = sessionmaker
 
 	#############################################
 	########## 2. Search
@@ -50,13 +50,16 @@ class Datasets2Tools:
 
 	def search(self, search_filters, search_options, get_related_objects=False, get_fairness=False, user_id=None, api=False):
 
+		# Create session
+		session = self.sessionmaker()
+
 		# Try
 		try:
-			search_results = Search(self.engine, self.session, self.tables, search_filters, search_options, get_related_objects, get_fairness, user_id, api)
-			self.session.commit()
+			search_results = Search(self.engine, session, self.tables, search_filters, search_options, get_related_objects, get_fairness, user_id, api)
+			session.commit()
 		except:
 			search_results = None
-			self.session.rollback()
+			session.rollback()
 			raise
 
 		# Return
@@ -68,13 +71,16 @@ class Datasets2Tools:
 
 	def upload_analyses(self, analysis_file, user_id):
 
+		# Create session
+		session = self.sessionmaker()
+
 		# Try
 		try:
-			upload_results = UploadAnalyses(self.engine, self.session, self.tables, analysis_file, user_id)
-			self.session.commit()
+			upload_results = UploadAnalyses(self.engine, session, self.tables, analysis_file, user_id)
+			session.commit()
 		except:
 			upload_results = None
-			self.session.rollback()
+			session.rollback()
 			raise
 
 		# Return
@@ -86,12 +92,15 @@ class Datasets2Tools:
 
 	def upload_evaluation(self, evaluation_scores):
 
+		# Create session
+		session = self.sessionmaker()
+
 		# Try
 		try:
 			UploadEvaluation(self.engine, self.tables, evaluation_scores)
-			self.session.commit()
+			session.commit()
 		except:
-			self.session.rollback()
+			session.rollback()
 			raise
 				
 	#############################################
@@ -100,12 +109,15 @@ class Datasets2Tools:
 
 	def update_database(self, file_directory):
 
+		# Create session
+		session = self.sessionmaker()
+
 		# Try
 		try:
-			UpdateDatabase(self.engine, self.session, self.tables, file_directory)
-			self.session.commit()
+			UpdateDatabase(self.engine, session, self.tables, file_directory)
+			session.commit()
 		except:
-			self.session.rollback()
+			session.rollback()
 			raise
 				
 	#############################################
@@ -114,12 +126,33 @@ class Datasets2Tools:
 
 	def get_homepage_data(self):
 
+		# Create session
+		session = self.sessionmaker()
+
 		# Get data
-		homepage_data = {x: int(round(self.session.query(func.count(self.tables[x].columns['id'])).all()[0][0], -2)) for x in ['canned_analysis', 'tool', 'dataset']}
-		self.session.close()
+		homepage_data = {x: int(round(session.query(func.count(self.tables[x].columns['id'])).all()[0][0], -2)) for x in ['canned_analysis', 'tool', 'dataset']}
+		session.close()
 
 		# Return
 		return homepage_data
+				
+	#############################################
+	########## 7. Get Contribute Data
+	#############################################
+
+	def get_contribute_data(self, object_type):
+
+		# Create session
+		session = self.sessionmaker()
+
+		# Get data
+		contribute_question_data = session.query(self.tables['contribute_question']).filter(self.tables['contribute_question'].columns['object_type'] == object_type).all()
+		contribute_questions = [x._asdict() for x in contribute_question_data]
+
+		session.close()
+
+		# Return
+		return contribute_questions
 
 #################################################################
 #################################################################
@@ -294,8 +327,14 @@ class Search:
 			object_data = [x._asdict() for x in canned_analysis_query][0]
 
 			# Perform metadata query
-			canned_analysis_metadata_query = self.session.query(self.tables['canned_analysis_metadata'].columns['value'], self.tables['term'].columns['term_name']).join(self.tables['term']).filter(self.tables['canned_analysis_metadata'].columns['canned_analysis_fk'] == object_id).all()
+			canned_analysis_metadata_query = self.session.query(self.tables['canned_analysis_metadata'].columns['value'], self.tables['tool'].columns['tool_name'], self.tables['term'].columns['term_display_name']).outerjoin(self.tables['term']).outerjoin(self.tables['tool']).filter(self.tables['canned_analysis_metadata'].columns['canned_analysis_fk'] == object_id).all()
 			metadata_dataframe = pd.DataFrame([metadata_query_result._asdict() for metadata_query_result in canned_analysis_metadata_query])
+			print(metadata_dataframe)
+			if 'tool_name' in metadata_dataframe.columns:
+				metadata_dataframe['tool_name'] = ['general' if not x else x for x in metadata_dataframe['tool_name']]
+				object_data['metadata_v2'] = {x:metadata_dataframe[metadata_dataframe['tool_name'] == x].drop('tool_name', axis=1).to_dict(orient='records') for x in metadata_dataframe['tool_name'].unique()}
+			else:
+				object_data['metadata_v2'] = {}
 			object_data['metadata'] = metadata_dataframe.set_index('term_name').to_dict()['value'] if 'term_name' in metadata_dataframe.columns else {}
 			object_data['date'] = '{:%B %d, %Y}'.format(object_data['date'])
 

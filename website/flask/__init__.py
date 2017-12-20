@@ -25,6 +25,7 @@ from sqlalchemy.exc import IntegrityError
 from flask_dropzone import Dropzone
 from sqlalchemy import MetaData
 from sqlalchemy.orm import sessionmaker
+from flask_cors import cross_origin
 
 ##### 2. Python modules #####
 import pandas as pd
@@ -39,7 +40,7 @@ from Datasets2Tools import Datasets2Tools
 ########## 2. App Setup
 #############################################
 ##### 1. Flask App #####
-entry_point = '/datasets2tools'
+entry_point = '/datasets2tools-dev'
 app = Flask(__name__, static_url_path=os.path.join(entry_point, 'static'))
 dropzone = Dropzone(app)
 
@@ -231,7 +232,6 @@ def landing(object_type, object_identifier):
 				associated_search_options.update({x: parameters.pop(x, default_search_options[x]) for x in associated_search_options.keys()})
 				associated_search_filters.update(parameters)
 			associated_objects[associated_object_type] = Datasets2Tools.search(search_filters = associated_search_filters, search_options = associated_search_options, get_related_objects=False, get_fairness=False)
-	print associated_objects
 	# Return template
 	return render_template('landing.html', object_data=object_data, object_type=object_type, associated_objects=associated_objects)
 
@@ -241,7 +241,15 @@ def landing(object_type, object_identifier):
 
 @app.route(entry_point+'/contribute')
 def contribute():
-	return render_template('contribute.html')
+	return render_template('contribute.html', object_type=None)
+
+@app.route(entry_point+'/contribute/<object_type>')
+def contribute_object(object_type):
+	if object_type not in ['dataset', 'tool', 'canned_analysis']:
+		return render_template('404.html'), 404
+	else:
+		contribute_questions = Datasets2Tools.get_contribute_data(object_type=object_type)
+		return render_template('contribute.html', object_type=object_type, contribute_questions=contribute_questions)
 
 #############################################
 ########## 5. Help Page
@@ -278,6 +286,15 @@ def archs4():
 @app.route(entry_point+'/api/archs4')
 def archs4_api():
 	data = urllib2.urlopen('https://s3.amazonaws.com/mssm-seq-series-json/'+request.args.get("q")+'.json').read()
+	data_dict = json.loads(data)
+	for i in range(len(data_dict['views'])):
+		col_nodes = data_dict['views'][i]['nodes']['col_nodes']
+		for j in range(len(col_nodes)):
+			data_dict['views'][i]['nodes']['col_nodes'][j] = {key:value for key, value in data_dict['views'][i]['nodes']['col_nodes'][j].iteritems() if 'cat' not in key}
+
+	for i in range(len(data_dict['col_nodes'])):
+		data_dict['col_nodes'][i] = {key: value for key, value in data_dict['col_nodes'][i].iteritems() if 'cat' not in key}
+	data = json.dumps(data_dict)
 	return data
 
 #######################################################
@@ -328,6 +345,7 @@ def static_files(path):
 ########## 4. Search
 #############################################
 
+@cross_origin()
 @app.route(entry_point+'/api/search', methods=['GET', 'POST'])
 def search_api():
 

@@ -21,7 +21,7 @@
 
 <body>
 
-  <div id='container-id-1'>
+  <div id='container-id-1' style='min-height: 500px; min-width: 500px;'>
       <h1 class='wait_message'>Please wait ...</h1>
   </div>
 
@@ -44,8 +44,13 @@
   <script src="{{ url_for('static', filename='clustergrammer/js/load_clustergram.js') }}"></script>
 
   <script type="text/javascript">
-      
-      make_clust(window.location.href.replace('analysis', 'api'));
+
+    
+      try {
+        make_clust(window.location.href.replace('analysis', 'api'));
+      } catch (err) {
+        alert('asd');
+      }
 
   </script>
 
