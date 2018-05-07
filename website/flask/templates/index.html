@@ -1,5 +1,15 @@
 {% extends "base.html" %}
 
+{% block head %}
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/chosen.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/slick.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/slick-theme.css') }}">
+	
+	<title>Datasets2Tools | Bioinformatics Index</title>
+
+{% endblock %}
+
 {% block content %}
 	<div id="homepage-container" class="container-fluid text-center">
 		<div id="homepage-header-row" class="row" style="background-image: url({{url_for('static', filename='images/header-background.png')}})">
@@ -48,6 +58,12 @@
 							<div class="info-row-title"><span class="info-row-number">{{ homepage_data['tool'] }}</span>+<br>Tools</div>
 							<div class="info-row-text">Find computational tools and databases spanning multiple technologies and disciplines</div>
 						</div>
+					</div>
+					<div id="citation">
+						 Please acknowledge Datasets2Tools in your publications by citing the following reference:
+						 <a href="https://doi.org/10.1038/sdata.2018.23" id="citation-link" class="d-block pt-2" target="_blank">
+							 Torre D, Krawczuk P, Jagodnik KM, Lachmann A, Wang Z, Wang L, Kuleshov MV, Ma'ayan A. Datasets2Tools, repository and search engine for bioinformatics datasets, tools and canned analyses. Sci Data. 2018 Feb 27;5:180023
+						 </a>
 					</div>
 				</div>
 			</div>

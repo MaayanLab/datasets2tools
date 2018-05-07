@@ -4,6 +4,7 @@
 {% block head %}
 
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/chosen.css') }}">
+    <title>{{object_type.split('_')[-1].title()}} Search Results | Datasets2Tools</title>
 
 {% endblock %}
 

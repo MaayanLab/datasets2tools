@@ -6,6 +6,17 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/chosen.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/slick.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/slick-theme.css') }}">
+	
+	<title>
+		{% if object_type == 'dataset' %}
+			{{ object_data.dataset_accession }}
+		{% elif object_type == 'tool' %}
+			{{ object_data.tool_name }}
+		{% elif object_type == 'canned_analysis' %}
+			{{ object_data.canned_analysis_title }}
+		{% endif %}
+		 | Datasets2Tools
+    </title>
 
 {% endblock %}
 
@@ -198,6 +209,21 @@
 					</div> <!-- #publication-info -->
 				{% endif %}
 
+				<!--              -->
+				<!-- Tool Parameters -->
+				<!--              -->
+				{% if object_type == 'tool' and object_data['parameters']|length > 0 %}
+					<div id="parameter-info" class="info-card">
+						<div class="info-card-title">Tool Parameters<span class="info-card-subtitle" style="margin-left: 5px;">(required parameters are marked in <b>bold</b>, optional parameters in <i>italic</i>)</span></div>
+						<table class="info-card-table">
+							{% for parameter in object_data['parameters'] %}
+								<tr><td data-toggle="tooltip" data-placement="top" data-animation="false" data-html="true" title="When uploading canned analyses generated using this tool, specify the parameter as: <i>{{ parameter['term_name'] }}</i>" style="text-decoration: underline; text-decoration-style: dotted; cursor: help; font-weight:{{'600' if parameter['required'] else '300'}};">{{ parameter['term_display_name'] }}</td><td>{{ parameter['term_description'] }}</td></tr>
+							{% endfor %}
+							<!-- {% if object_data['keywords']|length %}<td>Keywords</td><td>{% for keyword in object_data['keywords'] %} <a href="#" class="keyword">{{ keyword }}</a> {% endfor %} </td></tr>{% endif %} -->
+						</table>
+					</div> <!-- #parameter-info -->
+				{% endif %}
+
 				<!-- 						  -->
 				<!-- Canned Analysis Metadata -->
 				<!-- 						  -->
@@ -207,7 +233,7 @@
 							<div class="info-card-title">Metadata</div>
 							<table class="info-card-table">
 								{% for metadata_dict in object_data['metadata_v2'].pop('general') %}
-									<tr><td>{{ metadata_dict['term_display_name'] }}</td><td class="info-card-table-metadata-value">{{ metadata_dict['value'] }}</td></tr>
+									<tr><td data-toggle="tooltip" data-placement="top" data-animation="false" title="{{ metadata_dict['term_description'] }}" style="text-decoration: underline; text-decoration-style: dotted; cursor: help;">{{ metadata_dict['term_display_name'] }}</td><td class="info-card-table-metadata-value">{{ metadata_dict['value'] }}</td></tr>
 								{% endfor %}
 							</table>
 						</div> <!-- #metadata-info -->
@@ -218,7 +244,7 @@
 								<div class="info-card-title">{{ key }} parameters</div>
 								<table class="info-card-table">
 									{% for metadata_dict in metadata_dict_list %}
-										<tr><td>{{ metadata_dict['term_display_name'] }}</td><td class="info-card-table-metadata-value">{{ metadata_dict['value'] }}</td></tr>
+										<tr><td data-toggle="tooltip" data-placement="top" data-animation="false" title="{{ metadata_dict['term_description'] }}" style="text-decoration: underline; text-decoration-style: dotted; cursor: help;">{{ metadata_dict['term_display_name'] }}</td><td class="info-card-table-metadata-value">{{ metadata_dict['value'] }}</td></tr>
 									{% endfor %}
 								</table>
 							</div> <!-- #metadata-info -->
