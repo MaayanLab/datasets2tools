@@ -40,15 +40,16 @@ from Datasets2Tools import Datasets2Tools
 ########## 2. App Setup
 #############################################
 ##### 1. Flask App #####
-entry_point = '/datasets2tools'
+entry_point = os.environ.get('ENTRYPOINT', '/datasets2tools')
 app = Flask(__name__, static_url_path=os.path.join(entry_point, 'static'))
 dropzone = Dropzone(app)
 
 ##### 2. Database connection #####
-# Database Connection Data
-dbFile = '../../db.txt'
-if os.path.exists(dbFile):
-	with open(dbFile) as openfile: os.environ['SQLALCHEMY_DATABASE_URI'], os.environ['SECRET_KEY'] = openfile.readlines()
+app.config['ENTRYPOINT'] = entry_point
+app.config['ORIGIN'] = os.environ.get('ORIGIN', 'https://amp.pharm.mssm.edu')
+app.config['ENRICHR_URL'] = os.environ.get('ENRICHR_URL', app.config['ORIGIN'] + '/Enrichr')
+app.config['HARMONIZOME_URL'] = os.environ.get('HARMONIZOME_URL', app.config['ORIGIN'] + '/Harmonizome')
+app.config['CLUSTERGRAMMER_URL'] = os.environ.get('CLUSTERGRAMMER_URL', app.config['ORIGIN'] + '/clustergrammer')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -164,7 +165,7 @@ def logout():
 
 @app.errorhandler(404)
 def page_not_found(e):
-	return render_template('404.html'), 404
+	return render_template('404.html', config=app.config), 404
 
 #############################################
 ########## 6. Internal Server Found
@@ -172,7 +173,7 @@ def page_not_found(e):
 
 @app.errorhandler(500)
 def internal_server_error(e):
-	return render_template('500.html'), 500
+	return render_template('500.html', config=app.config), 500
 
 #######################################################
 #######################################################
@@ -188,7 +189,7 @@ def internal_server_error(e):
 @app.route(entry_point+'/')
 def index():
 	homepage_data = Datasets2Tools.get_homepage_data()
-	return render_template('index.html', homepage_data=homepage_data)
+	return render_template('index.html', homepage_data=homepage_data, config=app.config)
 
 #############################################
 ########## 2. Search Page
@@ -205,7 +206,7 @@ def search():
 	search_data = Datasets2Tools.search(search_filters = search_filters, search_options = search_options)
 
 	# Return template
-	return render_template('search.html', object_type=search_options['object_type'], search_data=search_data)
+	return render_template('search.html', object_type=search_options['object_type'], search_data=search_data, config=app.config)
 
 #############################################
 ########## 3. Landing Pages
@@ -234,7 +235,7 @@ def landing(object_type, object_identifier):
 				associated_search_filters.update(parameters)
 			associated_objects[associated_object_type] = Datasets2Tools.search(search_filters = associated_search_filters, search_options = associated_search_options, get_related_objects=False, get_fairness=False)
 	# Return template
-	return render_template('landing.html', object_data=object_data, object_type=object_type, associated_objects=associated_objects)
+	return render_template('landing.html', object_data=object_data, object_type=object_type, associated_objects=associated_objects, config=app.config)
 
 #############################################
 ########## 4. Contribute Page
@@ -242,17 +243,17 @@ def landing(object_type, object_identifier):
 
 @app.route(entry_point+'/contribute')
 def contribute():
-	return render_template('contribute.html', contribute_method=None)
+	return render_template('contribute.html', contribute_method=None, config=app.config)
 
 @app.route(entry_point+'/contribute/<contribute_method>')
 def contribute_object(contribute_method):
 	if contribute_method == 'manual':
 		contribute_data = Datasets2Tools.get_contribute_data()
-		return render_template('manual_contribute.html', contribute_data=contribute_data)
+		return render_template('manual_contribute.html', contribute_data=contribute_data, config=app.config)
 	elif contribute_method == 'bulk':
-		return render_template('bulk_contribute.html')
+		return render_template('bulk_contribute.html', config=app.config)
 	else:
-		return render_template('404.html'), 404
+		return render_template('404.html', config=app.config), 404
 		
 @app.route(entry_point+'/api/contribute_parameters', methods=['POST'])
 def contribute_parameters():
@@ -284,7 +285,7 @@ def manual_contribute_api():
 
 @app.route(entry_point+'/help')
 def help():
-	return render_template('help.html')
+	return render_template('help.html', config=app.config)
 
 #############################################
 ########## 6. FAIR Page
@@ -292,7 +293,7 @@ def help():
 
 @app.route(entry_point+'/fair')
 def fair():
-	return render_template('fair.html')
+	return render_template('fair.html', config=app.config)
 
 #############################################
 ########## 7. API Page
@@ -300,7 +301,7 @@ def fair():
 
 @app.route(entry_point+'/api')
 def api():
-	return render_template('api.html')
+	return render_template('api.html', config=app.config)
 
 #############################################
 ########## 8. ARCHS4 Analysis
@@ -308,7 +309,7 @@ def api():
 
 @app.route(entry_point+'/analysis/archs4')
 def archs4():
-	return render_template('archs4.html')
+	return render_template('archs4.html', config=app.config)
 
 @app.route(entry_point+'/api/archs4')
 def archs4_api():

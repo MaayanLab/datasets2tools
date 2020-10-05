@@ -163,7 +163,7 @@ def logout():
 
 @app.errorhandler(404)
 def page_not_found(e):
-	return render_template('404.html'), 404
+	return render_template('404.html', config=app.config), 404
 
 #######################################################
 #######################################################
@@ -177,7 +177,7 @@ def page_not_found(e):
 
 @app.route(entry_point)
 def index():
-	return render_template('index.html')
+	return render_template('index.html', config=app.config)
 
 #############################################
 ########## 2. Search Page
@@ -194,7 +194,7 @@ def search():
 	search_data = Datasets2Tools.search(search_filters = search_filters, search_options = search_options)
 
 	# Return template
-	return render_template('search.html', object_type=search_options['object_type'], search_data=search_data)
+	return render_template('search.html', object_type=search_options['object_type'], search_data=search_data, config=app.config)
 
 #############################################
 ########## 3. Landing Pages
@@ -223,7 +223,7 @@ def landing(object_type, object_identifier):
 				associated_search_filters.update(parameters)
 			associated_objects[associated_object_type] = Datasets2Tools.search(search_filters = associated_search_filters, search_options = associated_search_options, get_related_objects=False, get_fairness=False)
 	# Return template
-	return render_template('landing.html', object_data=object_data, object_type=object_type, associated_objects=associated_objects)
+	return render_template('landing.html', object_data=object_data, object_type=object_type, associated_objects=associated_objects, config=app.config)
 
 #############################################
 ########## 4. Contribute Page
@@ -231,7 +231,7 @@ def landing(object_type, object_identifier):
 
 @app.route(entry_point+'/contribute')
 def contribute():
-	return render_template('contribute.html')
+	return render_template('contribute.html', config=app.config)
 
 #######################################################
 #######################################################

@@ -1,6 +1,6 @@
 $('.fairness-insignia').each(function(i, elem) {
     $.ajax({
-        url: "http://amp.pharm.mssm.edu/datasets2tools-dev/api/fairness_insignia",
+        url: window._config.ORIGIN + window._config.ENTRYPOINT + "/api/fairness_insignia",
         data: {
             object_type: $(elem).attr('data-object-type'),
             object_identifier: $(elem).attr('data-identifier')

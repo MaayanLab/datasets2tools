@@ -248,7 +248,7 @@
         		contentType: "application/x-www-form-urlencoded",
 				dataType: "json",
 				success: function(data) {
-					window.location.replace('http://amp.pharm.mssm.edu/datasets2tools/landing/canned_analysis/'+data['canned_analysis_accession']);
+					window.location.replace('{{ config.ORIGIN }}{{ config.ENTRYPOINT }}/landing/canned_analysis/'+data['canned_analysis_accession']);
 				},
 				error: function() {
 					alert('Sorry, there has been an error.')

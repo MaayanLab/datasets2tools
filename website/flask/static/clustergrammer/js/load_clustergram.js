@@ -4,7 +4,7 @@ Example files
 
 var hzome = ini_hzome();
 
-var about_string = 'Zoom, scroll, and click buttons to interact with the clustergram. <a href="http://amp.pharm.mssm.edu/clustergrammer/help"> <i class="fa fa-question-circle" aria-hidden="true"></i> </a>';
+var about_string = 'Zoom, scroll, and click buttons to interact with the clustergram. <a href="' + window._config.CLUSTERGRAMMER_URL + '/help"> <i class="fa fa-question-circle" aria-hidden="true"></i> </a>';
 
 function make_clust(inst_network){
 
