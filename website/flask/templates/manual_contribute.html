@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block head %}
+
+    <title>Contribute Analyses | Datasets2Tools</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:500" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/chosen.css') }}">
+
+    <style type="text/css">
+
+	    #contribute-container {
+		    font-family: 'Montserrat', sans-serif;
+		}
+
+		#contribute-questions {
+			margin-top: 15px;
+		}
+
+			.contribute-questions-input {
+				width: 90%;
+				margin-top: 5px;
+				margin-bottom: 15px;
+			    font-family: 'Montserrat', sans-serif;
+			    font-weight: 300;
+			    padding: 3px 5px;
+			}
+
+			.chosen-container {
+				margin-top: 5px;
+				margin-bottom: 15px;
+				font-size: 11pt;
+			}
+
+			#parameter-content {
+				margin-top: 15px;
+				margin-bottom: 15px;
+				font-weight: 300;
+			}
+
+				.tool-parameter-div {
+					margin-bottom: 10px;
+				}
+
+					.tool-parameter-div-title {
+						margin-bottom: 7px;
+						margin-top: 5px;
+						font-style: italic;
+						text-decoration: underline;
+					}
+
+				.tool-parameter-input-row {
+				    padding-left: 35px;
+				    font-size: 11pt;
+				}
+
+					.required-parameter {
+						font-weight: 500;
+					}
+
+					.tool-parameter-input-row label {
+						padding-top: 10px;
+					}
+
+					.tool-parameter-input-row input {
+						font-family: 'Montserrat', sans-serif;
+						margin-left: 7px;
+					}
+
+			.metadata-input-row {
+			    padding-left: 35px;
+			    font-size: 11pt;
+			}
+
+				.metadata-input-row select {
+					background: white;
+					font-family: 'Montserrat', sans-serif;
+					font-size: 12pt;
+					padding: 5px 7px;
+					margin-top: 5px;
+				}
+
+					.metadata-input-row select option {
+						background: white;
+						font-family: 'Montserrat', sans-serif;
+						font-size: 12pt;
+						padding: 5px 7px;
+					}
+
+				.metadata-input-row input {
+					background: white;
+					font-family: 'Montserrat', sans-serif;
+					font-size: 12pt;
+					padding: 5px 5px;
+					margin-top: 5px;
+					width: 90%;
+				}
+
+    </style>
+{% endblock %}
+
+{% block content %}
+
+	<div id="contribute-container" class="container">
+		<div class="row">
+			<div class="col-12">
+				<p id="contribute-title">Canned Analysis Submission Form</p>
+				<hr width="100%" align="left" class="my-2">
+				<p id="contribute-text">Use the form below to upload a canned analysis to the Datasets2Tools database.</p>
+					{% if not current_user.is_authenticated %}
+						<p id="contribute-text">(<b>Note: </b>You must be a registered user in order to contribute analyses to the database.)
+							<button id="sign-in" type="button" class="btn" data-toggle="modal" data-target="#login-modal">Sign In</button>
+						</p>
+					{% endif %}
+			</div>
+		</div>
+
+		<div id="contribute-questions">
+			<form id="contribute-form" action="{{ url_for('manual_contribute_api') }}" method="post">
+				{% for question in contribute_data['questions'] %}
+					<div class="row">
+						<div class="col-12">
+							{{ loop.index }}. <span style="font-weight: {{500 if question.required else 300}}">{{ question.question }} ({{ 'required' if question.required else 'optional' }})</span>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-12">
+							{% if question.select_from in ['tools', 'datasets'] %}
+								<select data-placeholder=" " id="{{question.select_from}}-select" class="contribute-select" name="{{ question.select_from }}" multiple style="visibility: hidden;">
+									<option></option>
+									{% for value in contribute_data[question.select_from] %}
+										<option value="{{ value }}">{{ value }}</option>
+									{% endfor %}
+								</select>
+							{% elif question.select_from == 'parameters' %}
+								<input id="parameter-placeholder" type="text" class="contribute-questions-input" placeholder="Please select a tool to visualize required parameters..." disabled>
+								<div id="parameter-content">
+								</div>
+							{% elif question.select_from == 'metadata' %}
+								<div id="metadata-content">
+								</div>
+							{% else %}
+								<input type="text" class="contribute-questions-input" {{ 'required' if question.required else '' }}  name="question_id_{{question.id}}" {{'maxlength=500' if question.id == 33 else ''}} placeholder="{{ question.placeholder if question.placeholder else '' }}">
+							{% endif %}
+						</div>
+					</div>
+				{% endfor %}
+				<input class="btn btn-primary" type="submit" {{'disabled' if not current_user.is_authenticated }} value="Submit">
+			</form>	
+		</div>
+
+	</div>
+
+{% endblock %}
+
+
+{% block footer %}
+	<script src="{{ url_for('static', filename='js/chosen.jquery.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/chosen.proto.min.js') }}"></script>
+
+	<script type="text/javascript">
+		$('.contribute-select').each(function(i, elem){
+			$(elem).chosen({width: '90%', allow_single_deselect: true});
+		});
+
+
+		var addToolParameters = function(tool_name) {
+			$.ajax({
+		        url: '{{ url_for("contribute_parameters") }}',
+		        type: 'post',
+		        data: JSON.stringify({'tool_name': tool_name}),
+        		contentType: "application/json; charset=utf-8",
+				dataType: "json",
+		        success: function(parameters) {
+		        	var parameterDiv = $('<div>', {'data-tool-name': tool_name, 'class': 'tool-parameter-div'})
+								        	.append($('<i>', {'class': 'fa fa-circle'}).css('font-size', '7pt').css('margin-right', '7px'))
+								        	.append($('<span>', {'class': 'tool-parameter-div-title'}).html(tool_name+' Parameters:'));
+		        	if (parameters['parameters'].length > 0) {
+		        		$.each(parameters['parameters'], function(i, val) {
+		        			if (val['required']) {
+		        				label = ' (required)';
+		        				required = true;
+		        				divclass = 'required-parameter';
+		        			} else {
+		        				label = ' (optional)';
+		        				required = false;
+		        				divclass = 'optional-parameter';
+		        			}
+		        			var inputRow = $('<div>', {'class': 'form-group row tool-parameter-input-row '+divclass})
+						        			.append($('<label>')
+						        				.append($('<span>').html(val['term_display_name']+label))
+						        				.append($('<sup>').html(
+						        					$('<i>', {'class': 'fa fa-info-circle', 'data-toggle': 'tooltip', 'data-placement': 'top', 'data-animation': 'false', 'title': val['term_description']}))
+						        						.css('margin-left', '5px')
+						        						.css('font-size', '9pt')))
+						        			.append($('<input>', {'type': 'text', 'required': required, 'name': 'term_id_'+val['id']}));
+		        			parameterDiv.append(inputRow);
+		        		});
+		        	} else {
+		        		parameterDiv.html('');
+		        		parameterDiv
+			        		.append($('<i>', {'class': 'fa fa-circle'}).css('font-size', '7pt').css('margin-right', '7px'))
+			        		.append('No parameters currently indexed for '+tool_name+'.');
+		        	}
+		        	$('#parameter-content').append(parameterDiv);
+		        $('[data-toggle="tooltip"]').tooltip();
+		        }
+			});
+		};
+
+		$('#tools-select').chosen().change(function(evt) {
+			// get selected tools
+			var selected_tools = $('#tools-select').val();
+
+			// remove unselected
+			var existing_divs = $('#parameter-content').children();
+			if (existing_divs.length > 0) {
+				$.each(existing_divs, function(i, elem) {
+					if (selected_tools.indexOf($(elem).attr('data-tool-name')) === -1) {
+						$(elem).remove();
+					}
+				})
+			}
+
+			// loop through selected tools
+			if (selected_tools.length > 0) {
+				$('#parameter-placeholder').hide();
+
+				$.each(selected_tools, function(i, val){
+					// add new div, if it doesn't exist already
+					var tool_parameter_div = $('#parameter-content [data-tool-name="'+val+'"]');
+					if (tool_parameter_div.length > 0) {
+					} else {
+						addToolParameters(val);
+					}
+				})				
+			} else {
+				$('#parameter-placeholder').show();
+			}
+		});
+
+		$('#contribute-form').submit(function(evt) {
+			evt.preventDefault();
+			$.ajax({
+		        url: '{{ url_for("manual_contribute_api") }}',
+		        type: 'post',
+		        data: $('#contribute-form').serialize(),
+        		contentType: "application/x-www-form-urlencoded",
+				dataType: "json",
+				success: function(data) {
+					window.location.replace('http://amp.pharm.mssm.edu/datasets2tools/landing/canned_analysis/'+data['canned_analysis_accession']);
+				},
+				error: function() {
+					alert('Sorry, there has been an error.')
+				}
+			})
+		});
+
+		var addMetadataRow = function() {
+			$.ajax({
+		        url: '{{ url_for("terms_api") }}',
+		        type: 'post',
+        		contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				success: function(data) {
+					var nrRows = $('#metadata-content').children().length;
+					var metadataRow = $('<div>', {'class': 'form-group row metadata-input-row'})
+											.append($('<div>', {'class': 'col-4'}).css('margin-top', 'auto').css('margin-bottom', 'auto')
+												.html($('<select>', {'name': 'metadata-id-'+(nrRows+1)})))
+											.append($('<div>', {'class': 'col-6'})
+												.append($('<input>', {'type': 'text', 'name': 'metadata-value-'+(nrRows+1)}))
+												.append($('<i>', {'class': 'fa fa-plus-circle'}).css('font-size', '15pt').css('margin-left', '15px')));
+					$.each(data, function(i, elem) {
+						if (elem['term_display_name']) {
+							metadataRow.find('select').append($('<option>', {'value': elem['id'], 'placeholder': 'Select term...'}).html(elem['term_display_name']));
+						}
+					})
+					if (nrRows > 0) {
+						$('.fa-plus-circle').last().removeClass('fa-plus-circle').addClass('fa-minus-circle');
+					}
+					$('#metadata-content').append(metadataRow);
+				}
+			})
+		};
+
+		addMetadataRow();
+
+		$(document).on('click', '.fa-plus-circle', function(evt) {
+			addMetadataRow();
+		})
+
+		$(document).on('click', '.fa-minus-circle', function(evt) {
+			$(evt.target).parents('.metadata-input-row').remove();
+		})
+
+	</script>
+{% endblock %}

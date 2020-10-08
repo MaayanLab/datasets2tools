@@ -40,7 +40,7 @@ from Datasets2Tools import Datasets2Tools
 ########## 2. App Setup
 #############################################
 ##### 1. Flask App #####
-entry_point = '/datasets2tools-dev'
+entry_point = '/datasets2tools'
 app = Flask(__name__, static_url_path=os.path.join(entry_point, 'static'))
 dropzone = Dropzone(app)
 
@@ -185,6 +185,7 @@ def internal_server_error(e):
 #############################################
 
 @app.route(entry_point)
+@app.route(entry_point+'/')
 def index():
 	homepage_data = Datasets2Tools.get_homepage_data()
 	return render_template('index.html', homepage_data=homepage_data)
@@ -241,15 +242,41 @@ def landing(object_type, object_identifier):
 
 @app.route(entry_point+'/contribute')
 def contribute():
-	return render_template('contribute.html', object_type=None)
+	return render_template('contribute.html', contribute_method=None)
 
-@app.route(entry_point+'/contribute/<object_type>')
-def contribute_object(object_type):
-	if object_type not in ['dataset', 'tool', 'canned_analysis']:
-		return render_template('404.html'), 404
+@app.route(entry_point+'/contribute/<contribute_method>')
+def contribute_object(contribute_method):
+	if contribute_method == 'manual':
+		contribute_data = Datasets2Tools.get_contribute_data()
+		return render_template('manual_contribute.html', contribute_data=contribute_data)
+	elif contribute_method == 'bulk':
+		return render_template('bulk_contribute.html')
 	else:
-		contribute_questions = Datasets2Tools.get_contribute_data(object_type=object_type)
-		return render_template('contribute.html', object_type=object_type, contribute_questions=contribute_questions)
+		return render_template('404.html'), 404
+		
+@app.route(entry_point+'/api/contribute_parameters', methods=['POST'])
+def contribute_parameters():
+	tool_name = json.loads(request.data)['tool_name']
+	parameters = Datasets2Tools.get_contribute_parameters(tool_name)
+	data = {'tool_name': tool_name, 'parameters': parameters}
+	return json.dumps(data, indent=4)
+				
+@app.route(entry_point+'/api/terms', methods=['POST'])
+def terms_api():
+	parameters = Datasets2Tools.get_terms()
+	return json.dumps(parameters, indent=4)
+		
+@app.route(entry_point+'/api/manual_contribute', methods=['GET', 'POST'])
+def manual_contribute_api():
+
+	# Get data
+	uploaded_analysis_data = dict(request.form)
+
+	# Upload
+	result_data = Datasets2Tools.manual_contribute_analysis(uploaded_analysis_data = uploaded_analysis_data, user_id = current_user.get_id())
+
+	# Return
+	return json.dumps(result_data)
 
 #############################################
 ########## 5. Help Page

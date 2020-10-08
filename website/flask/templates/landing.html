@@ -380,9 +380,9 @@
 		// FAIR Table
 		$('#fairness-table input[type="radio"]').click(function(evt) {
 			if ($(evt.target).val() === "yes-but") {
-				$(evt.target).parents('tr').find('.yes-but-comment').css('visibility', 'visible');
+				// $(evt.target).parents('tr').find('.yes-but-comment').css('visibility', 'visible');
 			} else {
-				$(evt.target).parents('tr').find('.yes-but-comment').css('visibility', 'hidden');
+				// $(evt.target).parents('tr').find('.yes-but-comment').css('visibility', 'hidden');
 			}
 		});
 		$('#fairness-table input[type="radio"][value="yes-but"]:checked').click();

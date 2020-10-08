@@ -3,6 +3,56 @@
 
 {% block head %}
 
+    <title>Contribute Analyses | Datasets2Tools</title>
+
+    <style type="text/css">
+
+    #contribute-container {
+    	font-family: 'Montserrat', sans-serif;
+    }
+    	.contribute-link {
+    		background-color: #255FA7;
+    		color: white !important;
+    		border-radius: 7px;
+    		margin-top: 35px;
+    		text-align: center;
+    	}
+
+    		.contribute-link a {
+    			color: white !important;
+    			text-decoration: none !important;
+    		}
+
+    		.contribute-link .fa {
+    			font-size: 75pt;
+    			padding-top: 35px;
+    			padding-bottom: 35px;
+    		}
+
+    		.contribute-link div {
+    			font-size: 16pt;
+    			font-weight: 200;
+    			padding-bottom: 15px;
+    		}
+
+    		#upload-description-row {
+				font-family: 'Montserrat', sans-serif;
+    		}
+
+    			.upload-title {
+    				text-align: center;
+    				padding-top: 15px;
+    				font-weight: 300;
+    				font-size: 14pt;
+    			}
+
+    			.upload-description {
+    				padding-top: 15px;
+    				font-size: 11pt;
+    				font-weight: 300;
+    				text-align: center;
+    			}
+    </style>
 {% endblock %}
 
 {% block content %}
@@ -10,38 +60,47 @@
 	<div id="contribute-container" class="container">
 		<div class="row">
 			<div class="col-12">
-				<p id="contribute-title">Contribute</p>
+				<p id="contribute-title">
+					Submit your canned analyses to Datasets2Tools
+				</p>
 				<hr width="100%" align="left" class="my-2">
 			</div>
 		</div>
 
 
-		{% if not object_type %}
+		{% if not contribute_method %}
 		<div class="row">
-			<div class="col-4">
-				<a href="{{ url_for('contribute_object', object_type='dataset') }}">Upload Dataset</a>
+			<div class="col-12">
+				This section allows users to contribute their own canned analyses to the Datasets2Tools database.
+				<br><br>
+				To proceed, please select one of the two options below:
 			</div>
-			<div class="col-4">
-				<a href="{{ url_for('contribute_object', object_type='tool') }}">Upload Tool</a>
+		</div>
+		<div class="row">
+			<div class="col-3 offset-2 contribute-link">
+				<a href="{{ url_for('contribute_object', contribute_method='manual') }}">
+					<i class="fa fa-upload"></i>
+				</a>
 			</div>
-			<div class="col-4">
-				<a href="{{ url_for('contribute_object', object_type='canned_analysis') }}">Upload Canned Analysis</a>
+			<div class="col-3 offset-2 contribute-link">
+				<a href="{{ url_for('contribute_object', contribute_method='bulk') }}">
+					<i class="fa fa-table"></i>
+				</a>
+			</div>
+		</div>
+		<div id="upload-description-row" class="row">
+			<div class="col-5 offset-1">
+				<div class="upload-title">Manual Upload</div>
+				<div class="upload-description">Upload individual canned analyses to the database using an interactive, web-based form.</div>
+			</div>
+			<div class="col-5">
+				<div class="upload-title">Bulk Upload</div>
+				<div class="upload-description">Contribute multiple canned analyses by uploading a table.</div>
 			</div>
 		</div>
 		{% else %}
 		<form>
-			{% for question in contribute_questions %}
-				<div class="row">
-					<div class="col-12"> {{ question.question }} ( {{ 'required' if question.required else 'optional' }} )</div>
-				</div>
-				<div class="row">
-					<div class="col-12">
-						<input type="text" name="question-{{ question.id }}" {{ 'required' if question.required }}>
-					</div>
-				</div>
-			{% endfor %}
-			<button type="submit">Submit</button>
-		</form>
+
 		{% endif %}
 
 	</div>

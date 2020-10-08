@@ -140,20 +140,140 @@ class Datasets2Tools:
 	########## 7. Get Contribute Data
 	#############################################
 
-	def get_contribute_data(self, object_type):
+	def get_contribute_data(self, object_type='canned_analysis'):
 
 		# Create session
 		session = self.sessionmaker()
 
+		# Get dict
+		contribute_data = {}
+
 		# Get data
-		contribute_question_data = session.query(self.tables['contribute_question']).filter(self.tables['contribute_question'].columns['object_type'] == object_type).all()
-		contribute_questions = [x._asdict() for x in contribute_question_data]
+		question_data = session.query(self.tables['contribute_question']).filter(self.tables['contribute_question'].columns['id'].in_([28, 29, 30, 31, 32, 33, 45, 46])).all()
+		contribute_data['questions'] = [x._asdict() for x in question_data]
+
+		# Get datasets
+		dataset_data = session.query(self.tables['dataset'].columns['dataset_accession']).all()
+		contribute_data['datasets'] = [x._asdict()['dataset_accession'] for x in dataset_data]
+
+		# Get tools
+		tool_data = session.query(self.tables['tool'].columns['tool_name']).all()
+		contribute_data['tools'] = [x._asdict()['tool_name'] for x in tool_data]
 
 		session.close()
 
 		# Return
-		return contribute_questions
+		return contribute_data
+				
+	#############################################
+	########## 8. Get Contribute Parameters
+	#############################################
 
+	def get_contribute_parameters(self, tool_name):
+
+		# Create session
+		session = self.sessionmaker()
+
+		# Get parameter
+		parameter_data = session.query(self.tables['term']).outerjoin(self.tables['tool']).filter(self.tables['tool'].columns['tool_name'] == tool_name).all()
+		parameters = [x._asdict() for x in parameter_data]
+		if len(parameters):
+			parameters = pd.DataFrame(parameters).sort_values(['required', 'term_display_name'], ascending=False).to_dict(orient='records')
+
+		session.close()
+
+		# Return
+		return parameters
+				
+	#############################################
+	########## 9. Manual Contribute Analysis
+	#############################################
+
+	def manual_contribute_analysis(self, uploaded_analysis_data, user_id):
+
+		# Create session
+		session = self.sessionmaker()
+
+		# Get dataset and tool fks
+		dataset_data = session.query(self.tables['dataset'].columns['id']).filter(self.tables['dataset'].columns['dataset_accession'].in_(uploaded_analysis_data['datasets'])).all()
+		dataset_fks = [int(x._asdict()['id']) for x in dataset_data]
+
+		tool_data = session.query(self.tables['tool'].columns['id']).filter(self.tables['tool'].columns['tool_name'].in_(uploaded_analysis_data['tools'])).all()
+		tool_fks = [int(x._asdict()['id']) for x in tool_data]
+
+		# Get canned analysis data
+		canned_analysis_data = {
+			'canned_analysis_title': uploaded_analysis_data['question_id_31'][0],
+			'canned_analysis_description': uploaded_analysis_data['question_id_33'][0],
+			'canned_analysis_url': uploaded_analysis_data['question_id_30'][0],
+			'canned_analysis_preview_url': uploaded_analysis_data['question_id_45'][0] if uploaded_analysis_data['question_id_45'][0] else 'http://amp.pharm.mssm.edu/datasets2tools/static/icons/analysis.png',
+		}
+
+		# Parameters
+		parameter_data = {int(key.split('_')[-1]): value[0] for key, value in uploaded_analysis_data.iteritems() if 'term_id_' in key}
+
+		# Terms
+		term_data = pd.Series({key: value[0] for key, value in uploaded_analysis_data.iteritems() if 'metadata' in key}).to_frame('input').reset_index()
+		term_data['id'] = [int(x.split('-')[-1]) for x in term_data['index']]
+		term_data['type'] = [x.split('-')[1] for x in term_data['index']]
+		term_data = term_data[term_data['type']=='value'].merge(term_data[term_data['type']=='id'], on='id')[['input_x', 'input_y']].rename(columns={'input_x': 'value', 'input_y': 'term_fk'}).to_dict(orient='records')
+		term_data = {x['term_fk']: x['value'] for x in term_data if x['value']}
+		# Get contribution
+		try:
+			result = self.engine.execute(self.tables['contribution'].insert(), {'user_fk': user_id})
+			print(result.lastrowid)
+
+			# Add contribution
+			canned_analysis_data['contribution_fk'] = result.lastrowid
+
+			# Add canned analysis
+			result = self.engine.execute(self.tables['canned_analysis'].insert(), canned_analysis_data)
+			canned_analysis_id = result.lastrowid
+
+			# Add analysis to tool and dataset
+			self.engine.execute(self.tables['analysis_to_tool'].insert(), [{'canned_analysis_fk': canned_analysis_id, 'tool_fk': tool_fk} for tool_fk in tool_fks])
+			self.engine.execute(self.tables['analysis_to_dataset'].insert(), [{'canned_analysis_fk': canned_analysis_id, 'dataset_fk': dataset_fk} for dataset_fk in dataset_fks])
+
+			# Add parameters
+			self.engine.execute(self.tables['canned_analysis_metadata'].insert(), [{'canned_analysis_fk': canned_analysis_id, 'term_fk': key, 'value': value} for key, value in parameter_data.iteritems()])
+
+			# Add metadata terms
+			self.engine.execute(self.tables['canned_analysis_metadata'].insert(), [{'canned_analysis_fk': canned_analysis_id, 'term_fk': key, 'value': value} for key, value in term_data.iteritems()])
+
+			# get accession
+			session.commit()
+			canned_analysis_accession = session.query(self.tables['canned_analysis'].columns['canned_analysis_accession']).filter(self.tables['canned_analysis'].columns['id'] == result.lastrowid).all()[0][0]
+			duplicate = False
+
+			session.close()
+		except:
+			canned_analysis_accession = session.query(self.tables['canned_analysis'].columns['canned_analysis_accession']).filter(self.tables['canned_analysis'].columns['canned_analysis_url'] == canned_analysis_data['canned_analysis_url']).all()[0][0]
+			duplicate = True
+			session.rollback()
+			session.close()
+
+		# Return
+		data = {'canned_analysis_accession': canned_analysis_accession, 'duplicate': duplicate}
+		return data
+
+	#############################################
+	########## 10. Terms
+	#############################################
+
+	def get_terms(self):
+
+		# Create session
+		session = self.sessionmaker()
+
+		# Get parameter
+		parameter_data = session.query(self.tables['term']).filter(self.tables['term'].columns['tool_fk'] == None).all()
+		parameters = [x._asdict() for x in parameter_data]
+
+		session.close()
+
+		# Return
+		return parameters
+				
 #################################################################
 #################################################################
 ############### 2. Search API ###################################
@@ -311,6 +431,11 @@ class Search:
 			# Add analyses
 			object_data['analyses'] = self.session.query(func.count(self.tables['analysis_to_tool'].columns['tool_fk'])).filter(self.tables['analysis_to_tool'].columns['tool_fk'] == object_id).all()[0][0]
 
+			# Add parameters
+			object_data['parameters'] = [x._asdict() for x in self.session.query(self.tables['term']).filter(self.tables['term'].columns['tool_fk'] == object_id).all()]
+			if len(object_data['parameters']):
+				object_data['parameters'] = pd.DataFrame(object_data['parameters']).sort_values(['required', 'term_display_name'], ascending=False).to_dict(orient='records')
+
 			# Remove extra
 			if api:
 				# Get article data
@@ -327,12 +452,11 @@ class Search:
 			object_data = [x._asdict() for x in canned_analysis_query][0]
 
 			# Perform metadata query
-			canned_analysis_metadata_query = self.session.query(self.tables['canned_analysis_metadata'].columns['value'], self.tables['tool'].columns['tool_name'], self.tables['term'].columns['term_display_name']).outerjoin(self.tables['term']).outerjoin(self.tables['tool']).filter(self.tables['canned_analysis_metadata'].columns['canned_analysis_fk'] == object_id).all()
+			canned_analysis_metadata_query = self.session.query(self.tables['canned_analysis_metadata'].columns['value'], self.tables['tool'].columns['tool_name'], self.tables['term'].columns['term_display_name'], self.tables['term'].columns['required'], self.tables['term'].columns['term_description']).outerjoin(self.tables['term']).outerjoin(self.tables['tool']).filter(self.tables['canned_analysis_metadata'].columns['canned_analysis_fk'] == object_id).all()
 			metadata_dataframe = pd.DataFrame([metadata_query_result._asdict() for metadata_query_result in canned_analysis_metadata_query])
-			print(metadata_dataframe)
 			if 'tool_name' in metadata_dataframe.columns:
 				metadata_dataframe['tool_name'] = ['general' if not x else x for x in metadata_dataframe['tool_name']]
-				object_data['metadata_v2'] = {x:metadata_dataframe[metadata_dataframe['tool_name'] == x].drop('tool_name', axis=1).to_dict(orient='records') for x in metadata_dataframe['tool_name'].unique()}
+				object_data['metadata_v2'] = {x:metadata_dataframe[metadata_dataframe['tool_name'] == x].drop('tool_name', axis=1).sort_values(['required', 'term_display_name']).to_dict(orient='records') for x in metadata_dataframe['tool_name'].unique()}
 			else:
 				object_data['metadata_v2'] = {}
 			object_data['metadata'] = metadata_dataframe.set_index('term_name').to_dict()['value'] if 'term_name' in metadata_dataframe.columns else {}
@@ -394,7 +518,6 @@ class Search:
 			object_data['id'] = object_id
 
 		# Return
-		print(object_data)
 		return object_data
 
 	#############################################
