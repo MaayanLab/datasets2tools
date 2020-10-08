@@ -21,6 +21,7 @@ import json, os
 import pandas as pd
 import numpy as np
 from datetime import datetime
+from flask import current_app
 
 ##### 2. Database modules #####
 from sqlalchemy import or_, and_, func
@@ -206,7 +207,7 @@ class Datasets2Tools:
 			'canned_analysis_title': uploaded_analysis_data['question_id_31'][0],
 			'canned_analysis_description': uploaded_analysis_data['question_id_33'][0],
 			'canned_analysis_url': uploaded_analysis_data['question_id_30'][0],
-			'canned_analysis_preview_url': uploaded_analysis_data['question_id_45'][0] if uploaded_analysis_data['question_id_45'][0] else 'http://amp.pharm.mssm.edu/datasets2tools/static/icons/analysis.png',
+			'canned_analysis_preview_url': uploaded_analysis_data['question_id_45'][0] if uploaded_analysis_data['question_id_45'][0] else (current_app.config['ORIGIN'] + current_app.config['ENTRYPOINT'] + '/static/icons/analysis.png'),
 		}
 
 		# Parameters
